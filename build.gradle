@@ -19,7 +19,11 @@ repositories {
 }
 
 loom {
+	accessWidenerPath = file("src/main/resources/zfastnoise.ct")
 
+	decompilerOptions.named("vineflower") {
+        options.put("mark-corresponding-synthetics", "1")
+    }
 }
 
 dependencies {
