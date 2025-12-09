@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "org.codeberg.zenxarch.example.client.mixin",
+	"package": "org.codeberg.zenxarch.fastnoise.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"ExampleClientMixin"

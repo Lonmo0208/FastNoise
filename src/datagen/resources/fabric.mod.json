@@ -1,13 +1,13 @@
 {
 	"schemaVersion": 1,
-	"id": "example_datagen",
+	"id": "zfastnoise_datagen",
 	"version": "1.0.0",
-	"name": "Example Mod Datagen",
+	"name": "Fast Noise Mod Datagen",
 	"license": "Mozilla Public License 2.0",
 	"environment": "client",
 	"entrypoints": {
 		"fabric-datagen": [
-			"org.codeberg.zenxarch.example.datagen.ExampleModDataGenerator"
+			"org.codeberg.zenxarch.fastnoise.datagen.FastNoiseModDataGenerator"
 		]
 	}
 }

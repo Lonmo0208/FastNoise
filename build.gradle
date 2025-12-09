@@ -22,7 +22,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"example" {
+		"zfastnoise" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -34,7 +34,7 @@ fabricApi {
 	configureDataGeneration {
 		createSourceSet = true
 		client = true
-		modId = "example_datagen"
+		modId = "zfastnoise_datagen"
 	}
 }
 

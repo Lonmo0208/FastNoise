@@ -1,16 +1,17 @@
-package org.codeberg.zenxarch.example.datagen;
+package org.codeberg.zenxarch.fastnoise.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import org.codeberg.zenxarch.example.ExampleMod;
+
+import org.codeberg.zenxarch.fastnoise.FastNoiseMod;
 import org.jetbrains.annotations.Nullable;
 
-public class ExampleModDataGenerator implements DataGeneratorEntrypoint {
+public class FastNoiseModDataGenerator implements DataGeneratorEntrypoint {
   @Override
   public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {}
 
   @Override
   public @Nullable String getEffectiveModId() {
-    return ExampleMod.MOD_ID;
+    return FastNoiseMod.MOD_ID;
   }
 }

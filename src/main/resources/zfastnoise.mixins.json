@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "org.codeberg.zenxarch.example.mixin",
+	"package": "org.codeberg.zenxarch.fastnoise.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ExampleMixin"

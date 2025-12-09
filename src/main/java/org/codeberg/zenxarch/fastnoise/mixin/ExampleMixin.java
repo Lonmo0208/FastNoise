@@ -1,4 +1,4 @@
-package org.codeberg.zenxarch.example.mixin;
+package org.codeberg.zenxarch.fastnoise.mixin;
 
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
