@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "example",
+	"version": "${version}",
+	"name": "Example Mod",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"ZenXArch"
+	],
+	"contact": {
+		"mastodon": "https://mastodon.social/@ZenXArch",
+		"discord": "https://discord.gg/RFSmd7debX",
+		"sources": "https://codeberg.org/ZenXArch/example",
+		"modrinth": "https://modrinth.com/mod/zenxarch-example"
+	},
+	"license": "Mozilla Public License 2.0",
+	"icon": "assets/example/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"org.codeberg.zenxarch.example.ExampleMod"
+		],
+		"client": [
+			"org.codeberg.zenxarch.example.client.ExampleModClient"
+		]
+	},
+	"mixins": [
+		"example.mixins.json",
+		{
+			"config": "example.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
