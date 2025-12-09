@@ -19,23 +19,7 @@ repositories {
 }
 
 loom {
-	splitEnvironmentSourceSets()
 
-	mods {
-		"zfastnoise" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
-
-}
-
-fabricApi {
-	configureDataGeneration {
-		createSourceSet = true
-		client = true
-		modId = "zfastnoise_datagen"
-	}
 }
 
 dependencies {

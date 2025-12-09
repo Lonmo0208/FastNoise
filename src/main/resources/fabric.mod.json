@@ -19,17 +19,10 @@
 	"entrypoints": {
 		"main": [
 			"org.codeberg.zenxarch.fastnoise.FastNoiseMod"
-		],
-		"client": [
-			"org.codeberg.zenxarch.fastnoise.client.FastNoiseClient"
 		]
 	},
 	"mixins": [
-		"zfastnoise.mixins.json",
-		{
-			"config": "zfastnoise.client.mixins.json",
-			"environment": "client"
-		}
+		"zfastnoise.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=${loader_version}",
