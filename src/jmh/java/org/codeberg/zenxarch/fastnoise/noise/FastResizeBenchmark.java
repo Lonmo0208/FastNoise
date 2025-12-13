@@ -8,7 +8,7 @@ public class FastResizeBenchmark {
   @Benchmark
   public void vanilla(ArrayState state, Blackhole hole) {
     for (int i = 0; i < (16 * 16 * 16); i++) {
-      state.packedArray.set(i, (int) ((state.small[i >> 6] >> (i & 0x3F)) & 0x1));
+      state.bigArray.set(i, state.smallArray.get(i));
     }
     hole.consume(state);
   }

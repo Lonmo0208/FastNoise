@@ -11,7 +11,8 @@ import org.openjdk.jmh.annotations.State;
 public class ArrayState {
   long[] small = new long[64];
   long[] big = new long[128];
-  PackedIntegerArray packedArray = new PackedIntegerArray(2, 16 * 16 * 16, big);
+  PackedIntegerArray smallArray = new PackedIntegerArray(1, 16 * 16 * 16, small);
+  PackedIntegerArray bigArray = new PackedIntegerArray(2, 16 * 16 * 16, big);
 
   int seed = 63;
 
