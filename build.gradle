@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
+	id 'me.champeau.jmh' version "${jmh_version}"
 }
 
 version = project.mod_version + "+" + project.minecraft_version
@@ -90,4 +91,14 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+jmh {
+	iterations = 4
+	fork = 2
+	timeOnIteration = '100ms'
+
+	warmup = '50ms'
+	warmupIterations = 2
+	zip64 = true
 }

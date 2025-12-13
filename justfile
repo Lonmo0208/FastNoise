@@ -24,6 +24,9 @@ tidy:
 test:
     ./gradlew test
 
+bench:
+    ./gradlew jmh
+
 stop:
     ./gradlew --stop
 
