@@ -2,6 +2,7 @@ package org.codeberg.zenxarch.fastnoise.noise;
 
 import java.util.Random;
 import net.minecraft.util.collection.PackedIntegerArray;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 
@@ -22,7 +23,7 @@ public class FastResizeTest {
     FastResize.fastResize1to2bits(smallArray.getData(), largeArray.getData());
 
     for (int x = 0; x < (16 * 16 * 16); x++) {
-      assert (smallArray.get(x) == largeArray.get(x));
+      Assertions.assertEquals(smallArray.get(x), largeArray.get(x));
     }
   }
 }
