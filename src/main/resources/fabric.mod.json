@@ -10,8 +10,8 @@
 	"contact": {
 		"mastodon": "https://mastodon.social/@ZenXArch",
 		"discord": "https://discord.gg/RFSmd7debX",
-		"sources": "https://codeberg.org/ZenXArch/example",
-		"modrinth": "https://modrinth.com/mod/zenxarch-example"
+		"sources": "https://codeberg.org/ZenXArch/FastNoise",
+		"modrinth": "https://modrinth.com/mod/zfastnoise"
 	},
 	"license": "Mozilla Public License 2.0",
 	"icon": "assets/zfastnoise/icon.png",
