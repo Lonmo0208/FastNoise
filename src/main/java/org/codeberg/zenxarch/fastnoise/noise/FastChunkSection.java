@@ -38,7 +38,7 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
     var oldStorage = oldData.storage().getData();
     var newStorage = newData.storage().getData();
 
-    if (newBits == 2) fastResize1to2bits(oldStorage, newStorage);
+    if (newBits == 2) FastResize.fastResize1to2bits(oldStorage, newStorage);
     else newData.importFrom(oldData.palette(), oldData.storage());
 
     section.blockStateContainer.data = newData;
@@ -48,16 +48,5 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
 
   public void recalculateCounts() {
     section.calculateCounts();
-  }
-
-  // fast expand bits using mask
-  private void fastResize1to2bits(long[] small, long[] large) {
-    // is 0b010101....
-    long mask = 0x5555_5555_5555_5555L;
-
-    for (int i = 0; i < small.length; i++) {
-      large[(i << 1)] = Long.expand(small[i], mask);
-      large[(i << 1) | 1] = Long.expand(small[i] >> 32, mask);
-    }
   }
 }
