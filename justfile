@@ -21,6 +21,9 @@ tidy:
     # cd nim
     # find -iname "*.nim" | xargs nimpretty
     
+test:
+    ./gradlew test
+
 stop:
     ./gradlew --stop
 

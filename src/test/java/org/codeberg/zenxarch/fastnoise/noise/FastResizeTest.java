@@ -3,13 +3,13 @@ package org.codeberg.zenxarch.fastnoise.noise;
 import java.util.Random;
 import net.minecraft.util.collection.PackedIntegerArray;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 
 public class FastResizeTest {
   @BeforeAll
   static void init() {}
 
-  @Test
+  @RepeatedTest(5)
   void testFastResize1to2bits() {
     var random = new Random();
     var smallArray = new PackedIntegerArray(1, 16 * 16 * 16);
