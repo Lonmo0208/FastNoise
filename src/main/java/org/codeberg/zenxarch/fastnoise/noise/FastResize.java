@@ -1,7 +1,7 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
 public final class FastResize {
-    
+
   // fast expand bits using mask
   public static void fastResize1to2bits(long[] small, long[] large) {
     // is 0b010101....
