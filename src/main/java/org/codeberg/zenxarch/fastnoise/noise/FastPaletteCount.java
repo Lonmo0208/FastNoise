@@ -33,34 +33,9 @@ public final class FastPaletteCount {
     counter.accept(palette.get(1), count);
   }
 
-  private static final long[] fastCountSize4Table = initFastCountSize4Table();
-
-  private static long[] initFastCountSize4Table() {
-    var result = new long[256];
-    final long[] count = {1L, 1L << 16, 1L << 32, 1L << 48};
-
-    for (long i = 0; i < 256; i++) {
-      var ia = i & 0b11;
-      var ib = (i >> 2) & 0b11;
-      var ic = (i >> 4) & 0b11;
-      var id = (i >> 6) & 0b11;
-      result[(int) i] = count[(int) ia] + count[(int) ib] + count[(int) ic] + count[(int) id];
-    }
-
-    return result;
-  }
-
-  private static long fastCountSize4(long ix) {
-    long result = 0;
-    result += fastCountSize4Table[(int) ((ix >> 0) & 0xFF)];
-    result += fastCountSize4Table[(int) ((ix >> 8) & 0xFF)];
-    result += fastCountSize4Table[(int) ((ix >> 16) & 0xFF)];
-    result += fastCountSize4Table[(int) ((ix >> 24) & 0xFF)];
-    result += fastCountSize4Table[(int) ((ix >> 32) & 0xFF)];
-    result += fastCountSize4Table[(int) ((ix >> 40) & 0xFF)];
-    result += fastCountSize4Table[(int) ((ix >> 48) & 0xFF)];
-    result += fastCountSize4Table[(int) ((ix >> 56) & 0xFF)];
-    return result;
+  private static int fastCountSize4(long ix, long mask) {
+    var t = ix ^ mask;
+    return Long.bitCount((t >> 1) & t);
   }
 
   private static <T> void fastCountSize4(
@@ -69,17 +44,31 @@ public final class FastPaletteCount {
       fastCountSizeMoreThan4(counter, palette, storage);
       return;
     }
-    long count = 0;
+
+    final long mask0 = ~0L;
+    final long mask1 = 0x5555_5555_5555_5555L << 1;
+    final long mask2 = 0x5555_5555_5555_5555L;
+    final long mask3 = 0L;
+
+    int count0 = 0;
+    int count1 = 0;
+    int count2 = 0;
+    int count3 = 0;
+
     var size = palette.getSize();
     var data = storage.getData();
+
     for (int i = 0; i < data.length; i++) {
-      count += fastCountSize4(data[i]);
+      count0 += fastCountSize4(i, mask0);
+      count1 += fastCountSize4(i, mask1);
+      count2 += fastCountSize4(i, mask2);
+      count3 += fastCountSize4(i, mask3);
     }
 
-    counter.accept(palette.get(0), (int) (count & 0xFFFF));
-    counter.accept(palette.get(1), (int) ((count >> 16) & 0xFFFF));
-    counter.accept(palette.get(2), (int) ((count >> 32) & 0xFFFF));
-    if (size == 4) counter.accept(palette.get(3), (int) ((count >> 48) & 0xFFFF));
+    if (count0 != 0) counter.accept(palette.get(0), count0);
+    if (count1 != 0) counter.accept(palette.get(1), count1);
+    if (count2 != 0) counter.accept(palette.get(2), count2);
+    if (count3 != 0) if (size == 4) counter.accept(palette.get(3), count3);
   }
 
   private static boolean canUseFastCountSize4(int size) {
