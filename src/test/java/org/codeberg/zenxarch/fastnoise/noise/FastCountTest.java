@@ -17,7 +17,7 @@ import net.minecraft.world.chunk.PalettedContainer.Counter;
 import org.codeberg.zenxarch.fastnoise.mixin.PaletteProviderAccessor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 
 public class FastCountTest {
 
@@ -30,7 +30,7 @@ public class FastCountTest {
     this.paletteProvider = PaletteProvider.forBlockStates(Block.STATE_IDS);
   }
 
-  @Test
+  @RepeatedTest(4)
   private void fastCount2() {
     fastCount(16 * 16 * 16, 1);
     fastCount(16 * 16 * 16, 2);
@@ -39,7 +39,7 @@ public class FastCountTest {
     fastCount(17, 2);
   }
 
-  @Test
+  @RepeatedTest(4)
   private void fastCount4() {
     fastCount(16 * 16 * 16, 3);
     fastCount(16 * 16 * 16, 4);
@@ -48,13 +48,13 @@ public class FastCountTest {
     fastCount(1721, 4);
   }
 
-  @Test
+  @RepeatedTest(4)
   private void fastCount16() {
     fastCount(16 * 16 * 16, 17);
     fastCount(16 * 16 * 16, 32);
   }
 
-  @Test
+  @RepeatedTest(4)
   private void fastCount64() {
     fastCount(16 * 16 * 16, 100);
     fastCount(16 * 16 * 16, 111);
