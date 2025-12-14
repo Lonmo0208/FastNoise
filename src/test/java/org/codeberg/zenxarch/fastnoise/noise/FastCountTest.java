@@ -10,7 +10,6 @@ import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.collection.PackedIntegerArray;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.PaletteProvider;
 import net.minecraft.world.chunk.PaletteResizeListener;
 import net.minecraft.world.chunk.PalettedContainer.Counter;
@@ -21,17 +20,17 @@ import org.junit.jupiter.api.RepeatedTest;
 
 public class FastCountTest {
 
-  private PaletteProvider<BlockState> paletteProvider;
+  private static PaletteProvider<BlockState> paletteProvider;
 
   @BeforeAll
-  public void init() {
+  static void init() {
     SharedConstants.createGameVersion();
     Bootstrap.initialize();
-    this.paletteProvider = PaletteProvider.forBlockStates(Block.STATE_IDS);
+    paletteProvider = PaletteProvider.forBlockStates(Block.STATE_IDS);
   }
 
   @RepeatedTest(4)
-  private void fastCount2() {
+  void fastCount2() {
     fastCount(16 * 16 * 16, 1);
     fastCount(16 * 16 * 16, 2);
 
@@ -40,7 +39,7 @@ public class FastCountTest {
   }
 
   @RepeatedTest(4)
-  private void fastCount4() {
+  void fastCount4() {
     fastCount(16 * 16 * 16, 3);
     fastCount(16 * 16 * 16, 4);
 
@@ -49,20 +48,23 @@ public class FastCountTest {
   }
 
   @RepeatedTest(4)
-  private void fastCount16() {
+  void fastCount16() {
     fastCount(16 * 16 * 16, 17);
     fastCount(16 * 16 * 16, 32);
   }
 
   @RepeatedTest(4)
-  private void fastCount64() {
+  void fastCount64() {
     fastCount(16 * 16 * 16, 100);
     fastCount(16 * 16 * 16, 111);
   }
 
   private void fastCount(int size, int count) {
-    var bits = MathHelper.ceilLog2(count);
-    var paletteType = ((PaletteProviderAccessor) this.paletteProvider).zenxarch$createType(bits);
+    int bits =
+        (count & (count - 1)) == 0
+            ? Integer.numberOfLeadingZeros(count)
+            : 32 - Integer.numberOfTrailingZeros(count);
+    var paletteType = ((PaletteProviderAccessor) paletteProvider).zenxarch$createType(bits);
 
     var storage = new PackedIntegerArray(bits, size);
     var palette = paletteType.createPalette(paletteProvider, List.of());
@@ -89,7 +91,7 @@ public class FastCountTest {
   }
 
   private static class TestCounter implements Counter<BlockState> {
-    private Object2IntMap<BlockState> counts = new Object2IntOpenHashMap<>();
+    private final Object2IntMap<BlockState> counts = new Object2IntOpenHashMap<>();
 
     @Override
     public void accept(BlockState state, int count) {
