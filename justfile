@@ -24,6 +24,9 @@ tidy:
 test:
     ./gradlew test
 
+view_test_results:
+    cd build/reports/tests/test/ && python -m http.server
+
 bench:
     ./gradlew jmh
 
