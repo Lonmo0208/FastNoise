@@ -82,21 +82,37 @@ public class FastCountTest {
     {
       var counts = new Int2IntOpenHashMap();
       storage.forEach(key -> counts.addTo(key, 1));
-      counts
-          .int2IntEntrySet()
-          .forEach(entry -> counter.accept(palette.get(entry.getIntKey()), entry.getIntValue()));
+      for (var entry : counts.int2IntEntrySet())
+        counter.accept(palette.get(entry.getIntKey()), entry.getIntValue());
     }
 
+    counter.onFinishFirstRound();
+
     FastPaletteCount.fastCount(counter, palette, storage);
+
+    counter.onFinishSecondRound();
   }
 
   private static class TestCounter implements Counter<BlockState> {
     private final Object2IntMap<BlockState> counts = new Object2IntOpenHashMap<>();
+    private boolean secondRound = false;
 
     @Override
     public void accept(BlockState state, int count) {
-      if (counts.containsKey(state)) Assertions.assertEquals(counts.apply(state), count);
-      else counts.put(state, count);
+      Assertions.assertNotEquals(count, 0);
+      if (secondRound) {
+        Assertions.assertTrue(counts.containsKey(state));
+        Assertions.assertEquals(counts.getInt(state), count);
+        counts.removeInt(state);
+      } else counts.put(state, count);
+    }
+
+    public void onFinishFirstRound() {
+      secondRound = true;
+    }
+
+    public void onFinishSecondRound() {
+      Assertions.assertTrue(counts.isEmpty());
     }
   }
 }
