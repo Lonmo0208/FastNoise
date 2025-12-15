@@ -41,36 +41,27 @@ public final class FastPaletteCount {
     return Long.bitCount((t >> 1) & t);
   }
 
+  private static final long[] twoBitMasks =
+      new long[] {~0L, ~0x5555_5555_5555_5555L, ~0xAAAA_AAAA_AAAA_AAAAL, ~0xFFFF_FFFF_FFFF_FFFFL};
+
   private static <T> void fastCountSize4(
       Counter<T> counter, Palette<T> palette, PaletteStorage storage) {
-    final long mask0 = ~0L;
-    final long mask1 = 0x5555_5555_5555_5555L << 1;
-    final long mask2 = 0x5555_5555_5555_5555L;
-    final long mask3 = 0L;
-
-    int count0 = 0;
-    int count1 = 0;
-    int count2 = 0;
-    int count3 = 0;
-
+    int[] counts = {0, 0, 0, 0};
     var size = palette.getSize();
     var data = storage.getData();
 
     for (int i = 0; i < data.length; i++) {
-      if (data[i] == 0) {
-        count0 += 32;
-        continue;
+      if (data[i] == 0) counts[0] += 32;
+      else {
+        counts[0] += fastCountSize4(data[i], twoBitMasks[0]);
+        counts[1] += fastCountSize4(data[i], twoBitMasks[1]);
+        if ((data[i] & 0xaaaa_aaaa_aaaa_aaaaL) == 0) continue;
+        counts[2] += fastCountSize4(data[i], twoBitMasks[2]);
+        counts[3] += fastCountSize4(data[i], twoBitMasks[3]);
       }
-      count0 += fastCountSize4(data[i], mask0);
-      count1 += fastCountSize4(data[i], mask1);
-      count2 += fastCountSize4(data[i], mask2);
-      count3 += fastCountSize4(data[i], mask3);
     }
 
-    if (count0 != 0) counter.accept(palette.get(0), count0);
-    if (count1 != 0) counter.accept(palette.get(1), count1);
-    if (count2 != 0) counter.accept(palette.get(2), count2);
-    if (count3 != 0) if (size == 4) counter.accept(palette.get(3), count3);
+    for (int i = 0; i < size; i++) if (counts[i] != 0) counter.accept(palette.get(i), counts[i]);
   }
 
   private static <T> void fastCountSizeMoreThan4(

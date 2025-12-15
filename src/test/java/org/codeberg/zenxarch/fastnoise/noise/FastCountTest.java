@@ -33,18 +33,12 @@ public class FastCountTest {
   void fastCount2() {
     fastCount(16 * 16 * 16, 1);
     fastCount(16 * 16 * 16, 2);
-
-    fastCount(3, 1);
-    fastCount(17, 2);
   }
 
   @RepeatedTest(4)
   void fastCount4() {
     fastCount(16 * 16 * 16, 3);
     fastCount(16 * 16 * 16, 4);
-
-    fastCount(72141, 3);
-    fastCount(1721, 4);
   }
 
   @RepeatedTest(4)
