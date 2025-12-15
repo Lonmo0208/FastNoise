@@ -6,6 +6,9 @@ import net.minecraft.world.chunk.Palette;
 import net.minecraft.world.chunk.PalettedContainer.Counter;
 
 public final class FastPaletteCount {
+  /**
+   * @implNote Assumes storage size i 4096
+   */
   public static <T> void fastCount(Counter<T> counter, Palette<T> palette, PaletteStorage storage) {
     var size = palette.getSize();
     switch (size) {
@@ -40,11 +43,6 @@ public final class FastPaletteCount {
 
   private static <T> void fastCountSize4(
       Counter<T> counter, Palette<T> palette, PaletteStorage storage) {
-    if (!canUseFastCountSize4(storage.getSize())) {
-      fastCountSizeMoreThan4(counter, palette, storage);
-      return;
-    }
-
     final long mask0 = ~0L;
     final long mask1 = 0x5555_5555_5555_5555L << 1;
     final long mask2 = 0x5555_5555_5555_5555L;
@@ -59,21 +57,20 @@ public final class FastPaletteCount {
     var data = storage.getData();
 
     for (int i = 0; i < data.length; i++) {
-      count0 += fastCountSize4(i, mask0);
-      count1 += fastCountSize4(i, mask1);
-      count2 += fastCountSize4(i, mask2);
-      count3 += fastCountSize4(i, mask3);
+      if (data[i] == 0) {
+        count0 += 32;
+        continue;
+      }
+      count0 += fastCountSize4(data[i], mask0);
+      count1 += fastCountSize4(data[i], mask1);
+      count2 += fastCountSize4(data[i], mask2);
+      count3 += fastCountSize4(data[i], mask3);
     }
 
     if (count0 != 0) counter.accept(palette.get(0), count0);
     if (count1 != 0) counter.accept(palette.get(1), count1);
     if (count2 != 0) counter.accept(palette.get(2), count2);
     if (count3 != 0) if (size == 4) counter.accept(palette.get(3), count3);
-  }
-
-  private static boolean canUseFastCountSize4(int size) {
-    if (size > 0x1000000) return false;
-    return (size & 0x1F) == 0;
   }
 
   private static <T> void fastCountSizeMoreThan4(

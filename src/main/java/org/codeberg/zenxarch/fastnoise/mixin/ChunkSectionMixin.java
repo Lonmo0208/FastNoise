@@ -18,7 +18,7 @@ public abstract class ChunkSectionMixin {
           @At(
               value = "INVOKE",
               target =
-                  "Lnet/minecraft/world/chunk/PalettedContainer;count(Lnet/minecraft/world/chunk/PalettedContainer;Counter;)V"))
+                  "Lnet/minecraft/world/chunk/PalettedContainer;count(Lnet/minecraft/world/chunk/PalettedContainer$Counter;)V"))
   private void zenxarch$fastCount(
       PalettedContainer<BlockState> self, Counter<BlockState> counter, Operation<Void> op) {
     FastPaletteCount.fastCount(counter, self.data.palette(), self.data.storage());
