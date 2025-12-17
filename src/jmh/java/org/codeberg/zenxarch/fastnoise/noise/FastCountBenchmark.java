@@ -61,9 +61,8 @@ public class FastCountBenchmark {
     for (int i = 0; i < 4096; i++) storage.set(i, random.nextInt(count));
   }
 
-  @Setup(Level.Iteration)
+  @Setup(Level.Invocation)
   public void fillWithRandomData() {
-    random = new Random(0);
     switch (sizeIdx) {
       case 0:
         fillRandomData(1);

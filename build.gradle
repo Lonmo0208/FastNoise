@@ -96,9 +96,9 @@ publishing {
 jmh {
 	iterations = 4
 	fork = 2
-	timeOnIteration = '100ms'
+	timeOnIteration = '1s'
 
-	warmup = '50ms'
+	warmup = '2s'
 	warmupIterations = 2
 	zip64 = true
 }
