@@ -44,3 +44,4 @@ replay_*.log
 .metals/
 
 logs/
+*.log

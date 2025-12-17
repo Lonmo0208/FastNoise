@@ -98,6 +98,8 @@ jmh {
 	fork = 2
 	timeOnIteration = '1s'
 
+	// jvmArgsAppend = ["-XX:+UnlockDiagnosticVMOptions","-XX:+LogCompilation","-XX:+PrintAssembly"]
+
 	warmup = '2s'
 	warmupIterations = 2
 	zip64 = true
