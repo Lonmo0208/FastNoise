@@ -7,7 +7,7 @@ import net.minecraft.world.chunk.PalettedContainer.Counter;
 
 public final class FastPaletteCount {
   /**
-   * @implNote Assumes storage size i 4096
+   * @implNote Assumes storage size is 4096
    */
   public static <T> void fastCount(Counter<T> counter, Palette<T> palette, PaletteStorage storage) {
     var size = palette.getSize();
