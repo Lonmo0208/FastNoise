@@ -102,5 +102,8 @@ jmh {
 
 	warmup = '2s'
 	warmupIterations = 2
+
+	profilers = ['perf']
+
 	zip64 = true
 }
