@@ -36,5 +36,8 @@ stop:
 clean:
     ./gradlew clean
 
+perf:
+    ./gradlew :perf:runServer
+
 task taskName:
     ./gradlew {{taskName}}
