@@ -76,6 +76,8 @@ public class PerfTest {
     var start = chunk.getSectionIndex(minY);
     var end = chunk.getSectionIndex(cellHeight * shapeConfig.verticalCellBlockCount() - 1 + minY);
 
+    int warmups = 5000;
+    int benchmarks = 25000;
     doBenchmark(
         () -> {
           clearSections(chunk, factory);
@@ -83,8 +85,8 @@ public class PerfTest {
         () -> {
           vanilla(chunkNoiseSampler, settings.value(), chunk, minimumCellY, cellHeight, start, end);
         },
-        5000,
-        25000,
+        warmups,
+        benchmarks,
         "Vanilla");
 
     doBenchmark(
@@ -95,36 +97,36 @@ public class PerfTest {
           optimized(
               chunkNoiseSampler, settings.value(), chunk, minimumCellY, cellHeight, start, end);
         },
-        5000,
-        25000,
+        warmups,
+        benchmarks,
         "Optimized");
   }
 
   private static void doBenchmark(
       Runnable setup, Runnable benchmark, int warmups, int benchmarks, String name) {
+    doBenchmark(setup, benchmark, warmups, "warmups", name);
+    doBenchmark(setup, benchmark, benchmarks, "benchmarks", name);
+  }
+
+  private static void doBenchmark(
+      Runnable setup, Runnable benchmark, int count, String type, String name) {
     var logger = LogUtils.getLogger();
     var time = 0l;
+    var max = Long.MIN_VALUE;
+    var min = Long.MAX_VALUE;
 
-    for (int i = 0; i < warmups; i++) {
+    for (int i = 0; i < count; i++) {
       setup.run();
-      var startTime = Util.getMeasuringTimeMs();
+      var startTime = Util.getMeasuringTimeNano() / 1000;
       benchmark.run();
-      var endTime = Util.getMeasuringTimeMs();
-      time += (endTime - startTime);
+      var endTime = Util.getMeasuringTimeNano() / 1000;
+      var thisTime = (endTime - startTime);
+      max = Long.max(max, thisTime);
+      min = Long.min(min, thisTime);
+      time += thisTime;
     }
-    logger.info("{} {} warmups took {} ms", warmups, name, time);
-    logger.info("Average time: {} ms", (float) time / warmups);
-
-    time = 0l;
-    for (int i = 0; i < benchmarks; i++) {
-      setup.run();
-      var startTime = Util.getMeasuringTimeMs();
-      benchmark.run();
-      var endTime = Util.getMeasuringTimeMs();
-      time += (endTime - startTime);
-    }
-    logger.info("{} {} benchmarks took {} ms", benchmarks, name, time);
-    logger.info("Average time: {} ms", (float) time / benchmarks);
+    logger.info("{} {} {} took {} us", count, name, type, time);
+    logger.info("(Min / Average / Max) time: ({} / {} / {}) us", min, (float) time / count, max);
   }
 
   private static void clearSections(ProtoChunk chunk, PalettesFactory factory) {
