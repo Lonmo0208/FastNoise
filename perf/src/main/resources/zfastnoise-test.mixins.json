@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "org.codeberg.zenxarch.fastnoise.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MainMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
