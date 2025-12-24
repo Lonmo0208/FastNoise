@@ -15,6 +15,7 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OperationsPerInvocation;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -36,7 +37,7 @@ public class FastCountBenchmark {
       };
 
   Palette<Integer> palette;
-  PaletteStorage storage;
+  PaletteStorage[] storage;
   Random random;
 
   @Param(value = {"0", "1", "2", "3", "4", "5", "6", "7"})
@@ -52,16 +53,21 @@ public class FastCountBenchmark {
   @Setup(Level.Iteration)
   public void init() {
     random = new Random(0);
+    fillWithRandomData();
+  }
+
+  private void fillRandomData(int count, int bits, int index) {
+    if (bits == 0) storage[index] = new EmptyPaletteStorage(4096);
+    else storage[index] = new PackedIntegerArray(MathHelper.ceilLog2(count), 4096);
+    for (int i = 0; i < 4096; i++) storage[index].set(i, random.nextInt(count));
   }
 
   private void fillRandomData(int count) {
     var bits = MathHelper.ceilLog2(count);
-    if (bits == 0) storage = new EmptyPaletteStorage(4096);
-    else storage = new PackedIntegerArray(MathHelper.ceilLog2(count), 4096);
-    for (int i = 0; i < 4096; i++) storage.set(i, random.nextInt(count));
+    storage = new PaletteStorage[10240];
+    for (int i = 0; i < storage.length; i++) fillRandomData(count, bits, i);
   }
 
-  @Setup(Level.Invocation)
   public void fillWithRandomData() {
     switch (sizeIdx) {
       case 0:
@@ -94,18 +100,23 @@ public class FastCountBenchmark {
   }
 
   @Benchmark
+  @OperationsPerInvocation(10240)
   public void vanilla(Blackhole hole) {
     this.hole = hole;
-    var counts = new Int2IntOpenHashMap();
-    storage.forEach(key -> counts.addTo(key, 1));
-    counts
-        .int2IntEntrySet()
-        .forEach(entry -> counter.accept(palette.get(entry.getIntKey()), entry.getIntValue()));
+    for (int i = 0; i < storage.length; i++) {
+      var counts = new Int2IntOpenHashMap();
+      storage[i].forEach(key -> counts.addTo(key, 1));
+      counts
+          .int2IntEntrySet()
+          .forEach(entry -> counter.accept(palette.get(entry.getIntKey()), entry.getIntValue()));
+    }
   }
 
   @Benchmark
+  @OperationsPerInvocation(10240)
   public void optimized(Blackhole hole) {
     this.hole = hole;
-    FastPaletteCount.fastCount(counter, palette, storage);
+    for (int i = 0; i < storage.length; i++)
+      FastPaletteCount.fastCount(counter, palette, storage[i]);
   }
 }

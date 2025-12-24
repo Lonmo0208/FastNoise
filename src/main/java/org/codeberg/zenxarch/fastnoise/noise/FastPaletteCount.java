@@ -30,7 +30,7 @@ public final class FastPaletteCount {
   private static <T> void fastCountSize2(
       Counter<T> counter, Palette<T> palette, PaletteStorage storage) {
     var data = storage.getData();
-    short count = 0;
+    int count = 0;
     for (int i = 0; i < data.length; i++) count += Long.bitCount(data[i]);
     counter.accept(palette.get(0), storage.getSize() - count);
     counter.accept(palette.get(1), count);
