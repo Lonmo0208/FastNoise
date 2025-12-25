@@ -4,7 +4,10 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "PalettedContainerAccessor",
-    "NoiseChunkGeneratorMixin"
+    "NoiseChunkGeneratorMixin",
+    "PackedIntegerArrayMixin",
+    "EmptyPaletteStorageMixin",
+    "ChunkSectionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

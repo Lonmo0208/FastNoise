@@ -103,7 +103,7 @@ jmh {
 	warmup = '2s'
 	warmupIterations = 2
 
-	profilers = ['perf']
+	profilers = ['async']
 
 	zip64 = true
 }
