@@ -17,8 +17,7 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
     var blkidx = (((y << 4) | z) << 4) | x;
     var valIdx = section.blockStateContainer.data.palette().index(state, this);
 
-    ((FastPackedIntegerArray) section.blockStateContainer.data.storage())
-        .zenxarch$unsafeSet(blkidx, valIdx);
+    section.blockStateContainer.data.storage().zenxarch$unsafeSet(blkidx, valIdx);
   }
 
   @Override
