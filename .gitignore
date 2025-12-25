@@ -45,3 +45,5 @@ replay_*.log
 
 logs/
 *.log
+
+summary-cpu.txt

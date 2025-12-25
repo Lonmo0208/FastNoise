@@ -9,3 +9,5 @@ accessible field net/minecraft/world/chunk/ChunkSection blockStateContainer Lnet
 accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft/world/chunk/PalettedContainer$Data;
 
 accessible class net/minecraft/world/chunk/PalettedContainer$Data
+
+inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray
