@@ -5,7 +5,7 @@ import java.util.Random;
 import net.minecraft.util.collection.PackedIntegerArray;
 import net.minecraft.util.math.MathHelper;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 
 public class FastPackedIntegerArrayTest {
   void testSet(int maxElement) {
@@ -25,8 +25,34 @@ public class FastPackedIntegerArrayTest {
     }
   }
 
-  @Test
+  @RepeatedTest(5)
   void testSet() {
+    testSet(1);
+    testSet(2);
+    testSet(3);
+
+    testSet(5);
+    testSet(17);
+    testSet(330);
+  }
+
+  void testEqual(int maxElement) {
+    int bits = Math.max(MathHelper.ceilLog2(maxElement), 1);
+    var random = new Random();
+    var packedArray = new PackedIntegerArray(bits, 4096);
+    var against = new PackedIntegerArray(bits, 4096);
+
+    for (int i = 0; i < 4096; i++) {
+      var value = random.nextInt(maxElement);
+      ((FastPackedIntegerArray) packedArray).zenxarch$unsafeSet(i, value);
+      against.set(i, value);
+    }
+
+    Assertions.assertArrayEquals(against.getData(), packedArray.getData());
+  }
+
+  @RepeatedTest(5)
+  void testEqual() {
     testSet(1);
     testSet(2);
     testSet(3);
