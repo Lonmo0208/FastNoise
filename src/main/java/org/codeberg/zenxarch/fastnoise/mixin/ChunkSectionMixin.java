@@ -23,7 +23,7 @@ public abstract class ChunkSectionMixin {
 
     for (int iy = 0; iy < 4; iy++) {
       for (int iz = 0; iz < 4; iz++) {
-        for (int ix = 0; ix++ < 4; ix++) {
+        for (int ix = 0; ix < 4; ix++) {
           var idx = (((iy << 2) | iz) << 2) | ix;
           var valIdx =
               palettedContainer
