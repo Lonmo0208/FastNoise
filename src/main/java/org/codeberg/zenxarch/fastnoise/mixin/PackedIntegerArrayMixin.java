@@ -21,6 +21,7 @@ public abstract class PackedIntegerArrayMixin implements FastPackedIntegerArray 
   public void zenxarch$unsafeSet(int index, int value) {
     int idx = this.getStorageIndex(index);
     int bitIdx = (index - idx * this.elementsPerLong) * this.elementBits;
-    this.data[idx] = this.data[idx] | ((long) value & this.maxValue) << bitIdx;
+    this.data[idx] =
+        this.data[idx] & ~(this.maxValue << bitIdx) | ((long) value & this.maxValue) << bitIdx;
   }
 }
