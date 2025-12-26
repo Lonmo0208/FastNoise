@@ -1,6 +1,7 @@
 package org.codeberg.zenxarch.fastnoise;
 
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import org.codeberg.zenxarch.fastnoise.Worldgen.PopulateNoiseFunction;
 
@@ -20,9 +21,16 @@ public record BenchmarkSettings(
     return new BenchmarkSettings(region, seed, settings, Worldgen::optimized);
   }
 
-  public static record ChunkRegion(int minX, int maxX, int minZ, int maxZ) {
+  public static record ChunkRegion(ChunkPos[] pos) {
     public static ChunkRegion of(int min, int max) {
-      return new ChunkRegion(min, max, min, max);
+      var pos = new ChunkPos[(max + 1 - min) * (max + 1 - min)];
+      int idx = 0;
+      for (int x = min; x <= max; x++) {
+        for (int z = min; z <= max; z++) {
+          pos[idx++] = new ChunkPos(x, z);
+        }
+      }
+      return new ChunkRegion(pos);
     }
   }
 }

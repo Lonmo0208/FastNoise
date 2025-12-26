@@ -33,10 +33,7 @@ public final class TestWorld {
         manager,
         settings.settings(),
         settings.function(),
-        settings.region().minX(),
-        settings.region().minZ(),
-        settings.region().maxX(),
-        settings.region().maxZ(),
+        settings.region().pos(),
         settings.seed());
   }
 
@@ -44,10 +41,7 @@ public final class TestWorld {
       DynamicRegistryManager manager,
       RegistryKey<ChunkGeneratorSettings> settingIp,
       PopulateNoiseFunction function,
-      int minX,
-      int minZ,
-      int maxX,
-      int maxZ,
+      ChunkPos[] pos,
       long seed) {
     this.function = function;
     this.settings = manager.getEntryOrThrow(settingIp).value();
@@ -67,30 +61,21 @@ public final class TestWorld {
     int cutoff = Math.min(-54, this.settings.seaLevel());
     FluidLevelSampler fluidLevelSampler = (x, y, z) -> y < cutoff ? lava : water;
 
-    var numZ = (maxZ + 1 - minZ);
-    var numChunks = numZ * (maxX + 1 - minX);
-
-    this.chunks = new ProtoChunk[numChunks];
-    int idx = 0;
+    this.chunks = new ProtoChunk[pos.length];
     var beardifying = new BeardifyingImpl();
-    for (int x = minX; x <= maxX; x++) {
-      for (int z = minZ; z <= maxZ; z++) {
-        this.chunks[idx] =
-            new ProtoChunk(
-                new ChunkPos(x, z), UpgradeData.NO_UPGRADE_DATA, world, this.factory, null);
+    for (int i = 0; i < pos.length; i++) {
+      this.chunks[i] =
+          new ProtoChunk(pos[i], UpgradeData.NO_UPGRADE_DATA, world, this.factory, null);
 
-        this.chunks[idx].getOrCreateChunkNoiseSampler(
-            chunk ->
-                ChunkNoiseSampler.create(
-                    chunk,
-                    noiseConfig,
-                    beardifying,
-                    this.settings,
-                    fluidLevelSampler,
-                    Blender.getNoBlending()));
-
-        idx++;
-      }
+      this.chunks[i].getOrCreateChunkNoiseSampler(
+          chunk ->
+              ChunkNoiseSampler.create(
+                  chunk,
+                  noiseConfig,
+                  beardifying,
+                  this.settings,
+                  fluidLevelSampler,
+                  Blender.getNoBlending()));
     }
   }
 
