@@ -24,9 +24,6 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
 
   @Override
   public int onResize(int newBits, BlockState object) {
-    assert (newBits < 4);
-    assert (newBits > 1);
-
     var oldData = section.blockStateContainer.data;
 
     @SuppressWarnings("unchecked")
