@@ -79,16 +79,19 @@ public final class TestWorld {
     }
   }
 
-  public long[] run() {
-    var result = new long[this.chunks.length];
+  public void noise() {
     for (int i = 0; i < this.chunks.length; i++) {
-      result[i] = runForChunk(this.chunks[i]);
+      runForChunk(this.chunks[i]);
     }
-    for (var chunk : this.chunks) clearSections(chunk);
-    return result;
   }
 
-  private long runForChunk(ProtoChunk chunk) {
+  public void clear() {
+    for (int i = 0; i < this.chunks.length; i++) {
+      clearSections(this.chunks[i]);
+    }
+  }
+
+  private void runForChunk(ProtoChunk chunk) {
     var shapeConfig = this.settings.generationShapeConfig().trimHeight(chunk.getHeightLimitView());
 
     int minY = shapeConfig.minimumY();
@@ -101,11 +104,7 @@ public final class TestWorld {
 
     var sampler = chunk.getOrCreateChunkNoiseSampler(null);
 
-    var startTime = System.nanoTime();
     this.function.populateNoise(sampler, settings, chunk, minimumCellY, cellHeight, start, end);
-    var endTime = System.nanoTime();
-
-    return endTime - startTime;
   }
 
   private void clearSections(ProtoChunk chunk) {
