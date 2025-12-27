@@ -14,14 +14,19 @@ public class PerfTest {
   public static void runTest(DynamicRegistryManager manager) {
     PerfTest.manager = manager;
 
+    runFor(5, 5, "Cold avgt.txt");
+    runFor(20, 60, "Hot avgt.txt");
+  }
+
+  private static void runFor(int warmupSeconds, int benchmarkSeconds, String output) {
     var options =
         new OptionsBuilder()
             .forks(0)
             .mode(Mode.AverageTime)
-            .warmupTime(TimeValue.seconds(20))
-            .measurementTime(TimeValue.seconds(60))
+            .warmupTime(TimeValue.seconds(warmupSeconds))
+            .measurementTime(TimeValue.seconds(benchmarkSeconds))
             .timeUnit(TimeUnit.MILLISECONDS)
-            .result("results avgt.txt")
+            .result(output)
             .build();
     var runner = new Runner(options);
     try {
