@@ -10,6 +10,8 @@ import org.codeberg.zenxarch.fastnoise.mixin.PalettedContainerAccessor;
 public final class FastChunkSection implements PaletteResizeListener<BlockState> {
 
   private final ChunkSection section;
+  private BlockState lastState = null;
+  private int lastIdx = -1;
 
   public FastChunkSection(ChunkSection section) {
     this.section = section;
@@ -17,8 +19,13 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
 
   public void setBlockState(int x, int y, int z, BlockState state) {
     var blkidx = (((y << 4) | z) << 4) | x;
-    var valIdx = section.blockStateContainer.data.palette().index(state, this);
+    var valIdx =
+        state == lastState
+            ? lastIdx
+            : section.blockStateContainer.data.palette().index(state, this);
 
+    lastState = state;
+    lastIdx = valIdx;
     section.blockStateContainer.data.storage().zenxarch$unsafeSet(blkidx, valIdx);
   }
 
