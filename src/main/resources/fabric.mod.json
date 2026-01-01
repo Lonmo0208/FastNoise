@@ -30,5 +30,5 @@
 		"java": ">=21",
 		"fabric-api": "*"
 	},
-	"accesswidener": "zfastnoise.ct"
+	"accessWidener": "zfastnoise.ct"
 }
