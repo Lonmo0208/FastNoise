@@ -107,3 +107,7 @@ jmh {
 
 	zip64 = true
 }
+
+tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+	mods.from configurations.modImplementation
+}
