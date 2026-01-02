@@ -29,8 +29,7 @@ public abstract class ChunkSectionMixin {
               palettedContainer
                   .data
                   .palette()
-                  .index(
-                      biomeSupplier.getBiome(x + ix, y + iy, z + iz, sampler), palettedContainer);
+                  .index(biomeSupplier.getBiome(x + ix, y + iy, z + iz, sampler));
           palettedContainer.data.storage().zenxarch$unsafeSet(idx, valIdx);
         }
       }

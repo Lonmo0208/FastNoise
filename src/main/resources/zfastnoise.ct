@@ -11,3 +11,7 @@ accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft
 accessible class net/minecraft/world/chunk/PalettedContainer$Data
 
 inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray
+
+accessible class net/minecraft/world/chunk/PaletteResizeListener
+accessible field net/minecraft/world/chunk/ArrayPalette listener Lnet/minecraft/world/chunk/PaletteResizeListener;
+mutable field net/minecraft/world/chunk/ArrayPalette listener Lnet/minecraft/world/chunk/PaletteResizeListener;
