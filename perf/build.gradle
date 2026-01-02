@@ -3,12 +3,12 @@ plugins {
 }
 
 loom {
-    accessWidenerPath = project(":").file("src/main/resources/zfastnoise.ct")
+    accessWidenerPath = project(':').file('src/main/resources/zfastnoise.ct')
 
     runs {
         server {
             server()
-            property("zperfbenchmark", project.getProperty("zperfbenchmark"))
+            property('zperfbenchmark', project.getProperty('zperfbenchmark'))
         }
     }
 }
@@ -19,9 +19,9 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    implementation project(path: ":", configuration: "namedElements")
-    implementation "org.openjdk.jmh:jmh-core:1.37"
-    annotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:1.37"
+    implementation project(path: ':', configuration: 'namedElements')
+    implementation 'org.openjdk.jmh:jmh-core:1.37'
+    annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -39,10 +39,10 @@ java {
 }
 
 processResources {
-    inputs.property "loader_version", project.loader_version
-    inputs.property "minecraft_version", project.min_minecraft_version
+    inputs.property 'loader_version', project.loader_version
+    inputs.property 'minecraft_version', project.min_minecraft_version
 
-    filesMatching("fabric.mod.json") {
+    filesMatching('fabric.mod.json') {
         expand(inputs.properties)
     }
 }
