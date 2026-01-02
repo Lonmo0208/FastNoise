@@ -14,11 +14,12 @@ public class PerfTest {
   public static void runTest(DynamicRegistryManager manager) {
     PerfTest.manager = manager;
 
-    runFor(5, 5, "Cold avgt.txt");
-    runFor(20, 60, "Hot avgt.txt");
+    runFor(5, 5, "Cold");
+    runFor(20, 60, "Hot");
   }
 
   private static void runFor(int warmupSeconds, int benchmarkSeconds, String output) {
+    var benchmarkName = System.getProperty("zperfbenchmark");
     var options =
         new OptionsBuilder()
             .forks(0)
@@ -26,7 +27,8 @@ public class PerfTest {
             .warmupTime(TimeValue.seconds(warmupSeconds))
             .measurementTime(TimeValue.seconds(benchmarkSeconds))
             .timeUnit(TimeUnit.MILLISECONDS)
-            .result(output)
+            .include(benchmarkName)
+            .result(output + " " + benchmarkName + ".txt")
             .build();
     var runner = new Runner(options);
     try {

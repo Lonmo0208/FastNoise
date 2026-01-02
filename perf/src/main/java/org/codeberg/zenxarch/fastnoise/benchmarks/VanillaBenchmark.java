@@ -1,7 +1,5 @@
 package org.codeberg.zenxarch.fastnoise.benchmarks;
 
-import org.codeberg.zenxarch.fastnoise.BenchmarkSettings;
-import org.codeberg.zenxarch.fastnoise.PerfTest;
 import org.codeberg.zenxarch.fastnoise.TestServer;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
@@ -15,12 +13,7 @@ public class VanillaBenchmark {
 
   @Setup(Level.Trial)
   public void setup() {
-    var centeredRegion = BenchmarkSettings.ChunkRegion.of(-256 / 16, 256 / 16);
-    var offsetRegion = BenchmarkSettings.ChunkRegion.of((2048 - 256) / 16, 2048 / 16);
-
-    var manager = PerfTest.getManager();
-
-    this.server = TestServer.vanilla(manager, 100, centeredRegion, centeredRegion, offsetRegion);
+    this.server = TestServer.vanillaDefault();
   }
 
   @Setup(Level.Invocation)

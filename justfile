@@ -40,7 +40,12 @@ prod:
     ./gradlew prodClient
 
 perf:
-    ./gradlew :perf:runServer
+    ./gradlew :perf:runServer -Pzperfbenchmark="overworldVanilla"
+    ./gradlew :perf:runServer -Pzperfbenchmark="netherVanilla"
+    ./gradlew :perf:runServer -Pzperfbenchmark="endVanilla"
+    ./gradlew :perf:runServer -Pzperfbenchmark="overworldOptimized"
+    ./gradlew :perf:runServer -Pzperfbenchmark="netherOptimized"
+    ./gradlew :perf:runServer -Pzperfbenchmark="endOptimized"
 
 task taskName:
     ./gradlew {{taskName}}

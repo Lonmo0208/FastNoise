@@ -33,4 +33,21 @@ public record TestServer(TestWorld overworld, TestWorld nether, TestWorld end) {
             manager, BenchmarkSettings.optimized(ChunkGeneratorSettings.NETHER, seed, nether)),
         new TestWorld(manager, BenchmarkSettings.optimized(ChunkGeneratorSettings.END, seed, end)));
   }
+
+  private static final long seed = 100;
+  private static final int WorldRadiusInChunks = 16;
+
+  public static TestServer vanillaDefault() {
+    var centeredRegion =
+        BenchmarkSettings.ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
+    var offsetRegion = BenchmarkSettings.ChunkRegion.of(128 - WorldRadiusInChunks, 128);
+    return vanilla(PerfTest.getManager(), seed, centeredRegion, centeredRegion, offsetRegion);
+  }
+
+  public static TestServer optimizedDefault() {
+    var centeredRegion =
+        BenchmarkSettings.ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
+    var offsetRegion = BenchmarkSettings.ChunkRegion.of(128 - WorldRadiusInChunks, 128);
+    return optimized(PerfTest.getManager(), seed, centeredRegion, centeredRegion, offsetRegion);
+  }
 }
