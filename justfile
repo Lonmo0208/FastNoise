@@ -36,6 +36,9 @@ stop:
 clean:
     ./gradlew clean
 
+prod:
+    ./gradlew prodClient
+
 perf:
     ./gradlew :perf:runServer
 
