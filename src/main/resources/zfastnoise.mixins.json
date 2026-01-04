@@ -7,6 +7,7 @@
     "NoiseChunkGeneratorMixin",
     "PackedIntegerArrayMixin",
     "EmptyPaletteStorageMixin",
+    "PaletteStorageMixin",
     "ChunkSectionMixin"
   ],
   "injectors": {
