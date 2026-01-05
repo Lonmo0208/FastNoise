@@ -8,4 +8,9 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class EmptyPaletteStorageMixin implements FastPackedIntegerArray {
   @Override
   public void zenxarch$unsafeSet(int index, int value) {}
+
+  @Override
+  public int zenxarch$unsafeGet(int index) {
+    return 0;
+  }
 }

@@ -6,4 +6,9 @@ public interface FastPackedIntegerArray {
    * @param value value to put in array
    */
   public void zenxarch$unsafeSet(int index, int value);
+
+  /**
+   * @param index Array index
+   */
+  public int zenxarch$unsafeGet(int index);
 }

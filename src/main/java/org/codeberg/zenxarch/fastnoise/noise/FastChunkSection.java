@@ -57,7 +57,7 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
 
   private static <T> void fastImport(PaletteStorage oldStorage, PaletteStorage newStorage) {
     for (int i = 0; i < oldStorage.getSize(); i++)
-      newStorage.zenxarch$unsafeSet(i, oldStorage.get(i));
+      newStorage.zenxarch$unsafeSet(i, oldStorage.zenxarch$unsafeGet(i));
   }
 
   public void recalculateCounts() {
