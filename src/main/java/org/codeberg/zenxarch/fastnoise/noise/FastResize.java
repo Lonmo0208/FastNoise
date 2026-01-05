@@ -1,19 +1,19 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
 public final class FastResize {
+  private static final long[] oneToTwoBitConstants =
+      new long[] {
+        Long.expand(0b0000_0101_0000_0101l, 0x5555555555555555l),
+        Long.expand(0b0000_1010_0000_1010l, 0x5555555555555555l),
+        Long.expand(0b0101_0000_0101_0000l, 0x5555555555555555l),
+        Long.expand(0b1010_0000_1010_0000l, 0x5555555555555555l)
+      };
+
   private static long expand16bit(long in) {
-    var a =
-        ((in & 0b0000_0101_0000_0101l) * 0b0000_0101_0000_0101l)
-            & Long.expand(0b0000_0101_0000_0101l, 0x5555555555555555l);
-    var b =
-        ((in & 0b0000_1010_0000_1010l) * 0b0000_1010_0000_1010l)
-            & Long.expand(0b0000_1010_0000_1010l, 0x5555555555555555l);
-    var c =
-        ((in & 0b0101_0000_0101_0000l) * 0b0101_0000_0101_0000l)
-            & Long.expand(0b0101_0000_0101_0000l, 0x5555555555555555l);
-    var d =
-        ((in & 0b1010_0000_1010_0000l) * 0b1010_0000_1010_0000l)
-            & Long.expand(0b1010_0000_1010_0000l, 0x5555555555555555l);
+    var a = ((in & 0b0000_0101_0000_0101l) * 0b0000_0101_0000_0101l) & oneToTwoBitConstants[0];
+    var b = ((in & 0b0000_1010_0000_1010l) * 0b0000_1010_0000_1010l) & oneToTwoBitConstants[1];
+    var c = ((in & 0b0101_0000_0101_0000l) * 0b0101_0000_0101_0000l) & oneToTwoBitConstants[2];
+    var d = ((in & 0b1010_0000_1010_0000l) * 0b1010_0000_1010_0000l) & oneToTwoBitConstants[3];
     return a | b | c | d;
   }
 
