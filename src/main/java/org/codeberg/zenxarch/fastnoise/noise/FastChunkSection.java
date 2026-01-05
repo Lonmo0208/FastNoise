@@ -1,7 +1,6 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.util.collection.PaletteStorage;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PaletteResizeListener;
 import net.minecraft.world.chunk.PalettedContainer.Data;
@@ -32,13 +31,16 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
             .zenxarch$getCompatibleData(null, newBits);
 
     var canUseFastImport = true;
+    var mapping = new int[oldData.palette().getSize()];
     for (int i = 0; i < oldData.palette().getSize(); i++) {
-      if (i != newData.palette().index(oldData.palette().get(i), PaletteResizeListener.throwing()))
-        canUseFastImport = false;
+      var newIdx =
+          newData.palette().index(oldData.palette().get(i), PaletteResizeListener.throwing());
+      if (newIdx != i) canUseFastImport = false;
+      mapping[i] = newIdx;
     }
 
     if (canUseFastImport) fastImport(oldData, newData, newBits);
-    else newData.importFrom(oldData.palette(), oldData.storage());
+    else newData.storage().zenxarch$copy(oldData.storage(), oldData.storage().getSize(), mapping);
 
     section.blockStateContainer.data = newData;
 
@@ -52,12 +54,7 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
     var newStorageData = newStorage.getData();
 
     if (newBits == 2) FastResize.fastResize1to2bits(oldStorageData, newStorageData);
-    else fastImport(oldStorage, newStorage);
-  }
-
-  private static <T> void fastImport(PaletteStorage oldStorage, PaletteStorage newStorage) {
-    for (int i = 0; i < oldStorage.getSize(); i++)
-      newStorage.zenxarch$unsafeSet(i, oldStorage.zenxarch$unsafeGet(i));
+    else newStorage.zenxarch$copy(newStorage, oldStorage.getSize());
   }
 
   public void recalculateCounts() {
