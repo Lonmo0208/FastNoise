@@ -1,6 +1,7 @@
 package org.codeberg.zenxarch.fastnoise;
 
 import java.util.Arrays;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
@@ -10,6 +11,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.PalettesFactory;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
@@ -112,6 +114,36 @@ public final class TestWorld {
     for (int i = 0; i < data.length; i++) data[i] = new ChunkSection(factory);
     Arrays.setAll(chunk.getHeightmap(Type.OCEAN_FLOOR_WG).asLongArray(), t -> 0);
     Arrays.setAll(chunk.getHeightmap(Type.WORLD_SURFACE_WG).asLongArray(), t -> 0);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (!(obj instanceof TestWorld world)) return false;
+    if (chunks.length != world.chunks.length) return false;
+
+    for (int i = 0; i < chunks.length; i++) {
+      var self = chunks[i].getSectionArray();
+      var other = world.chunks[i].getSectionArray();
+      if (self.length != other.length) return false;
+      for (int j = 0; j < self.length; j++) {
+        if (!sameBlocks(self[j].blockStateContainer, other[j].blockStateContainer)) return false;
+      }
+    }
+
+    return true;
+  }
+
+  private static boolean sameBlocks(
+      PalettedContainer<BlockState> self, PalettedContainer<BlockState> other) {
+    if (self.data.storage().getSize() != other.data.storage().getSize()) return false;
+    for (int i = 0; i < self.data.storage().getSize(); i++) {
+      if (self.data.palette().get(self.data.storage().get(i))
+          != other.data.palette().get(other.data.storage().get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private static record FakeWorld(int height, int bottomY) implements HeightLimitView {

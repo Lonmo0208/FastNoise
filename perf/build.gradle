@@ -8,7 +8,9 @@ loom {
     runs {
         server {
             server()
-            property('zperfbenchmark', project.getProperty('zperfbenchmark'))
+            if (project.hasProperty("zperfbenchmark")) {
+                property('zperfbenchmark', project.getProperty('zperfbenchmark'))
+            }
         }
     }
 }

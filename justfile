@@ -47,5 +47,8 @@ perf:
     ./gradlew :perf:runServer -Pzperfbenchmark="netherOptimized"
     ./gradlew :perf:runServer -Pzperfbenchmark="endOptimized"
 
+parity:
+    ./gradlew :perf:runServer -Pzperfbenchmark="parity"
+
 task taskName:
     ./gradlew {{taskName}}
