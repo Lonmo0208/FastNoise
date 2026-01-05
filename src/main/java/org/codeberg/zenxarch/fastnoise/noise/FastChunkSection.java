@@ -1,5 +1,8 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PaletteResizeListener;
@@ -9,16 +12,29 @@ import org.codeberg.zenxarch.fastnoise.mixin.PalettedContainerAccessor;
 public final class FastChunkSection implements PaletteResizeListener<BlockState> {
 
   private final ChunkSection section;
+  private static final int INITIAL_SIZE = 128;
+
+  private ShortArrayList positions = new ShortArrayList(4096);
+  private ObjectList<BlockState> states = new ObjectArrayList<>(128);
+  private ShortArrayList lengths = new ShortArrayList(128);
 
   public FastChunkSection(ChunkSection section) {
     this.section = section;
   }
 
-  public void setBlockState(int x, int y, int z, BlockState state) {
-    var blkidx = (((y << 4) | z) << 4) | x;
-    var valIdx = section.blockStateContainer.data.palette().index(state, this);
+  private static short pack(int x, int y, int z) {
+    return (short) ((((y << 4) | z) << 4) | x);
+  }
 
-    section.blockStateContainer.data.storage().zenxarch$unsafeSet(blkidx, valIdx);
+  public void setBlockState(int x, int y, int z, BlockState state) {
+    positions.add(pack(x, y, z));
+
+    if (states.isEmpty() || state != states.getLast()) {
+      states.add(state);
+      lengths.add((short) 1);
+    } else {
+      lengths.elements()[lengths.size() - 1]++;
+    }
   }
 
   @Override
@@ -58,6 +74,14 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
   }
 
   public void recalculateCounts() {
+    var posz = positions.iterator();
+    for (int i = 0; i < states.size(); i++) {
+      var len = lengths.getShort(i);
+      var blkId = section.blockStateContainer.data.palette().index(states.get(i), this);
+      for (int j = 0; j < len; j++) {
+        section.blockStateContainer.data.storage().set(posz.nextShort(), blkId);
+      }
+    }
     section.calculateCounts();
   }
 }
