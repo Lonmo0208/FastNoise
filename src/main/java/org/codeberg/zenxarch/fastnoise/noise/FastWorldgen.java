@@ -71,7 +71,7 @@ public class FastWorldgen {
                   if (skipDefaultBlock) continue;
                   fastSection.setDefaultBlockState(
                       blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
-                  state = defaultBlockState;
+                  continue;
                 } else if (state == AIR) continue;
                 else
                   fastSection.setBlockState(
