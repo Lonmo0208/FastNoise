@@ -1,5 +1,6 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.collection.PackedIntegerArray;
 import net.minecraft.world.chunk.ArrayPalette;
@@ -15,6 +16,9 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
   private BlockState lastState = null;
   private int lastIdx = -1;
 
+  private Reference2IntArrayMap<BlockState> fluids = new Reference2IntArrayMap<>(2);
+  private Reference2IntArrayMap<BlockState> ores = new Reference2IntArrayMap<>(3);
+
   private int defaultIdx = -1;
 
   public FastChunkSection(ChunkSection section) {
@@ -27,11 +31,17 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
     setBlockState(x, y, z, defaultIdx);
   }
 
+  private int getIndex(BlockState state) {
+    if (state == lastState) return lastIdx;
+    if (state.getFluidState().isEmpty())
+      return ores.computeIfAbsent(
+          state, statex -> section.blockStateContainer.data.palette().index(state, this));
+    return fluids.computeIfAbsent(
+        state, statex -> section.blockStateContainer.data.palette().index(state, this));
+  }
+
   public void setBlockState(int x, int y, int z, BlockState state) {
-    var valIdx =
-        state == lastState
-            ? lastIdx
-            : section.blockStateContainer.data.palette().index(state, this);
+    var valIdx = getIndex(state);
 
     lastState = state;
     lastIdx = valIdx;
