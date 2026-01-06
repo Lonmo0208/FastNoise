@@ -30,6 +30,8 @@ public class FastWorldgen {
     int verticalCellBlockCount = chunkNoiseSampler.getVerticalCellBlockCount();
     int cellWidth = 16 / horizontalCellBlockCount;
 
+    final boolean skipDefaultBlock = defaultBlockState == AIR;
+
     FastChunkSection fastSection = fastSections[fastSections.length - 1];
 
     for (int cellX = 0; cellX < cellWidth; cellX++) {
@@ -65,9 +67,15 @@ public class FastWorldgen {
                 chunkNoiseSampler.interpolateZ(blockZ, cellZProgress);
 
                 var state = chunkNoiseSampler.sampleBlockState();
-                if (state == null) state = defaultBlockState;
-                if (state == AIR) continue;
-                fastSection.setBlockState(blockXInSection, blockYInSection, blockZInSection, state);
+                if (state == null) {
+                  if (skipDefaultBlock) continue;
+                  fastSection.setDefaultBlockState(
+                      blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
+                  state = defaultBlockState;
+                } else if (state == AIR) continue;
+                else
+                  fastSection.setBlockState(
+                      blockXInSection, blockYInSection, blockZInSection, state);
 
                 if (aquiferSampler.needsFluidTick() && !state.getFluidState().isEmpty()) {
                   mutable.set(blockX, blockY, blockZ);

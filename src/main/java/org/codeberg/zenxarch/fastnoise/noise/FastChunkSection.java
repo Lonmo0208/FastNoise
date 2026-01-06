@@ -12,12 +12,19 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
   private BlockState lastState = null;
   private int lastIdx = -1;
 
+  private int defaultIdx = -1;
+
   public FastChunkSection(ChunkSection section) {
     this.section = section;
   }
 
+  public void setDefaultBlockState(int x, int y, int z, BlockState state) {
+    if (defaultIdx == -1)
+      defaultIdx = section.blockStateContainer.data.palette().index(state, this);
+    setBlockState(x, y, z, defaultIdx);
+  }
+
   public void setBlockState(int x, int y, int z, BlockState state) {
-    var blkidx = (((y << 4) | z) << 4) | x;
     var valIdx =
         state == lastState
             ? lastIdx
@@ -25,7 +32,12 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
 
     lastState = state;
     lastIdx = valIdx;
-    section.blockStateContainer.data.storage().zenxarch$unsafeSet(blkidx, valIdx);
+    setBlockState(x, y, z, valIdx);
+  }
+
+  private void setBlockState(int x, int y, int z, int value) {
+    var blkidx = (((y << 4) | z) << 4) | x;
+    section.blockStateContainer.data.storage().zenxarch$unsafeSet(blkidx, value);
   }
 
   @Override
