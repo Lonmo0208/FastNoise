@@ -1,10 +1,13 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.util.collection.PackedIntegerArray;
+import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.Palette;
 import net.minecraft.world.chunk.PaletteResizeListener;
+import net.minecraft.world.chunk.PaletteType;
 import net.minecraft.world.chunk.PalettedContainer.Data;
-import org.codeberg.zenxarch.fastnoise.mixin.PalettedContainerAccessor;
 
 public final class FastChunkSection implements PaletteResizeListener<BlockState> {
 
@@ -40,37 +43,23 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
     section.blockStateContainer.data.storage().zenxarch$unsafeSet(blkidx, value);
   }
 
+  private static final Palette.Factory ARRAY = ArrayPalette::create;
+  private static final PaletteType ARRAY_4_TYPE = new PaletteType.Static(ARRAY, 4);
+  private static final long[] EMPTY_DATA = new long[4096 / (64 / 4)];
+
   @Override
   public int onResize(int newBits, BlockState object) {
-    var oldData = section.blockStateContainer.data;
-
-    @SuppressWarnings("unchecked")
+    var paletteData = new BlockState[16];
+    paletteData[0] = FastWorldgen.AIR;
     var newData =
-        ((PalettedContainerAccessor<BlockState>) section.blockStateContainer)
-            .zenxarch$getCompatibleData(null, newBits);
-
-    var canUseFastImport = true;
-    var mapping = new int[oldData.palette().getSize()];
-    for (int i = 0; i < oldData.palette().getSize(); i++) {
-      var newIdx =
-          newData.palette().index(oldData.palette().get(i), PaletteResizeListener.throwing());
-      if (newIdx != i) canUseFastImport = false;
-      mapping[i] = newIdx;
-    }
-
-    if (canUseFastImport) fastImport(oldData, newData, newBits);
-    else newData.storage().zenxarch$copy(oldData.storage(), oldData.storage().getSize(), mapping);
+        new Data<BlockState>(
+            ARRAY_4_TYPE,
+            new PackedIntegerArray(4, 4096, EMPTY_DATA.clone()),
+            new ArrayPalette<BlockState>(paletteData, 4, 1));
 
     section.blockStateContainer.data = newData;
 
     return newData.palette().index(object, PaletteResizeListener.throwing());
-  }
-
-  private static <T> void fastImport(Data<T> oldData, Data<T> newData, int newBits) {
-    var oldStorage = oldData.storage();
-    var newStorage = newData.storage();
-
-    newStorage.zenxarch$copy(oldStorage, oldStorage.getSize());
   }
 
   public void recalculateCounts() {

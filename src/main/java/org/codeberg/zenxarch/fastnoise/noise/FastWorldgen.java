@@ -11,7 +11,7 @@ import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 
 public class FastWorldgen {
-  private static final BlockState AIR = Blocks.AIR.getDefaultState();
+  public static final BlockState AIR = Blocks.AIR.getDefaultState();
 
   public static void populateNoise(
       ChunkNoiseSampler chunkNoiseSampler,
