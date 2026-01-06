@@ -19,13 +19,9 @@ public class FastResizeBenchmark {
     hole.consume(state);
   }
 
-  public static void fastResize1to2bits(long[] small, long[] large) {
-    
-  }
-
   private long expand(long ix) {
     long result = 0x0L;
-    for (int i = 0; i < 32;i++) {
+    for (int i = 0; i < 32; i++) {
       result |= ((ix >> i) & 0x1L) << (i << 1);
     }
     return result;
