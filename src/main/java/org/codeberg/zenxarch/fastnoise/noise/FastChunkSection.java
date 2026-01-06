@@ -69,11 +69,8 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
   private static <T> void fastImport(Data<T> oldData, Data<T> newData, int newBits) {
     var oldStorage = oldData.storage();
     var newStorage = newData.storage();
-    var oldStorageData = oldStorage.getData();
-    var newStorageData = newStorage.getData();
 
-    if (newBits == 2) FastResize.fastResize1to2bits(oldStorageData, newStorageData);
-    else newStorage.zenxarch$copy(newStorage, oldStorage.getSize());
+    newStorage.zenxarch$copy(oldStorage, oldStorage.getSize());
   }
 
   public void recalculateCounts() {
