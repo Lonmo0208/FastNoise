@@ -56,7 +56,6 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
 
   private static final Palette.Factory ARRAY = ArrayPalette::create;
   private static final PaletteType ARRAY_4_TYPE = new PaletteType.Static(ARRAY, 4);
-  private static final long[] EMPTY_DATA = new long[4096 / (64 / 4)];
 
   @Override
   public int onResize(int newBits, BlockState object) {
@@ -65,7 +64,7 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
     var newData =
         new Data<BlockState>(
             ARRAY_4_TYPE,
-            new PackedIntegerArray(4, 4096, EMPTY_DATA.clone()),
+            new PackedIntegerArray(4, 4096, new long[4096 / (64 / 4)]),
             new ArrayPalette<BlockState>(paletteData, 4, 1));
 
     section.blockStateContainer.data = newData;
