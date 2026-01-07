@@ -53,12 +53,39 @@ public class FastPackedIntegerArrayTest {
 
   @RepeatedTest(5)
   void testEqual() {
-    testSet(1);
-    testSet(2);
-    testSet(3);
+    testEqual(1);
+    testEqual(2);
+    testEqual(3);
 
-    testSet(5);
-    testSet(17);
-    testSet(330);
+    testEqual(5);
+    testEqual(17);
+    testEqual(330);
+  }
+
+  void testGet(int maxElement) {
+    int bits = Math.max(MathHelper.ceilLog2(maxElement), 1);
+    var random = new Random();
+    var packedArray = new PackedIntegerArray(bits, 4096);
+
+    for (int i = 0; i < 4096; i++) {
+      var value = random.nextInt(maxElement);
+      ((FastPackedIntegerArray) packedArray).zenxarch$unsafeSet(i, value);
+    }
+
+    for (int i = 0; i < 4096; i++) {
+      Assertions.assertEquals(
+          packedArray.get(i), ((FastPackedIntegerArray) packedArray).zenxarch$unsafeGet(i));
+    }
+  }
+
+  @RepeatedTest(5)
+  void testGet() {
+    testGet(1);
+    testGet(2);
+    testGet(3);
+
+    testGet(5);
+    testGet(17);
+    testGet(330);
   }
 }

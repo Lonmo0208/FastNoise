@@ -27,15 +27,6 @@ public abstract class NoiseChunkGeneratorMixin {
   protected abstract ChunkNoiseSampler createChunkNoiseSampler(
       Chunk chunk, StructureAccessor world, Blender blender, NoiseConfig noiseConfig);
 
-  @Shadow
-  protected abstract Chunk populateNoise(
-      Blender blender,
-      StructureAccessor structureAccessor,
-      NoiseConfig noiseConfig,
-      Chunk chunk,
-      int minimumCellY,
-      int cellHeight);
-
   private Chunk zenxarch$populateNoise(
       Blender blender,
       StructureAccessor structureAccessor,
@@ -80,17 +71,14 @@ public abstract class NoiseChunkGeneratorMixin {
     var result = chunk;
     try {
       result =
-          SharedConstants.AQUIFERS
-              ? this.populateNoise(
-                  blender, structureAccessor, noiseConfig, chunk, minimumCellY, cellHeight)
-              : this.zenxarch$populateNoise(
-                  blender,
-                  structureAccessor,
-                  noiseConfig,
-                  chunk,
-                  minimumCellY,
-                  cellHeight,
-                  fastSections);
+          this.zenxarch$populateNoise(
+              blender,
+              structureAccessor,
+              noiseConfig,
+              chunk,
+              minimumCellY,
+              cellHeight,
+              fastSections);
     } finally {
       for (int i = start; i <= end; i++) chunk.getSection(i).unlock();
     }
