@@ -1,6 +1,5 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
-
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.collection.PackedIntegerArray;
