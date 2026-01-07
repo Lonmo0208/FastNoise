@@ -67,7 +67,7 @@ public class PerfTest {
     try {
       runner.run();
     } catch (RunnerException exception) {
-
+      FastNoiseMod.LOGGER.info("Cannot run jmh: {}", exception.getMessage());
     }
   }
 
