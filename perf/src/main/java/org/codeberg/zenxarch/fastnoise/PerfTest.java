@@ -57,9 +57,13 @@ public class PerfTest {
             .measurementTime(TimeValue.seconds(benchmarkSeconds))
             .timeUnit(TimeUnit.MILLISECONDS)
             .include(benchmarkName)
-            .result(output + " " + benchmarkName + ".txt")
-            .build();
-    var runner = new Runner(options);
+            .result(output + " " + benchmarkName + ".txt");
+
+    if (System.getProperty("zuseasync") != null) {
+      options = options.addProfiler("async", "libPath=" + System.getProperty("zuseasync"));
+    }
+
+    var runner = new Runner(options.build());
     try {
       runner.run();
     } catch (RunnerException exception) {

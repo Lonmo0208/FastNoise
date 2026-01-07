@@ -47,6 +47,14 @@ perf:
     ./gradlew :perf:runServer -Pzperfbenchmark="netherOptimized"
     ./gradlew :perf:runServer -Pzperfbenchmark="endOptimized"
 
+perfAsync:
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="overworldVanilla"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="netherVanilla"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="endVanilla"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="overworldOptimized"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="netherOptimized"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="endOptimized"
+
 parity:
     ./gradlew :perf:runServer -Pzperfbenchmark="parity"
 

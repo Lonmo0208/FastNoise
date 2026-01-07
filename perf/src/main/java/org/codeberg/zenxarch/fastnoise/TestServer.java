@@ -37,19 +37,20 @@ public record TestServer(TestWorld overworld, TestWorld nether, TestWorld end) {
   private static final long seed = 100;
   private static final int WorldRadiusInChunks = 16;
 
-  private static BenchmarkSettings.ChunkRegion overworld() {
+  private static BenchmarkSettings.ChunkRegion overworldRegion() {
     return BenchmarkSettings.ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
   }
 
-  private static BenchmarkSettings.ChunkRegion end() {
+  private static BenchmarkSettings.ChunkRegion endRegion() {
     return BenchmarkSettings.ChunkRegion.of(128 - WorldRadiusInChunks, 128 + WorldRadiusInChunks);
   }
 
   public static TestServer vanillaDefault() {
-    return vanilla(PerfTest.getManager(), seed, overworld(), overworld(), end());
+    return vanilla(PerfTest.getManager(), seed, overworldRegion(), overworldRegion(), endRegion());
   }
 
   public static TestServer optimizedDefault() {
-    return optimized(PerfTest.getManager(), seed, overworld(), overworld(), end());
+    return optimized(
+        PerfTest.getManager(), seed, overworldRegion(), overworldRegion(), endRegion());
   }
 }

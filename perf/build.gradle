@@ -11,6 +11,10 @@ loom {
             if (project.hasProperty("zperfbenchmark")) {
                 property('zperfbenchmark', project.getProperty('zperfbenchmark'))
             }
+            if (project.hasProperty("zuseasync")) {
+                property('zuseasync', project.getProperty('zuseasync'))
+            }
+            vmArgs "-XX:+UnlockDiagnosticVMOptions"
         }
     }
 }
