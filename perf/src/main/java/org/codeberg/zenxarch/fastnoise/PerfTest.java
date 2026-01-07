@@ -60,7 +60,10 @@ public class PerfTest {
             .result(output + " " + benchmarkName + ".txt");
 
     if (System.getProperty("zuseasync") != null) {
-      options = options.addProfiler("async", "libPath=" + System.getProperty("zuseasync"));
+      options =
+          options.addProfiler(
+              "async",
+              "libPath=" + System.getProperty("zuseasync") + ";sig=true;output=flamegraph");
     }
 
     var runner = new Runner(options.build());
