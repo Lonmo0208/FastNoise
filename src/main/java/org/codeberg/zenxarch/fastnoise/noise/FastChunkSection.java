@@ -1,5 +1,6 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
+
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.collection.PackedIntegerArray;
@@ -20,6 +21,8 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
   private Reference2IntArrayMap<BlockState> ores = new Reference2IntArrayMap<>(3);
 
   private int defaultIdx = -1;
+
+  private long[] storage;
 
   public FastChunkSection(ChunkSection section) {
     this.section = section;
@@ -49,8 +52,7 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
   }
 
   private void setBlockState(int x, int y, int z, int value) {
-    var blkidx = (((y << 4) | z) << 4) | x;
-    section.blockStateContainer.data.storage().zenxarch$unsafeSet(blkidx, value);
+    this.storage[(y << 4) | z] |= Integer.toUnsignedLong(value) << (x * 4);
   }
 
   private static final Palette.Factory ARRAY = ArrayPalette::create;
@@ -68,6 +70,8 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
             new ArrayPalette<BlockState>(paletteData, 4, 1));
 
     section.blockStateContainer.data = newData;
+
+    this.storage = newData.storage().getData();
 
     return newData.palette().index(object, PaletteResizeListener.throwing());
   }
