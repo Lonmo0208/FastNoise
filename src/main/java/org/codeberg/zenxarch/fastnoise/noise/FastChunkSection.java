@@ -58,20 +58,21 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
   private static final PaletteType ARRAY_4_TYPE = new PaletteType.Static(ARRAY, 4);
 
   @Override
-  public int onResize(int newBits, BlockState object) {
+  public int onResize(int newBits, BlockState state) {
     var paletteData = new BlockState[16];
     paletteData[0] = FastWorldgen.AIR;
+    paletteData[1] = state;
     var newData =
         new Data<BlockState>(
             ARRAY_4_TYPE,
             new PackedIntegerArray(4, 4096, new long[4096 / (64 / 4)]),
-            new ArrayPalette<BlockState>(paletteData, 4, 1));
+            new ArrayPalette<BlockState>(paletteData, 4, 2));
 
     section.blockStateContainer.data = newData;
 
     this.storage = newData.storage().getData();
 
-    return newData.palette().index(object, PaletteResizeListener.throwing());
+    return 1;
   }
 
   public void recalculateCounts() {
