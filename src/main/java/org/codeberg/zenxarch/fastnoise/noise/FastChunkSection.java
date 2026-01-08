@@ -52,8 +52,8 @@ public final class FastChunkSection {
     setBlockState(x, y, z, valIdx);
   }
 
-  private void setBlockState(int x, int y, int z, int value) {
-    this.storage[(y << 4) | z] |= Integer.toUnsignedLong(value) << (x * 4);
+  private void setBlockState(int x, int y, int z, long value) {
+    this.storage[(y << 4) | z] |= value << (x * 4);
   }
 
   private static final Palette.Factory ARRAY = ArrayPalette::create;
