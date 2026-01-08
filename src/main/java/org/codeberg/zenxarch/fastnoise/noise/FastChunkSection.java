@@ -62,16 +62,14 @@ public final class FastChunkSection implements PaletteResizeListener<BlockState>
     var paletteData = new BlockState[16];
     paletteData[0] = FastWorldgen.AIR;
     paletteData[1] = state;
+    this.storage = new long[4096 / (64 / 4)];
     var newData =
         new Data<BlockState>(
             ARRAY_4_TYPE,
-            new PackedIntegerArray(4, 4096, new long[4096 / (64 / 4)]),
+            new PackedIntegerArray(4, 4096, this.storage),
             new ArrayPalette<BlockState>(paletteData, 4, 2));
 
     section.blockStateContainer.data = newData;
-
-    this.storage = newData.storage().getData();
-
     return 1;
   }
 
