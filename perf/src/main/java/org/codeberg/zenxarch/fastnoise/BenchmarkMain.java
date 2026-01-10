@@ -18,8 +18,7 @@ public class BenchmarkMain {
       return;
     }
 
-    runFor(5, 5, "Cold ");
-    runFor(20, 60, "Hot ");
+    runBenchmark("Benchmark ");
   }
 
   private static void doParityTest() {
@@ -53,13 +52,31 @@ public class BenchmarkMain {
     FastNoiseMod.LOGGER.info(name + " matches");
   }
 
-  private static void runFor(int warmupSeconds, int benchmarkSeconds, String outputPrefix) {
-    var options =
-        new OptionsBuilder()
-            .forks(0)
-            .mode(Mode.AverageTime)
-            .warmupTime(TimeValue.seconds(warmupSeconds))
-            .measurementTime(TimeValue.seconds(benchmarkSeconds))
+  private static int getIntProperty(String name, int def, int min) {
+    var value = System.getProperty(name);
+    if (value == null) return def;
+    try {
+      return Math.max(Integer.parseInt(value), min);
+    } catch (Exception e) {
+      return def;
+    }
+  }
+
+  private static void runBenchmark(String outputPrefix) {
+    var options = new OptionsBuilder().forks(0);
+
+    try {
+      options = options.mode(Mode.deepValueOf(System.getProperty("zbenchmode")));
+    } catch (Exception e) {
+      options = options.mode(Mode.AverageTime);
+    }
+
+    options =
+        options
+            .warmupTime(TimeValue.seconds(getIntProperty("zwarmuptime", 5, 1)))
+            .measurementTime(TimeValue.seconds(getIntProperty("zmeasuretime", 5, 1)))
+            .warmupIterations(getIntProperty("zwarmups", 5, 1))
+            .measurementIterations(getIntProperty("zmeasures", 5, 1))
             .timeUnit(TimeUnit.MILLISECONDS);
 
     var benchmarkName = "";

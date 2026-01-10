@@ -8,14 +8,11 @@ loom {
     runs {
         server {
             server()
-            if (project.hasProperty("zperfbenchmark")) {
-                property('zperfbenchmark', project.getProperty('zperfbenchmark'))
-            }
-            if (project.hasProperty("zuseasync")) {
-                property('zuseasync', project.getProperty('zuseasync'))
-            }
-            if (project.hasProperty("zworldname")) {
-                property('zworldname', project.getProperty('zworldname'))
+            def props = ["zperfbenchmark","zuseasync","zworldname","zbenchmode","zwarmuptime","zmeasuretime","zwarmups","zmeasures"]
+            for (def prop in props) {
+                if (project.hasProperty(prop)) {
+                    property(prop, project.getProperty(prop))
+                }
             }
             vmArgs "-XX:+UnlockDiagnosticVMOptions"
         }

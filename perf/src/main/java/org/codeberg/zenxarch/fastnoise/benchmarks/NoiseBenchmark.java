@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 
 @State(Scope.Benchmark)
 public class NoiseBenchmark {
@@ -35,7 +36,7 @@ public class NoiseBenchmark {
     }
   }
 
-  @Setup(Level.Invocation)
+  @TearDown(Level.Invocation)
   public void clearChunk() {
     for (var chunk : chunks) TestWorld.resetNoise(chunk);
   }
