@@ -39,7 +39,7 @@ clean:
 prod:
     ./gradlew prodClient
 
-perfNoise args="":
+perfNoise +args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="end" {{args}}
@@ -48,7 +48,7 @@ perfNoise args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
 
-perfBiomes args="":
+perfBiomes +args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end" {{args}}
@@ -57,7 +57,7 @@ perfBiomes args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end" {{args}}
 
-perfNoiseAsync args="":
+perfNoiseAsync +args="":
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="end" {{args}}
@@ -66,7 +66,7 @@ perfNoiseAsync args="":
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
 
-perfBiomesAsync args="":
+perfBiomesAsync +args="":
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end" {{args}}
