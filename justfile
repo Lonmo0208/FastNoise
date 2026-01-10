@@ -39,6 +39,7 @@ clean:
 prod:
     ./gradlew prodClient
 
+# Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfNoise +args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
@@ -48,6 +49,7 @@ perfNoise +args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
 
+# Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfBiomes +args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
@@ -57,6 +59,7 @@ perfBiomes +args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end" {{args}}
 
+# Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfNoiseAsync +args="":
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
@@ -66,6 +69,7 @@ perfNoiseAsync +args="":
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
 
+# Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfBiomesAsync +args="":
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
