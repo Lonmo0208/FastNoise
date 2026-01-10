@@ -39,41 +39,41 @@ clean:
 prod:
     ./gradlew prodClient
 
-perfNoise:
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="end"
+perfNoise args="":
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="end"
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
 
-perfBiomes:
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end"
+perfBiomes args="":
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end"
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end" {{args}}
 
-perfNoiseAsync:
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="end"
+perfNoiseAsync args="":
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="end"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
 
-perfBiomesAsync:
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end"
+perfBiomesAsync args="":
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end" {{args}}
 
 parity:
     ./gradlew :perf:runServer -Pzperfbenchmark="parity"
