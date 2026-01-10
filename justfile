@@ -39,21 +39,41 @@ clean:
 prod:
     ./gradlew prodClient
 
-perf:
-    ./gradlew :perf:runServer -Pzperfbenchmark="overworldVanilla"
-    ./gradlew :perf:runServer -Pzperfbenchmark="netherVanilla"
-    ./gradlew :perf:runServer -Pzperfbenchmark="endVanilla"
-    ./gradlew :perf:runServer -Pzperfbenchmark="overworldOptimized"
-    ./gradlew :perf:runServer -Pzperfbenchmark="netherOptimized"
-    ./gradlew :perf:runServer -Pzperfbenchmark="endOptimized"
+perfNoise:
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="end"
 
-perfAsync:
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="overworldVanilla"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="netherVanilla"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="endVanilla"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="overworldOptimized"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="netherOptimized"
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="endOptimized"
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="end"
+
+perfBiomes:
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end"
+
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end"
+
+perfNoiseAsync:
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="end"
+
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="end"
+
+perfBiomesAsync:
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end"
+
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether"
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end"
 
 parity:
     ./gradlew :perf:runServer -Pzperfbenchmark="parity"

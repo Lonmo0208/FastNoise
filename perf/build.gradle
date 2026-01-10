@@ -3,7 +3,7 @@ plugins {
 }
 
 loom {
-    accessWidenerPath = project(':').file('src/main/resources/zfastnoise.ct')
+    accessWidenerPath = file('src/main/resources/zfastnoise-test.ct')
 
     runs {
         server {
@@ -13,6 +13,9 @@ loom {
             }
             if (project.hasProperty("zuseasync")) {
                 property('zuseasync', project.getProperty('zuseasync'))
+            }
+            if (project.hasProperty("zworldname")) {
+                property('zworldname', project.getProperty('zworldname'))
             }
             vmArgs "-XX:+UnlockDiagnosticVMOptions"
         }

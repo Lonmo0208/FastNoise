@@ -16,5 +16,6 @@
 	},
 	"mixins": [
 		"zfastnoise-test.mixins.json"
-	]
+	],
+	"accessWidener": "zfastnoise-test.ct"
 }

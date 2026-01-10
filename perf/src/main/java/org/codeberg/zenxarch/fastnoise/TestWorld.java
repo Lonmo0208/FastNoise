@@ -1,141 +1,125 @@
 package org.codeberg.zenxarch.fastnoise;
 
-import java.util.Arrays;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap.Type;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeSource;
+import net.minecraft.world.biome.source.BiomeSupplier;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
+import net.minecraft.world.chunk.BelowZeroRetrogen;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.PalettedContainer;
-import net.minecraft.world.chunk.PalettesFactory;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.gen.WorldPresets;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.AquiferSampler.FluidLevelSampler;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
+import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.gen.densityfunction.DensityFunctionTypes.Beardifying;
 import net.minecraft.world.gen.noise.NoiseConfig;
-import org.codeberg.zenxarch.fastnoise.Worldgen.PopulateNoiseFunction;
 
 public final class TestWorld {
-  private final ProtoChunk[] chunks;
-  private final PopulateNoiseFunction function;
-  private final ChunkGeneratorSettings settings;
-  private final PalettesFactory factory;
+  public final ChunkGeneratorSettings settings;
+  private final BiomeSource biomeSource;
+  private final NoiseConfig noiseConfig;
+  private final FluidLevelSampler fluidLevelSampler;
 
-  public TestWorld(DynamicRegistryManager manager, BenchmarkSettings settings) {
-    this(
-        manager,
-        settings.settings(),
-        settings.function(),
-        settings.region().pos(),
-        settings.seed());
+  private static final Beardifying beardifying = new BeardifyingImpl();
+
+  private final FakeWorld world;
+
+  public TestWorld(BenchmarkSettings settings) {
+    this(settings.dimensionOptions(), settings.seed());
   }
 
-  public TestWorld(
-      DynamicRegistryManager manager,
-      RegistryKey<ChunkGeneratorSettings> settingIp,
-      PopulateNoiseFunction function,
-      ChunkPos[] pos,
-      long seed) {
-    this.function = function;
-    this.settings = manager.getEntryOrThrow(settingIp).value();
-    var world =
+  public TestWorld(RegistryKey<DimensionOptions> optionsKey, long seed) {
+    var manager = TestGlobals.getManager();
+    var options =
+        manager
+            .getEntryOrThrow(WorldPresets.DEFAULT)
+            .value()
+            .createDimensionsRegistryHolder()
+            .dimensions()
+            .get(optionsKey);
+
+    if (!(options.chunkGenerator() instanceof NoiseChunkGenerator chunkGenerator)) {
+      throw new IllegalStateException("Chunk generator must be noise chunk generator");
+    }
+
+    this.settings = chunkGenerator.getSettings().value();
+    this.world =
         new FakeWorld(
             this.settings.generationShapeConfig().height(),
             this.settings.generationShapeConfig().minimumY());
 
-    this.factory = PalettesFactory.fromRegistryManager(manager);
-
-    var noiseConfig =
+    this.noiseConfig =
         NoiseConfig.create(this.settings, manager.getOrThrow(RegistryKeys.NOISE_PARAMETERS), seed);
 
     var lava = new AquiferSampler.FluidLevel(-54, Blocks.LAVA.getDefaultState());
     var water =
         new AquiferSampler.FluidLevel(this.settings.seaLevel(), this.settings.defaultFluid());
     int cutoff = Math.min(-54, this.settings.seaLevel());
-    FluidLevelSampler fluidLevelSampler = (x, y, z) -> y < cutoff ? lava : water;
+    this.fluidLevelSampler = (x, y, z) -> y < cutoff ? lava : water;
 
-    this.chunks = new ProtoChunk[pos.length];
-    var beardifying = new BeardifyingImpl();
-    for (int i = 0; i < pos.length; i++) {
-      this.chunks[i] =
-          new ProtoChunk(pos[i], UpgradeData.NO_UPGRADE_DATA, world, this.factory, null);
-
-      this.chunks[i].getOrCreateChunkNoiseSampler(
-          chunk ->
-              ChunkNoiseSampler.create(
-                  chunk,
-                  noiseConfig,
-                  beardifying,
-                  this.settings,
-                  fluidLevelSampler,
-                  Blender.getNoBlending()));
-    }
+    this.biomeSource = chunkGenerator.getBiomeSource();
   }
 
-  public void noise() {
-    for (int i = 0; i < this.chunks.length; i++) {
-      runForChunk(this.chunks[i]);
-    }
+  public ProtoChunk createChunk(ChunkPos pos) {
+    return new ProtoChunk(
+        pos, UpgradeData.NO_UPGRADE_DATA, this.world, TestGlobals.getFactory(), null);
   }
 
-  public void clear() {
-    for (int i = 0; i < this.chunks.length; i++) {
-      clearSections(this.chunks[i]);
-    }
+  public ChunkNoiseSampler createSampler(Chunk chunk) {
+    return ChunkNoiseSampler.create(
+        chunk, noiseConfig, beardifying, this.settings, fluidLevelSampler, Blender.getNoBlending());
   }
 
-  private void runForChunk(ProtoChunk chunk) {
-    var shapeConfig = this.settings.generationShapeConfig().trimHeight(chunk.getHeightLimitView());
-
-    int minY = shapeConfig.minimumY();
-    int minimumCellY = MathHelper.floorDiv(minY, shapeConfig.verticalCellBlockCount());
-    int cellHeight =
-        MathHelper.floorDiv(shapeConfig.height(), shapeConfig.verticalCellBlockCount());
-
-    var start = chunk.getSectionIndex(minY);
-    var end = chunk.getSectionIndex(cellHeight * shapeConfig.verticalCellBlockCount() - 1 + minY);
-
-    var sampler = chunk.getOrCreateChunkNoiseSampler(null);
-
-    this.function.populateNoise(sampler, settings, chunk, minimumCellY, cellHeight, start, end);
+  public MultiNoiseSampler createMultiNoiseSampler(ProtoChunk chunk) {
+    // new sampler is created for chunk during biome phase
+    return this.createSampler(chunk)
+        .createMultiNoiseSampler(this.noiseConfig.getNoiseRouter(), this.settings.spawnTarget());
   }
 
-  private void clearSections(ProtoChunk chunk) {
+  public BiomeSupplier getBiomeSupplier(ProtoChunk chunk) {
+    return BelowZeroRetrogen.getBiomeSupplier(
+        Blender.getNoBlending().getBiomeSupplier(this.biomeSource), chunk);
+  }
+
+  public static void resetNoise(ProtoChunk chunk) {
     var data = chunk.getSectionArray();
-    for (int i = 0; i < data.length; i++) data[i] = new ChunkSection(factory);
-    Arrays.setAll(chunk.getHeightmap(Type.OCEAN_FLOOR_WG).asLongArray(), t -> 0);
-    Arrays.setAll(chunk.getHeightmap(Type.WORLD_SURFACE_WG).asLongArray(), t -> 0);
+    for (int i = 0; i < data.length; i++)
+      data[i].blockStateContainer = data[i].blockStateContainer.slice();
+    var len = chunk.getHeightmap(Type.OCEAN_FLOOR_WG).asLongArray().length;
+    chunk.setHeightmap(Type.OCEAN_FLOOR_WG, new long[len]);
+    len = chunk.getHeightmap(Type.WORLD_SURFACE_WG).asLongArray().length;
+    chunk.setHeightmap(Type.WORLD_SURFACE_WG, new long[len]);
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (!(obj instanceof TestWorld world)) return false;
-    if (chunks.length != world.chunks.length) return false;
+  public static boolean matches(ProtoChunk a, ProtoChunk b) {
+    var self = a.getSectionArray();
+    var other = b.getSectionArray();
 
-    for (int i = 0; i < chunks.length; i++) {
-      var self = chunks[i].getSectionArray();
-      var other = world.chunks[i].getSectionArray();
-      if (self.length != other.length) return false;
-      for (int j = 0; j < self.length; j++) {
-        if (!sameBlocks(self[j].blockStateContainer, other[j].blockStateContainer)) return false;
-      }
+    if (self.length != other.length) return false;
+
+    for (int i = 0; i < self.length; i++) {
+      if (!matches(self[i].blockStateContainer, other[i].blockStateContainer)) return false;
+      if (!matches(
+          (PalettedContainer<RegistryEntry<Biome>>) self[i].biomeContainer,
+          (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer)) return false;
     }
-
     return true;
   }
 
-  private static boolean sameBlocks(
-      PalettedContainer<BlockState> self, PalettedContainer<BlockState> other) {
+  private static <T> boolean matches(PalettedContainer<T> self, PalettedContainer<T> other) {
     if (self.data.storage().getSize() != other.data.storage().getSize()) return false;
     for (int i = 0; i < self.data.storage().getSize(); i++) {
       if (self.data.palette().get(self.data.storage().get(i))

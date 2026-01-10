@@ -2,27 +2,39 @@ package org.codeberg.zenxarch.fastnoise;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Heightmap.Type;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeCoords;
+import net.minecraft.world.biome.source.BiomeSupplier;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
-import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import org.codeberg.zenxarch.fastnoise.noise.FastChunkSection;
 import org.codeberg.zenxarch.fastnoise.noise.FastWorldgen;
 
 public interface Worldgen {
 
-  public static void optimized(
-      ChunkNoiseSampler chunkNoiseSampler,
-      ChunkGeneratorSettings settings,
-      ProtoChunk chunk,
-      int minimumCellY,
-      int cellHeight,
-      int start,
-      int end) {
+  public static void optimizedNoise(TestWorld world, ProtoChunk chunk) {
+
+    var settings = world.settings;
+    var shapeConfig = settings.generationShapeConfig().trimHeight(chunk.getHeightLimitView());
+
+    int minY = shapeConfig.minimumY();
+    int minimumCellY = MathHelper.floorDiv(minY, shapeConfig.verticalCellBlockCount());
+    int cellHeight =
+        MathHelper.floorDiv(shapeConfig.height(), shapeConfig.verticalCellBlockCount());
+
+    var start = chunk.getSectionIndex(minY);
+    var end = chunk.getSectionIndex(cellHeight * shapeConfig.verticalCellBlockCount() - 1 + minY);
+
+    var chunkNoiseSampler = chunk.getOrCreateChunkNoiseSampler(null);
+
     var fastSections = new FastChunkSection[end + 1];
     for (int i = start; i <= end; i++) fastSections[i] = new FastChunkSection(chunk.getSection(i));
     FastWorldgen.populateNoise(
@@ -31,14 +43,17 @@ public interface Worldgen {
 
   public static final BlockState AIR = Blocks.AIR.getDefaultState();
 
-  public static void vanilla(
-      ChunkNoiseSampler chunkNoiseSampler,
-      ChunkGeneratorSettings settings,
-      ProtoChunk chunk,
-      int minimumCellY,
-      int cellHeight,
-      int start,
-      int end) {
+  public static void vanillaNoise(TestWorld world, ProtoChunk chunk) {
+
+    var settings = world.settings;
+    var shapeConfig = settings.generationShapeConfig().trimHeight(chunk.getHeightLimitView());
+
+    int minY = shapeConfig.minimumY();
+    int minimumCellY = MathHelper.floorDiv(minY, shapeConfig.verticalCellBlockCount());
+    int cellHeight =
+        MathHelper.floorDiv(shapeConfig.height(), shapeConfig.verticalCellBlockCount());
+
+    var chunkNoiseSampler = chunk.getOrCreateChunkNoiseSampler(null);
 
     ChunkPos chunkPos = chunk.getPos();
     int chunkStartX = chunkPos.getStartX();
@@ -114,15 +129,43 @@ public interface Worldgen {
     chunkNoiseSampler.stopInterpolation();
   }
 
-  @FunctionalInterface
-  public static interface PopulateNoiseFunction {
-    public void populateNoise(
-        ChunkNoiseSampler chunkNoiseSampler,
-        ChunkGeneratorSettings settings,
-        ProtoChunk chunk,
-        int minimumCellY,
-        int cellHeight,
-        int start,
-        int end);
+  public static void optimizedBiomes(TestWorld world, ProtoChunk chunk) {
+    chunk.populateBiomes(world.getBiomeSupplier(chunk), world.createMultiNoiseSampler(chunk));
+  }
+
+  public static void vanillaBiomes(TestWorld world, ProtoChunk chunk) {
+    var supplier = world.getBiomeSupplier(chunk);
+    var sampler = world.createMultiNoiseSampler(chunk);
+    var chunkPos = chunk.getPos();
+    int x = BiomeCoords.fromBlock(chunkPos.getStartX());
+    int z = BiomeCoords.fromBlock(chunkPos.getStartZ());
+    var fakeWorld = chunk.getHeightLimitView();
+
+    for (int cy = fakeWorld.getBottomSectionCoord(); cy <= fakeWorld.getTopSectionCoord(); cy++) {
+      var section = chunk.getSection(chunk.sectionCoordToIndex(cy));
+      int y = BiomeCoords.fromChunk(cy);
+      populateBiomesVanilla(section, supplier, sampler, x, y, z);
+    }
+  }
+
+  private static void populateBiomesVanilla(
+      ChunkSection section,
+      BiomeSupplier supplier,
+      MultiNoiseUtil.MultiNoiseSampler sampler,
+      int x,
+      int y,
+      int z) {
+    PalettedContainer<RegistryEntry<Biome>> palettedContainer = section.biomeContainer.slice();
+
+    for (int ix = 0; ix < 4; ix++) {
+      for (int iy = 0; iy < 4; iy++) {
+        for (int iz = 0; iz < 4; iz++) {
+          palettedContainer.swapUnsafe(
+              ix, iy, iz, supplier.getBiome(x + ix, y + iy, z + iz, sampler));
+        }
+      }
+    }
+
+    section.biomeContainer = palettedContainer;
   }
 }

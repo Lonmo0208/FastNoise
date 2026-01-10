@@ -2,23 +2,32 @@ package org.codeberg.zenxarch.fastnoise;
 
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
-import org.codeberg.zenxarch.fastnoise.Worldgen.PopulateNoiseFunction;
+import net.minecraft.world.dimension.DimensionOptions;
 
 public record BenchmarkSettings(
-    ChunkRegion region,
-    long seed,
-    RegistryKey<ChunkGeneratorSettings> settings,
-    PopulateNoiseFunction function) {
+    ChunkRegion region, long seed, RegistryKey<DimensionOptions> dimensionOptions) {
 
-  public static BenchmarkSettings vanilla(
-      RegistryKey<ChunkGeneratorSettings> settings, long seed, ChunkRegion region) {
-    return new BenchmarkSettings(region, seed, settings, Worldgen::vanilla);
+  private static final long defaultSeed = 100;
+  private static final int WorldRadiusInChunks = 16;
+
+  private static ChunkRegion overworldRegion() {
+    return ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
   }
 
-  public static BenchmarkSettings optimized(
-      RegistryKey<ChunkGeneratorSettings> settings, long seed, ChunkRegion region) {
-    return new BenchmarkSettings(region, seed, settings, Worldgen::optimized);
+  private static ChunkRegion endRegion() {
+    return ChunkRegion.of(128 - WorldRadiusInChunks, 128 + WorldRadiusInChunks);
+  }
+
+  public static BenchmarkSettings overworld() {
+    return new BenchmarkSettings(overworldRegion(), defaultSeed, DimensionOptions.OVERWORLD);
+  }
+
+  public static BenchmarkSettings nether() {
+    return new BenchmarkSettings(overworldRegion(), defaultSeed, DimensionOptions.NETHER);
+  }
+
+  public static BenchmarkSettings end() {
+    return new BenchmarkSettings(endRegion(), defaultSeed, DimensionOptions.END);
   }
 
   public static record ChunkRegion(ChunkPos[] pos) {
