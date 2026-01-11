@@ -15,17 +15,18 @@ public abstract class TreeNodeMixin {
     long result = 0L;
 
     for (int i = 0; i < 7; i++) {
-      long noise = otherParameters[i];
-      long min = this.parameters[i].min();
-      long max = this.parameters[i].max();
+      final long noise = otherParameters[i];
+      final long max = this.parameters[i].max();
 
       if (noise > max) {
         long distance = noise - max;
         result += distance * distance;
-      }
-      if (min > noise) {
-        long distance = min - noise;
-        result += distance * distance;
+      } else {
+        final long min = this.parameters[i].min();
+        if (min > noise) {
+          long distance = min - noise;
+          result += distance * distance;
+        }
       }
     }
 
