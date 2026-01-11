@@ -72,7 +72,7 @@ public final class FastBiomeGen {
 
     var container = ((PalettedContainer<RegistryEntry<Biome>>) section.biomeContainer);
     if (size == 1) {
-      if (container.data.palette() instanceof SingularPalette palette) {
+      if (container.data.palette() instanceof SingularPalette<RegistryEntry<Biome>> palette) {
         palette.entry = biomes[0];
       } else {
         container.data =
