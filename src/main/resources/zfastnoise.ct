@@ -5,11 +5,15 @@ accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getVerticalCel
 accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler sampleBlockState ()Lnet/minecraft/block/BlockState;
 
 accessible field net/minecraft/world/chunk/ChunkSection blockStateContainer Lnet/minecraft/world/chunk/PalettedContainer;
+accessible field net/minecraft/world/chunk/ChunkSection biomeContainer Lnet/minecraft/world/chunk/ReadableContainer;
 
 accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft/world/chunk/PalettedContainer$Data;
 
 accessible class net/minecraft/world/chunk/PalettedContainer$Data
 
 accessible method net/minecraft/world/chunk/ArrayPalette <init> ([Ljava/lang/Object;II)V
+accessible field net/minecraft/world/chunk/ArrayPalette size I
+
+accessible field net/minecraft/world/chunk/SingularPalette entry Ljava/lang/Object;
 
 inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray

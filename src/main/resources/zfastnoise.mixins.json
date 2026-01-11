@@ -7,7 +7,7 @@
     "PackedIntegerArrayMixin",
     "EmptyPaletteStorageMixin",
     "PaletteStorageMixin",
-    "ChunkSectionMixin"
+    "TreeNodeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

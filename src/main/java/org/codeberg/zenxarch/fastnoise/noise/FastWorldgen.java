@@ -6,6 +6,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.biome.source.BiomeSupplier;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
@@ -97,5 +99,24 @@ public class FastWorldgen {
 
     Heightmap.populateHeightmaps(
         chunk, ObjectArraySet.of(Heightmap.Type.OCEAN_FLOOR_WG, Heightmap.Type.WORLD_SURFACE_WG));
+  }
+
+  public static void populateBiomes(
+      Chunk chunk, BiomeSupplier supplier, MultiNoiseSampler sampler) {
+    var chunkPos = chunk.getPos();
+    var world = chunk.getHeightLimitView();
+
+    int x = chunkPos.x * 4;
+    int y = world.getBottomY() >> 2;
+    int z = chunkPos.z * 4;
+
+    final int maxIdx = world.getHeight() >> 4;
+    var sections = chunk.getSectionArray();
+
+    for (int i = 0; i < maxIdx; i++) {
+      var section = sections[i];
+      FastBiomeGen.populateBiomes(section, supplier, sampler, x, y, z);
+      y += 4;
+    }
   }
 }
