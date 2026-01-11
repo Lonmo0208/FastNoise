@@ -130,7 +130,8 @@ public interface Worldgen {
   }
 
   public static void optimizedBiomes(TestWorld world, ProtoChunk chunk) {
-    chunk.populateBiomes(world.getBiomeSupplier(chunk), world.createMultiNoiseSampler(chunk));
+    FastWorldgen.populateBiomes(
+        chunk, world.getBiomeSupplier(chunk), world.createMultiNoiseSampler(chunk));
   }
 
   public static void vanillaBiomes(TestWorld world, ProtoChunk chunk) {
