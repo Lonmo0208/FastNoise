@@ -9,11 +9,6 @@
 	],
 	"license": "Mozilla Public License 2.0",
 	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"org.codeberg.zenxarch.fastnoise.FastNoiseMod"
-		]
-	},
 	"mixins": [
 		"zfastnoise-test.mixins.json"
 	],

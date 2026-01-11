@@ -3,7 +3,6 @@ package org.codeberg.zenxarch.fastnoise.benchmarks;
 import net.minecraft.world.chunk.ProtoChunk;
 import org.codeberg.zenxarch.fastnoise.BenchmarkSettings;
 import org.codeberg.zenxarch.fastnoise.TestWorld;
-import org.codeberg.zenxarch.fastnoise.Worldgen;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
@@ -38,20 +37,15 @@ public class NoiseBenchmark {
 
   @TearDown(Level.Invocation)
   public void clearChunk() {
-    for (var chunk : chunks) TestWorld.resetNoise(chunk);
-  }
-
-  @Benchmark
-  public void optimizedNoise() {
     for (int i = 0; i < chunks.length; i++) {
-      Worldgen.optimizedNoise(world, chunks[i]);
+      TestWorld.resetNoise(chunks[i]);
     }
   }
 
   @Benchmark
-  public void vanillaNoise() {
+  public void noisegen() {
     for (int i = 0; i < chunks.length; i++) {
-      Worldgen.vanillaNoise(world, chunks[i]);
+      world.noise(chunks[i]);
     }
   }
 }

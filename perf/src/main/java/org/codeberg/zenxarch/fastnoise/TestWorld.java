@@ -5,13 +5,10 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.biome.source.BiomeSupplier;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
-import net.minecraft.world.chunk.BelowZeroRetrogen;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.ProtoChunk;
@@ -26,12 +23,13 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.gen.densityfunction.DensityFunctionTypes.Beardifying;
 import net.minecraft.world.gen.noise.NoiseConfig;
+import org.codeberg.zenxarch.fastnoise.mixin.NoiseChunkGeneratorAccessor;
 
 public final class TestWorld {
   public final ChunkGeneratorSettings settings;
-  private final BiomeSource biomeSource;
   private final NoiseConfig noiseConfig;
   private final FluidLevelSampler fluidLevelSampler;
+  private final NoiseChunkGenerator generator;
 
   private static final Beardifying beardifying = new BeardifyingImpl();
 
@@ -55,6 +53,8 @@ public final class TestWorld {
       throw new IllegalStateException("Chunk generator must be noise chunk generator");
     }
 
+    this.generator = chunkGenerator;
+
     this.settings = chunkGenerator.getSettings().value();
     this.world =
         new FakeWorld(
@@ -69,8 +69,6 @@ public final class TestWorld {
         new AquiferSampler.FluidLevel(this.settings.seaLevel(), this.settings.defaultFluid());
     int cutoff = Math.min(-54, this.settings.seaLevel());
     this.fluidLevelSampler = (x, y, z) -> y < cutoff ? lava : water;
-
-    this.biomeSource = chunkGenerator.getBiomeSource();
   }
 
   public ProtoChunk createChunk(ChunkPos pos) {
@@ -83,17 +81,6 @@ public final class TestWorld {
         chunk, noiseConfig, beardifying, this.settings, fluidLevelSampler, Blender.getNoBlending());
   }
 
-  public MultiNoiseSampler createMultiNoiseSampler(ProtoChunk chunk) {
-    // new sampler is created for chunk during biome phase
-    return this.createSampler(chunk)
-        .createMultiNoiseSampler(this.noiseConfig.getNoiseRouter(), this.settings.spawnTarget());
-  }
-
-  public BiomeSupplier getBiomeSupplier(ProtoChunk chunk) {
-    return BelowZeroRetrogen.getBiomeSupplier(
-        Blender.getNoBlending().getBiomeSupplier(this.biomeSource), chunk);
-  }
-
   public static void resetNoise(ProtoChunk chunk) {
     var data = chunk.getSectionArray();
     for (int i = 0; i < data.length; i++)
@@ -102,6 +89,34 @@ public final class TestWorld {
     chunk.setHeightmap(Type.OCEAN_FLOOR_WG, new long[len]);
     len = chunk.getHeightmap(Type.WORLD_SURFACE_WG).asLongArray().length;
     chunk.setHeightmap(Type.WORLD_SURFACE_WG, new long[len]);
+  }
+
+  public static void resetBiomes(ProtoChunk chunk) {
+    var data = chunk.getSectionArray();
+    for (int i = 0; i < data.length; i++) data[i].biomeContainer = data[i].biomeContainer.slice();
+  }
+
+  public void noise(ProtoChunk chunk) {
+    var shapeConfig = this.settings.generationShapeConfig().trimHeight(this.world);
+    int minY = shapeConfig.minimumY();
+    int minimumCellY = MathHelper.floorDiv(minY, shapeConfig.verticalCellBlockCount());
+    int cellHeight =
+        MathHelper.floorDiv(shapeConfig.height(), shapeConfig.verticalCellBlockCount());
+    ((NoiseChunkGeneratorAccessor) (Object) this.generator)
+        .zenxarch$method_38332(
+            chunk,
+            cellHeight,
+            shapeConfig,
+            minY,
+            Blender.getNoBlending(),
+            null,
+            this.noiseConfig,
+            minimumCellY);
+  }
+
+  public void biomes(ProtoChunk chunk) {
+    chunk.chunkNoiseSampler = this.createSampler(chunk);
+    this.generator.populateBiomes(Blender.getNoBlending(), this.noiseConfig, null, chunk);
   }
 
   public static boolean matches(ProtoChunk a, ProtoChunk b) {

@@ -8,7 +8,7 @@ loom {
     runs {
         server {
             server()
-            def props = ["zperfbenchmark","zuseasync","zworldname","zbenchmode","zwarmuptime","zmeasuretime","zwarmups","zmeasures"]
+            def props = ["zperfbenchmark","zuseasync","zworldname","zbenchmode","zwarmuptime","zmeasuretime","zwarmups","zmeasures","zmod"]
             for (def prop in props) {
                 if (project.hasProperty(prop)) {
                     property(prop, project.getProperty(prop))
@@ -25,7 +25,9 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    implementation project(path: ':', configuration: 'namedElements')
+    if (project.hasProperty("zmod")) {
+        implementation project(path: ':', configuration: 'namedElements')
+    }
     implementation 'org.openjdk.jmh:jmh-core:1.37'
     annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 }

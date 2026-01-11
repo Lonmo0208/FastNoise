@@ -3,13 +3,7 @@ package org.codeberg.zenxarch.fastnoise.benchmarks;
 import net.minecraft.world.chunk.ProtoChunk;
 import org.codeberg.zenxarch.fastnoise.BenchmarkSettings;
 import org.codeberg.zenxarch.fastnoise.TestWorld;
-import org.codeberg.zenxarch.fastnoise.Worldgen;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Level;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.*;
 
 @State(Scope.Benchmark)
 public class BiomesBenchmark {
@@ -34,17 +28,17 @@ public class BiomesBenchmark {
     }
   }
 
-  @Benchmark
-  public void optimizedBiomes() {
+  @TearDown(Level.Invocation)
+  public void clearChunk() {
     for (int i = 0; i < chunks.length; i++) {
-      Worldgen.optimizedBiomes(world, chunks[i]);
+      TestWorld.resetBiomes(chunks[i]);
     }
   }
 
   @Benchmark
-  public void vanillaBiomes() {
+  public void biomegen() {
     for (int i = 0; i < chunks.length; i++) {
-      Worldgen.vanillaBiomes(world, chunks[i]);
+      world.biomes(chunks[i]);
     }
   }
 }

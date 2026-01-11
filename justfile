@@ -41,43 +41,43 @@ prod:
 
 # Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfNoise +args="":
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaNoise" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzmod="true" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzmod="true" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzmod="true" -Pzworldname="end" {{args}}
 
 # Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfBiomes +args="":
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="biomegen" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="biomegen" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="biomegen" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="biomegen" -Pzmod="true" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="biomegen" -Pzmod="true" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzperfbenchmark="biomegen" -Pzmod="true" -Pzworldname="end" {{args}}
 
 # Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfNoiseAsync +args="":
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaNoise" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="noisegen" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="noisegen" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="noisegen" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedNoise" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzmod="true" -Pzperfbenchmark="noisegen" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzmod="true" -Pzperfbenchmark="noisegen" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzmod="true" -Pzperfbenchmark="noisegen" -Pzworldname="end" {{args}}
 
 # Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
 perfBiomesAsync +args="":
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="vanillaBiomes" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="biomegen" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="biomegen" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="biomegen" -Pzworldname="end" {{args}}
 
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="overworld" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="nether" {{args}}
-    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzperfbenchmark="optimizedBiomes" -Pzworldname="end" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzmod="true" -Pzperfbenchmark="biomegen" -Pzworldname="overworld" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzmod="true" -Pzperfbenchmark="biomegen" -Pzworldname="nether" {{args}}
+    ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzmod="true" -Pzperfbenchmark="biomegen" -Pzworldname="end" {{args}}
 
 parity:
     ./gradlew :perf:runServer -Pzperfbenchmark="parity"

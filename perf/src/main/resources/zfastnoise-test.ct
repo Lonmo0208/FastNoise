@@ -15,6 +15,7 @@ accessible class net/minecraft/world/chunk/PalettedContainer$Data
 
 accessible method net/minecraft/world/chunk/ArrayPalette <init> ([Ljava/lang/Object;II)V
 
-inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray
-
 accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler createMultiNoiseSampler (Lnet/minecraft/world/gen/noise/NoiseRouter;Ljava/util/List;)Lnet/minecraft/world/biome/source/util/MultiNoiseUtil$MultiNoiseSampler;
+
+accessible field net/minecraft/world/chunk/Chunk chunkNoiseSampler Lnet/minecraft/world/gen/chunk/ChunkNoiseSampler;
+accessible method net/minecraft/world/gen/chunk/NoiseChunkGenerator populateBiomes (Lnet/minecraft/world/gen/chunk/Blender;Lnet/minecraft/world/gen/noise/NoiseConfig;Lnet/minecraft/world/gen/StructureAccessor;Lnet/minecraft/world/chunk/Chunk;)V
