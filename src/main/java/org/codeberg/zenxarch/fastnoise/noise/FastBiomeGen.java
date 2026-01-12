@@ -40,10 +40,9 @@ public final class FastBiomeGen {
       MultiNoiseUtil.MultiNoiseSampler sampler,
       int x,
       int y,
-      int z) {
-    @SuppressWarnings("unchecked")
-    RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
-    var storage = new byte[64];
+      int z,
+      RegistryEntry<Biome>[] biomes,
+      byte[] storage) {
 
     int size = 0;
     int idx = 0;
