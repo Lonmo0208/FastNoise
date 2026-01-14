@@ -102,7 +102,7 @@ jmh {
 	warmup = '2s'
 	warmupIterations = 2
 
-	profilers = ['async']
+	profilers = ['async:libPath=/opt/async-profiler/lib/libasyncProfiler.so;sig=true;output=flamegraph']
 
 	zip64 = true
 }
