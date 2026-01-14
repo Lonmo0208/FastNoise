@@ -14,6 +14,9 @@ accessible class net/minecraft/world/chunk/PalettedContainer$Data
 accessible method net/minecraft/world/chunk/ArrayPalette <init> ([Ljava/lang/Object;II)V
 accessible field net/minecraft/world/chunk/ArrayPalette size I
 
+accessible field net/minecraft/world/biome/source/util/MultiNoiseUtil$ParameterRange min J
+accessible field net/minecraft/world/biome/source/util/MultiNoiseUtil$ParameterRange max J
+
 accessible field net/minecraft/world/chunk/SingularPalette entry Ljava/lang/Object;
 
 inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray
