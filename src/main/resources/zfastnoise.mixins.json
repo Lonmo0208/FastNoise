@@ -4,9 +4,6 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "NoiseChunkGeneratorMixin",
-    "PackedIntegerArrayMixin",
-    "EmptyPaletteStorageMixin",
-    "PaletteStorageMixin",
     "TreeNodeMixin"
   ],
   "injectors": {

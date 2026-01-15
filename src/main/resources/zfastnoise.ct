@@ -15,5 +15,3 @@ accessible method net/minecraft/world/chunk/ArrayPalette <init> ([Ljava/lang/Obj
 accessible field net/minecraft/world/chunk/ArrayPalette size I
 
 accessible field net/minecraft/world/chunk/SingularPalette entry Ljava/lang/Object;
-
-inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray
