@@ -108,9 +108,9 @@ public class FastWorldgen {
     var chunkPos = chunk.getPos();
     var world = chunk.getHeightLimitView();
 
-    int x = chunkPos.x * 4;
+    int x = chunkPos.x() * 4;
     int y = world.getBottomY() >> 2;
-    int z = chunkPos.z * 4;
+    int z = chunkPos.z() * 4;
 
     final int maxIdx = world.getHeight() >> 4;
     var sections = chunk.getSectionArray();
