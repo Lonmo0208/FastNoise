@@ -3,15 +3,19 @@ package org.codeberg.zenxarch.fastnoise.noise;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeSupplier;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 
 public class FastWorldgen {
-  private static final BlockState AIR = Blocks.AIR.getDefaultState();
+  public static final BlockState AIR = Blocks.AIR.getDefaultState();
 
   public static void populateNoise(
       ChunkNoiseSampler chunkNoiseSampler,
@@ -29,6 +33,8 @@ public class FastWorldgen {
     int horizontalCellBlockCount = chunkNoiseSampler.getHorizontalCellBlockCount();
     int verticalCellBlockCount = chunkNoiseSampler.getVerticalCellBlockCount();
     int cellWidth = 16 / horizontalCellBlockCount;
+
+    final boolean skipDefaultBlock = defaultBlockState == AIR;
 
     FastChunkSection fastSection = fastSections[fastSections.length - 1];
 
@@ -65,9 +71,15 @@ public class FastWorldgen {
                 chunkNoiseSampler.interpolateZ(blockZ, cellZProgress);
 
                 var state = chunkNoiseSampler.sampleBlockState();
-                if (state == null) state = defaultBlockState;
-                if (state == AIR) continue;
-                fastSection.setBlockState(blockXInSection, blockYInSection, blockZInSection, state);
+                if (state == null) {
+                  if (skipDefaultBlock) continue;
+                  fastSection.setDefaultBlockState(
+                      blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
+                  continue;
+                } else if (state == AIR) continue;
+                else
+                  fastSection.setBlockState(
+                      blockXInSection, blockYInSection, blockZInSection, state);
 
                 if (aquiferSampler.needsFluidTick() && !state.getFluidState().isEmpty()) {
                   mutable.set(blockX, blockY, blockZ);
@@ -89,5 +101,28 @@ public class FastWorldgen {
 
     Heightmap.populateHeightmaps(
         chunk, ObjectArraySet.of(Heightmap.Type.OCEAN_FLOOR_WG, Heightmap.Type.WORLD_SURFACE_WG));
+  }
+
+  public static void populateBiomes(
+      Chunk chunk, BiomeSupplier supplier, MultiNoiseSampler sampler) {
+    var chunkPos = chunk.getPos();
+    var world = chunk.getHeightLimitView();
+
+    int x = chunkPos.x * 4;
+    int y = world.getBottomY() >> 2;
+    int z = chunkPos.z * 4;
+
+    final int maxIdx = world.getHeight() >> 4;
+    var sections = chunk.getSectionArray();
+
+    @SuppressWarnings("unchecked")
+    final RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
+    final var storage = new byte[64];
+
+    for (int i = 0; i < maxIdx; i++) {
+      var section = sections[i];
+      FastBiomeGen.populateBiomes(section, supplier, sampler, x, y, z, biomes, storage);
+      y += 4;
+    }
   }
 }

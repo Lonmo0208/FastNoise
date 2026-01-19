@@ -36,5 +36,8 @@ stop:
 clean:
     ./gradlew clean
 
+prod:
+    ./gradlew prodClient
+
 task taskName:
     ./gradlew {{taskName}}
