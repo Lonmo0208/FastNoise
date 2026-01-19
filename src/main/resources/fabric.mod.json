@@ -29,5 +29,11 @@
 		"minecraft": "~${minecraft_version}",
 		"java": ">=21"
 	},
+	"breaks": {
+		"moonrise": "*"
+	},
+	"recommends": {
+		"c2me": "*"
+	},
 	"accessWidener": "zfastnoise.ct"
 }
