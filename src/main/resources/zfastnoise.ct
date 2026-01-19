@@ -5,13 +5,15 @@ accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getVerticalCel
 accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler sampleBlockState ()Lnet/minecraft/block/BlockState;
 
 accessible field net/minecraft/world/chunk/ChunkSection blockStateContainer Lnet/minecraft/world/chunk/PalettedContainer;
+accessible field net/minecraft/world/chunk/ChunkSection biomeContainer Lnet/minecraft/world/chunk/ReadableContainer;
 
 accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft/world/chunk/PalettedContainer$Data;
 
 accessible class net/minecraft/world/chunk/PalettedContainer$Data
+accessible class net/minecraft/world/chunk/PalettedContainer$DataProvider
 
-inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray
+accessible method net/minecraft/world/chunk/ArrayPalette <init> (Lnet/minecraft/util/collection/IndexedIterable;[Ljava/lang/Object;Lnet/minecraft/world/chunk/PaletteResizeListener;II)V
+accessible field net/minecraft/world/chunk/ArrayPalette size I
 
-accessible class net/minecraft/world/chunk/PaletteResizeListener
-accessible field net/minecraft/world/chunk/ArrayPalette listener Lnet/minecraft/world/chunk/PaletteResizeListener;
-mutable field net/minecraft/world/chunk/ArrayPalette listener Lnet/minecraft/world/chunk/PaletteResizeListener;
+accessible field net/minecraft/world/chunk/SingularPalette entry Ljava/lang/Object;
+accessible field net/minecraft/world/chunk/PalettedContainer idList Lnet/minecraft/util/collection/IndexedIterable;
