@@ -80,7 +80,7 @@ public final class FastSearchTree<T> {
 
     @Override
     public LeafNode getClosestNode(long[] noise, LeafNode alternative, long distance) {
-      long minDist = alternative == null ? Long.MAX_VALUE : distance;
+      long minDist = distance;
       LeafNode result = alternative;
 
       for (var node : nodes) {
