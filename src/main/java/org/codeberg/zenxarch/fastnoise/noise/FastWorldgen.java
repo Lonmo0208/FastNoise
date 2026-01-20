@@ -13,6 +13,10 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.codeberg.zenxarch.fastnoise.mixin.MultiNoiseBiomeSourceAccessor;
+import org.codeberg.zenxarch.fastnoise.tree.FastSearchTree;
+import org.codeberg.zenxarch.fastnoise.tree.FastSearchTreeHolder;
 
 public class FastWorldgen {
   public static final BlockState AIR = Blocks.AIR.getDefaultState();
@@ -112,6 +116,20 @@ public class FastWorldgen {
     int y = world.getBottomY() >> 2;
     int z = chunkPos.z * 4;
 
+    ZBiomeSupplier zBiomeSupplier;
+    var lastLeaf = new MutableObject<FastSearchTree.LeafNode>();
+
+    if (supplier instanceof MultiNoiseBiomeSourceAccessor multiNoise) {
+      @SuppressWarnings("unchecked")
+      var fastSearchTree =
+          ((FastSearchTreeHolder<RegistryEntry<Biome>>) multiNoise.zenxarch$getBiomeEntries())
+              .zenxarch$getFastSearchTree();
+      zBiomeSupplier =
+          (ix, iy, iz) -> fastSearchTree.search(sampler.sample(x + ix, iy, z + iz), lastLeaf);
+    } else {
+      zBiomeSupplier = (ix, iy, iz) -> supplier.getBiome(x + ix, iy, z + iz, sampler);
+    }
+
     final int maxIdx = world.getHeight() >> 4;
     var sections = chunk.getSectionArray();
 
@@ -121,8 +139,13 @@ public class FastWorldgen {
 
     for (int i = 0; i < maxIdx; i++) {
       var section = sections[i];
-      FastBiomeGen.populateBiomes(section, supplier, sampler, x, y, z, biomes, storage);
+      FastBiomeGen.populateBiomes(section, zBiomeSupplier, y, biomes, storage);
       y += 4;
     }
+  }
+
+  @FunctionalInterface
+  public static interface ZBiomeSupplier {
+    public RegistryEntry<Biome> get(int ix, int iy, int iz);
   }
 }

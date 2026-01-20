@@ -7,8 +7,6 @@ import net.minecraft.util.collection.PackedIntegerArray;
 import net.minecraft.util.collection.PaletteStorage;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeSupplier;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.Palette;
@@ -16,6 +14,7 @@ import net.minecraft.world.chunk.PaletteType;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.PalettedContainer.Data;
 import net.minecraft.world.chunk.SingularPalette;
+import org.codeberg.zenxarch.fastnoise.noise.FastWorldgen.ZBiomeSupplier;
 
 public final class FastBiomeGen {
 
@@ -36,11 +35,8 @@ public final class FastBiomeGen {
 
   public static void populateBiomes(
       ChunkSection section,
-      BiomeSupplier biomeSupplier,
-      MultiNoiseUtil.MultiNoiseSampler sampler,
-      int x,
+      ZBiomeSupplier supplier,
       int y,
-      int z,
       RegistryEntry<Biome>[] biomes,
       byte[] storage) {
 
@@ -51,7 +47,7 @@ public final class FastBiomeGen {
       for (int iz = 0; iz < 4; iz++) {
         for (int ix = 0; ix < 4; ix++) {
 
-          var biome = biomeSupplier.getBiome(x + ix, y + iy, z + iz, sampler);
+          var biome = supplier.get(ix, y + iy, iz);
 
           int bidx = -1;
           for (int i = 0; i < size; i++)

@@ -8,6 +8,7 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil.SearchTree;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.SearchTree.TreeBranchNode;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.SearchTree.TreeLeafNode;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.SearchTree.TreeNode;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 public final class FastSearchTree<T> {
   private Node rootNode;
@@ -26,7 +27,13 @@ public final class FastSearchTree<T> {
   }
 
   public T search(MultiNoiseUtil.NoiseValuePoint point) {
-    var lastResult = this.lastResult.get();
+    var lastResult = new MutableObject<>(this.lastResult.get());
+    var result = this.search(point, lastResult);
+    this.lastResult.set(lastResult.get());
+    return result;
+  }
+
+  public T search(MultiNoiseUtil.NoiseValuePoint point, MutableObject<LeafNode> lastResult) {
     var noise =
         new long[] {
           point.temperatureNoise(),
@@ -36,9 +43,10 @@ public final class FastSearchTree<T> {
           point.depth(),
           point.weirdnessNoise()
         };
-    var lastDistance = lastResult == null ? Long.MAX_VALUE : lastResult.getDistance(noise);
-    var leaf = this.rootNode.getClosestNode(noise, lastResult, lastDistance);
-    this.lastResult.set(leaf);
+    var lastDistance =
+        lastResult.get() == null ? Long.MAX_VALUE : lastResult.get().getDistance(noise);
+    var leaf = this.rootNode.getClosestNode(noise, lastResult.get(), lastDistance);
+    lastResult.setValue(leaf);
     return this.values[leaf.value];
   }
 
@@ -106,7 +114,7 @@ public final class FastSearchTree<T> {
     }
   }
 
-  private static final class LeafNode implements Node {
+  public static final class LeafNode implements Node {
     private final Parameters params;
     public final int value;
 

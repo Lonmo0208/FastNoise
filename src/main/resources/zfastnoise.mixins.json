@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "NoiseChunkGeneratorMixin",
-    "EntriesMixin"
+    "EntriesMixin",
+    "MultiNoiseBiomeSourceAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
