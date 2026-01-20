@@ -11,9 +11,9 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil.SearchTree.TreeNode;
 
 public final class FastSearchTree<T> {
   private Node rootNode;
+  private ThreadLocal<LeafNode> lastResult = new ThreadLocal<>();
   private T[] values;
 
-  @SuppressWarnings("unchecked")
   public FastSearchTree(SearchTree<T> tree) {
     this(tree.firstNode);
   }
@@ -26,16 +26,19 @@ public final class FastSearchTree<T> {
   }
 
   public T search(MultiNoiseUtil.NoiseValuePoint point) {
-    var leaf =
-        this.rootNode.getClosestNode(
-            new long[] {
-              point.temperatureNoise(),
-              point.humidityNoise(),
-              point.continentalnessNoise(),
-              point.erosionNoise(),
-              point.depth(),
-              point.weirdnessNoise()
-            });
+    var lastResult = this.lastResult.get();
+    var noise =
+        new long[] {
+          point.temperatureNoise(),
+          point.humidityNoise(),
+          point.continentalnessNoise(),
+          point.erosionNoise(),
+          point.depth(),
+          point.weirdnessNoise()
+        };
+    var lastDistance = lastResult == null ? Long.MAX_VALUE : lastResult.getDistance(noise);
+    var leaf = this.rootNode.getClosestNode(noise, lastResult, lastDistance);
+    this.lastResult.set(leaf);
     return this.values[leaf.value];
   }
 
@@ -76,14 +79,14 @@ public final class FastSearchTree<T> {
     }
 
     @Override
-    public LeafNode getClosestNode(long[] noise) {
-      long minDist = Long.MAX_VALUE;
-      LeafNode result = null;
+    public LeafNode getClosestNode(long[] noise, LeafNode alternative, long distance) {
+      long minDist = alternative == null ? Long.MAX_VALUE : distance;
+      LeafNode result = alternative;
 
       for (var node : nodes) {
         var nextDist = node.getDistance(noise);
         if (nextDist < minDist) {
-          var leafNode = node.getClosestNode(noise);
+          var leafNode = node.getClosestNode(noise, result, minDist);
           if (leafNode == node) {
             result = leafNode;
             minDist = nextDist;
@@ -113,7 +116,7 @@ public final class FastSearchTree<T> {
     }
 
     @Override
-    public LeafNode getClosestNode(long[] noise) {
+    public LeafNode getClosestNode(long[] noise, LeafNode alternative, long distance) {
       return this;
     }
 
@@ -124,7 +127,7 @@ public final class FastSearchTree<T> {
   }
 
   private static sealed interface Node permits BranchNode, LeafNode {
-    public LeafNode getClosestNode(long[] noise);
+    public LeafNode getClosestNode(long[] noise, LeafNode alternative, long distance);
 
     public long getDistance(long[] noise);
   }
