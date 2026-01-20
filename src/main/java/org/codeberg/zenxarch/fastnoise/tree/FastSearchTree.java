@@ -163,11 +163,11 @@ public final class FastSearchTree<T> {
     @Override
     public long getSquaredDistance(long[] noise) {
       return params[0].getSquaredDistance(noise[0])
-          + params[0].getSquaredDistance(noise[1])
-          + params[0].getSquaredDistance(noise[2])
-          + params[0].getSquaredDistance(noise[3])
-          + params[0].getSquaredDistance(noise[4])
-          + params[0].getSquaredDistance(noise[5]);
+          + params[1].getSquaredDistance(noise[1])
+          + params[2].getSquaredDistance(noise[2])
+          + params[3].getSquaredDistance(noise[3])
+          + params[4].getSquaredDistance(noise[4])
+          + params[5].getSquaredDistance(noise[5]);
     }
   }
 
@@ -187,11 +187,11 @@ public final class FastSearchTree<T> {
     @Override
     public long getSquaredDistance(long[] noise) {
       return params[0].getSquaredDistance(noise[0])
-          + params[0].getSquaredDistance(noise[1])
-          + params[0].getSquaredDistance(noise[2])
-          + params[0].getSquaredDistance(noise[3])
-          + params[0].getSquaredDistance(noise[4])
-          + params[0].getSquaredDistance(noise[5])
+          + params[1].getSquaredDistance(noise[1])
+          + params[2].getSquaredDistance(noise[2])
+          + params[3].getSquaredDistance(noise[3])
+          + params[4].getSquaredDistance(noise[4])
+          + params[5].getSquaredDistance(noise[5])
           + sqOffset;
     }
   }
