@@ -45,7 +45,7 @@ public final class FastSearchTree<T> {
       case TreeLeafNode<T> nodex -> fromTreeLeafNode(nodex, values);
       default ->
           throw new IllegalStateException(
-              "Unknown node type with class: ", node.getClass().descriptorString());
+              "Unknown node type with class: " + node.getClass().descriptorString());
     };
   }
 
