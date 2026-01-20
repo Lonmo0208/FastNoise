@@ -20,3 +20,15 @@ accessible field net/minecraft/world/biome/source/util/MultiNoiseUtil$ParameterR
 accessible field net/minecraft/world/chunk/SingularPalette entry Ljava/lang/Object;
 
 inject-interface net/minecraft/util/collection/PaletteStorage org/codeberg/zenxarch/fastnoise/noise/FastPackedIntegerArray
+
+# search tree conversion
+accessible class net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree
+
+accessible class net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeNode
+accessible class net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeLeafNode
+accessible class net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeBranchNode
+
+accessible field net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree firstNode Lnet/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeNode;
+accessible field net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeLeafNode value Ljava/lang/Object;
+accessible field net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeBranchNode subTree [Lnet/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeNode;
+accessible field net/minecraft/world/biome/source/util/MultiNoiseUtil$SearchTree$TreeNode parameters [Lnet/minecraft/world/biome/source/util/MultiNoiseUtil$ParameterRange;
