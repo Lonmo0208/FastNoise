@@ -8,6 +8,7 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil.NoiseHypercube;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.SearchTree;
 import org.codeberg.zenxarch.fastnoise.FastNoiseMod;
 import org.codeberg.zenxarch.fastnoise.tree.FastSearchTree;
+import org.codeberg.zenxarch.fastnoise.tree.FastSearchTreeHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entries.class)
-public abstract class EntriesMixin<T> {
+public abstract class EntriesMixin<T> implements FastSearchTreeHolder<T> {
   @Shadow @Final private SearchTree<T> tree;
 
   @Unique @Final private FastSearchTree<T> zenxarch$searchtree;
@@ -48,5 +49,10 @@ public abstract class EntriesMixin<T> {
     } catch (Exception e) {
       FastNoiseMod.LOGGER.info("Failed to search tree: {}", e.getMessage());
     }
+  }
+
+  @Override
+  public FastSearchTree<T> zenxarch$getFastSearchTree() {
+    return this.zenxarch$searchtree;
   }
 }
