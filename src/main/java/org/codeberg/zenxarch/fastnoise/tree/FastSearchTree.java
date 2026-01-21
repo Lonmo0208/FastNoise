@@ -142,7 +142,7 @@ public final class FastSearchTree<T> {
 
   private static Parameters getParameters(MultiNoiseUtil.SearchTree.TreeNode<?> node) {
     var ix = node.parameters;
-    var params = new Parameter[6];
+    var params = new ParameterRange[6];
     params[0] = getParameter(ix[0]);
     params[1] = getParameter(ix[1]);
     params[2] = getParameter(ix[2]);
@@ -151,40 +151,15 @@ public final class FastSearchTree<T> {
     params[5] = getParameter(ix[5]);
 
     var sqOffset = MathHelper.square(ix[6].getDistance(0));
-
-    if (sqOffset == 0) {
-      return new NoOffsetParameters(params);
-    }
-    return new OffsetParameters(params, sqOffset);
+    return new Parameters(params, sqOffset);
   }
 
-  private static final class NoOffsetParameters implements Parameters {
-    private final Parameter[] params;
+  private static final class Parameters {
 
-    public NoOffsetParameters(Parameter[] params) {
-      if (params.length != 6) {
-        throw new IllegalStateException("Params must be 6 in length");
-      }
-      this.params = params;
-    }
-
-    @Override
-    public long getSquaredDistance(long[] noise) {
-      return params[0].getSquaredDistance(noise[0])
-          + params[1].getSquaredDistance(noise[1])
-          + params[2].getSquaredDistance(noise[2])
-          + params[3].getSquaredDistance(noise[3])
-          + params[4].getSquaredDistance(noise[4])
-          + params[5].getSquaredDistance(noise[5]);
-    }
-  }
-
-  private static final class OffsetParameters implements Parameters {
-
-    private final Parameter[] params;
+    private final ParameterRange[] params;
     private final long sqOffset;
 
-    public OffsetParameters(Parameter[] params, long sqOffset) {
+    public Parameters(ParameterRange[] params, long sqOffset) {
       if (params.length != 6) {
         throw new IllegalStateException("Params must be 6 in length");
       }
@@ -192,62 +167,50 @@ public final class FastSearchTree<T> {
       this.sqOffset = sqOffset;
     }
 
-    @Override
     public long getSquaredDistance(long[] noise) {
-      return params[0].getSquaredDistance(noise[0])
-          + params[1].getSquaredDistance(noise[1])
-          + params[2].getSquaredDistance(noise[2])
-          + params[3].getSquaredDistance(noise[3])
-          + params[4].getSquaredDistance(noise[4])
-          + params[5].getSquaredDistance(noise[5])
-          + sqOffset;
+      var m0 = noise[0] - params[0].max;
+      var m1 = noise[1] - params[1].max;
+      var m2 = noise[2] - params[2].max;
+      var m3 = noise[3] - params[3].max;
+      var m4 = noise[4] - params[4].max;
+      var m5 = noise[5] - params[5].max;
+
+      if (m0 < 0) m0 = params[0].min - noise[0];
+      if (m1 < 0) m1 = params[1].min - noise[1];
+      if (m2 < 0) m2 = params[2].min - noise[2];
+      if (m3 < 0) m3 = params[3].min - noise[3];
+      if (m4 < 0) m4 = params[4].min - noise[4];
+      if (m5 < 0) m5 = params[5].min - noise[5];
+
+      if (m0 < 0) m0 = 0;
+      if (m1 < 0) m1 = 0;
+      if (m2 < 0) m2 = 0;
+      if (m3 < 0) m3 = 0;
+      if (m4 < 0) m4 = 0;
+      if (m5 < 0) m5 = 0;
+
+      m0 *= m0;
+      m1 *= m1;
+      m2 *= m2;
+      m3 *= m3;
+      m4 *= m4;
+      m5 *= m5;
+
+      return m0 + m1 + m2 + m3 + m4 + m5 + sqOffset;
     }
   }
 
-  private static sealed interface Parameters permits NoOffsetParameters, OffsetParameters {
-    public long getSquaredDistance(long[] noise);
-  }
-
-  private static Parameter getParameter(MultiNoiseUtil.ParameterRange range) {
-    if (range.min == range.max) return new ParameterValue(range.min);
+  private static ParameterRange getParameter(MultiNoiseUtil.ParameterRange range) {
     return new ParameterRange(range.min, range.max);
   }
 
-  private static final class ParameterRange implements Parameter {
+  private static final class ParameterRange {
     public final long min;
     public final long max;
 
     public ParameterRange(long min, long max) {
       this.min = min;
       this.max = max;
-    }
-
-    @Override
-    public long getSquaredDistance(long noise) {
-      if (noise > max) return square(noise - max);
-      if (noise < min) return square(noise - min);
-      return 0L;
-    }
-  }
-
-  private static final class ParameterValue implements Parameter {
-    public final long value;
-
-    public ParameterValue(long value) {
-      this.value = value;
-    }
-
-    @Override
-    public long getSquaredDistance(long noise) {
-      return square(noise - value);
-    }
-  }
-
-  private static sealed interface Parameter permits ParameterValue, ParameterRange {
-    public long getSquaredDistance(long noise);
-
-    default long square(long v) {
-      return v * v;
     }
   }
 }
