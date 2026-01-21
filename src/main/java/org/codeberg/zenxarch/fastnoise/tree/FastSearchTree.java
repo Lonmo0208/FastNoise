@@ -142,52 +142,35 @@ public final class FastSearchTree<T> {
 
   private static Parameters getParameters(MultiNoiseUtil.SearchTree.TreeNode<?> node) {
     var ix = node.parameters;
-    var params = new ParameterRange[6];
-    params[0] = getParameter(ix[0]);
-    params[1] = getParameter(ix[1]);
-    params[2] = getParameter(ix[2]);
-    params[3] = getParameter(ix[3]);
-    params[4] = getParameter(ix[4]);
-    params[5] = getParameter(ix[5]);
+    var min = new long[] {ix[0].min, ix[1].min, ix[2].min, ix[3].min, ix[4].min, ix[5].min};
+    var max = new long[] {ix[0].max, ix[1].max, ix[2].max, ix[3].max, ix[4].max, ix[5].max};
 
     var sqOffset = MathHelper.square(ix[6].getDistance(0));
-    return new Parameters(params, sqOffset);
+    return new Parameters(min, max, sqOffset);
   }
 
   private static final class Parameters {
 
-    private final ParameterRange[] params;
+    private final long[] min;
+    private final long[] max;
     private final long sqOffset;
 
-    public Parameters(ParameterRange[] params, long sqOffset) {
-      if (params.length != 6) {
+    public Parameters(long[] min, long[] max, long sqOffset) {
+      if (min.length != 6 || max.length != 6) {
         throw new IllegalStateException("Params must be 6 in length");
       }
-      this.params = params;
+      this.min = min;
+      this.max = max;
       this.sqOffset = sqOffset;
     }
 
     public long getSquaredDistance(long[] noise) {
-      var m0 = noise[0] - params[0].max;
-      var m1 = noise[1] - params[1].max;
-      var m2 = noise[2] - params[2].max;
-      var m3 = noise[3] - params[3].max;
-      var m4 = noise[4] - params[4].max;
-      var m5 = noise[5] - params[5].max;
-
-      if (m0 < 0) m0 = params[0].min - noise[0];
-      if (m1 < 0) m1 = params[1].min - noise[1];
-      if (m2 < 0) m2 = params[2].min - noise[2];
-      if (m3 < 0) m3 = params[3].min - noise[3];
-      if (m4 < 0) m4 = params[4].min - noise[4];
-      if (m5 < 0) m5 = params[5].min - noise[5];
-
-      if (m0 < 0) m0 = 0;
-      if (m1 < 0) m1 = 0;
-      if (m2 < 0) m2 = 0;
-      if (m3 < 0) m3 = 0;
-      if (m4 < 0) m4 = 0;
-      if (m5 < 0) m5 = 0;
+      long m0 = Math.max(Math.max(noise[0] - this.max[0], this.min[0] - noise[0]), 0);
+      long m1 = Math.max(Math.max(noise[1] - this.max[1], this.min[1] - noise[1]), 0);
+      long m2 = Math.max(Math.max(noise[2] - this.max[2], this.min[2] - noise[2]), 0);
+      long m3 = Math.max(Math.max(noise[3] - this.max[3], this.min[3] - noise[3]), 0);
+      long m4 = Math.max(Math.max(noise[4] - this.max[4], this.min[4] - noise[4]), 0);
+      long m5 = Math.max(Math.max(noise[5] - this.max[5], this.min[5] - noise[5]), 0);
 
       m0 *= m0;
       m1 *= m1;
@@ -197,20 +180,6 @@ public final class FastSearchTree<T> {
       m5 *= m5;
 
       return m0 + m1 + m2 + m3 + m4 + m5 + sqOffset;
-    }
-  }
-
-  private static ParameterRange getParameter(MultiNoiseUtil.ParameterRange range) {
-    return new ParameterRange(range.min, range.max);
-  }
-
-  private static final class ParameterRange {
-    public final long min;
-    public final long max;
-
-    public ParameterRange(long min, long max) {
-      this.min = min;
-      this.max = max;
     }
   }
 }
