@@ -44,10 +44,12 @@ public final class FastSearchTree<T> {
           (int) point.weirdnessNoise()
         };
     var lastDistance =
-        lastResult.get() == null ? Long.MAX_VALUE : lastResult.get().getDistance(noise);
+        lastResult.get() == null
+            ? Long.MAX_VALUE
+            : lastResult.get().params.getSquaredDistance(noise);
     var leaf = this.rootNode.getClosestNode(noise, lastResult.get(), lastDistance);
-    lastResult.setValue(leaf);
-    return this.values[leaf.value];
+    lastResult.setValue(leaf.node);
+    return this.values[leaf.node.value];
   }
 
   private static <T> Node fromTreeNode(TreeNode<T> node, ArrayList<T> values) {
@@ -61,7 +63,8 @@ public final class FastSearchTree<T> {
   }
 
   private static <T> BranchNode fromTreeBranchNode(TreeBranchNode<T> node, ArrayList<T> values) {
-    var params = getParameters(node);
+    var params =
+        Stream.of(node.subTree).map(nodex -> getParameters(nodex)).toArray(Parameters[]::new);
     var nodes =
         Stream.of(node.subTree).map(nodex -> fromTreeNode(nodex, values)).toArray(Node[]::new);
     return new BranchNode(params, nodes);
@@ -79,65 +82,72 @@ public final class FastSearchTree<T> {
 
   private static final class BranchNode implements Node {
     private final Node[] nodes;
-    private final Parameters params;
+    private final Parameters[] params;
 
-    public BranchNode(Parameters params, Node[] nodes) {
+    public BranchNode(Parameters[] params, Node[] nodes) {
       this.nodes = nodes;
       this.params = params;
     }
 
     @Override
-    public LeafNode getClosestNode(int[] noise, LeafNode alternative, long distance) {
+    public SearchResult getClosestNode(int[] noise, LeafNode alternative, long distance) {
       long minDist = distance;
       LeafNode result = alternative;
 
-      for (var node : nodes) {
-        var nextDist = node.getDistance(noise);
+      var distances = new long[this.params.length];
+      for (int i = 0; i < distances.length; i++) distances[i] = params[i].getSquaredDistance(noise);
+
+      for (int i = 0; i < distances.length; i++) {
+        var nextDist = distances[i];
         if (nextDist < minDist) {
-          var leafNode = node.getClosestNode(noise, result, minDist);
-          if (leafNode == node) {
-            result = leafNode;
-            minDist = nextDist;
-          } else if ((nextDist = leafNode.getDistance(noise)) < minDist) {
-            result = leafNode;
-            minDist = nextDist;
+          switch (nodes[i]) {
+            case BranchNode nodex -> {
+              var searchResult = nodex.getClosestNode(noise, alternative, minDist);
+              if (searchResult.distance < minDist) {
+                minDist = searchResult.distance;
+                result = searchResult.node;
+              }
+            }
+            case LeafNode nodex -> {
+              minDist = nextDist;
+              result = nodex;
+            }
           }
+          ;
         }
       }
 
-      return result;
-    }
-
-    @Override
-    public long getDistance(int[] noise) {
-      return params.getSquaredDistance(noise);
+      return new SearchResult(minDist, result);
     }
   }
 
   public static final class LeafNode implements Node {
-    private final Parameters params;
     public final int value;
+    public final Parameters params;
 
     public LeafNode(int value, Parameters params) {
-      this.params = params;
       this.value = value;
+      this.params = params;
     }
 
     @Override
-    public LeafNode getClosestNode(int[] noise, LeafNode alternative, long distance) {
-      return this;
+    public SearchResult getClosestNode(int[] noise, LeafNode alternative, long distance) {
+      return null;
     }
+  }
 
-    @Override
-    public long getDistance(int[] noise) {
-      return params.getSquaredDistance(noise);
+  private static final class SearchResult {
+    public final long distance;
+    public final LeafNode node;
+
+    public SearchResult(long distance, LeafNode node) {
+      this.distance = distance;
+      this.node = node;
     }
   }
 
   private static sealed interface Node permits BranchNode, LeafNode {
-    public LeafNode getClosestNode(int[] noise, LeafNode alternative, long distance);
-
-    public long getDistance(int[] noise);
+    public SearchResult getClosestNode(int[] noise, LeafNode alternative, long distance);
   }
 
   private static Parameters getParameters(MultiNoiseUtil.SearchTree.TreeNode<?> node) {
