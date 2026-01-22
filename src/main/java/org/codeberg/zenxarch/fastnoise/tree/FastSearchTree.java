@@ -165,21 +165,16 @@ public final class FastSearchTree<T> {
     }
 
     public long getSquaredDistance(long[] noise) {
-      long m0 = Math.max(Math.max(noise[0] - this.max[0], this.min[0] - noise[0]), 0);
-      long m1 = Math.max(Math.max(noise[1] - this.max[1], this.min[1] - noise[1]), 0);
-      long m2 = Math.max(Math.max(noise[2] - this.max[2], this.min[2] - noise[2]), 0);
-      long m3 = Math.max(Math.max(noise[3] - this.max[3], this.min[3] - noise[3]), 0);
-      long m4 = Math.max(Math.max(noise[4] - this.max[4], this.min[4] - noise[4]), 0);
-      long m5 = Math.max(Math.max(noise[5] - this.max[5], this.min[5] - noise[5]), 0);
+      var values = new long[6];
+      for (int i = 0; i < 6; i++)
+        values[i] = Math.max(Math.max(noise[i] - this.max[i], this.min[i] - noise[i]), 0L);
 
-      m0 *= m0;
-      m1 *= m1;
-      m2 *= m2;
-      m3 *= m3;
-      m4 *= m4;
-      m5 *= m5;
+      long result = 0L;
+      for (int i = 0; i < 6; i++) {
+        result += values[i] * values[i];
+      }
 
-      return m0 + m1 + m2 + m3 + m4 + m5 + sqOffset;
+      return result + sqOffset;
     }
   }
 }
