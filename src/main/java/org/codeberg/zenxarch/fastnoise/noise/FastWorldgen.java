@@ -9,6 +9,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSupplier;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
@@ -116,36 +117,42 @@ public class FastWorldgen {
     int y = world.getBottomY() >> 2;
     int z = chunkPos.z * 4;
 
-    ZBiomeSupplier zBiomeSupplier;
-    var lastLeaf = new MutableObject<FastSearchTree.LeafNode>();
-
-    if (supplier instanceof MultiNoiseBiomeSourceAccessor multiNoise) {
-      @SuppressWarnings("unchecked")
-      var fastSearchTree =
-          ((FastSearchTreeHolder<RegistryEntry<Biome>>) multiNoise.zenxarch$getBiomeEntries())
-              .zenxarch$getFastSearchTree();
-      zBiomeSupplier =
-          (ix, iy, iz) -> fastSearchTree.search(sampler.sample(x + ix, iy, z + iz), lastLeaf);
-    } else {
-      zBiomeSupplier = (ix, iy, iz) -> supplier.getBiome(x + ix, iy, z + iz, sampler);
-    }
-
     final int maxIdx = world.getHeight() >> 4;
     var sections = chunk.getSectionArray();
 
     @SuppressWarnings("unchecked")
     final RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
+    @SuppressWarnings("unchecked")
+    final RegistryEntry<Biome>[] reusableArray = new RegistryEntry[64];
     final var storage = new byte[64];
 
-    for (int i = 0; i < maxIdx; i++) {
-      var section = sections[i];
-      FastBiomeGen.populateBiomes(section, zBiomeSupplier, y, biomes, storage);
-      y += 4;
-    }
-  }
+    if (supplier instanceof MultiNoiseBiomeSourceAccessor multiNoise) {
+      var lastLeaf = new MutableObject<FastSearchTree.LeafNode>();
+      var noiseValuePoints = new MultiNoiseUtil.NoiseValuePoint[64];
+      @SuppressWarnings("unchecked")
+      var fastSearchTree =
+          ((FastSearchTreeHolder<RegistryEntry<Biome>>) multiNoise.zenxarch$getBiomeEntries())
+              .zenxarch$getFastSearchTree();
 
-  @FunctionalInterface
-  public static interface ZBiomeSupplier {
-    public RegistryEntry<Biome> get(int ix, int iy, int iz);
+      for (int i = 0; i < maxIdx; i++) {
+
+        FastBiomeGen.populateBiomesUsingFastSearchTree(
+            sampler, noiseValuePoints, biomes, fastSearchTree, x, y, z, lastLeaf);
+
+        var section = sections[i];
+        FastBiomeGen.populateBiomes(section, biomes, reusableArray, storage);
+        y += 4;
+      }
+    } else {
+
+      for (int i = 0; i < maxIdx; i++) {
+
+        FastBiomeGen.populateBiomesUsingSupplier(supplier, sampler, biomes, x, y, z);
+
+        var section = sections[i];
+        FastBiomeGen.populateBiomes(section, biomes, reusableArray, storage);
+        y += 4;
+      }
+    }
   }
 }
