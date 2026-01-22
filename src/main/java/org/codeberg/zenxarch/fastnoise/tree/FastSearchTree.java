@@ -35,13 +35,13 @@ public final class FastSearchTree<T> {
 
   public T search(MultiNoiseUtil.NoiseValuePoint point, MutableObject<LeafNode> lastResult) {
     var noise =
-        new long[] {
-          point.temperatureNoise(),
-          point.humidityNoise(),
-          point.continentalnessNoise(),
-          point.erosionNoise(),
-          point.depth(),
-          point.weirdnessNoise()
+        new int[] {
+          (int) point.temperatureNoise(),
+          (int) point.humidityNoise(),
+          (int) point.continentalnessNoise(),
+          (int) point.erosionNoise(),
+          (int) point.depth(),
+          (int) point.weirdnessNoise()
         };
     var lastDistance =
         lastResult.get() == null ? Long.MAX_VALUE : lastResult.get().getDistance(noise);
@@ -87,7 +87,7 @@ public final class FastSearchTree<T> {
     }
 
     @Override
-    public LeafNode getClosestNode(long[] noise, LeafNode alternative, long distance) {
+    public LeafNode getClosestNode(int[] noise, LeafNode alternative, long distance) {
       long minDist = distance;
       LeafNode result = alternative;
 
@@ -109,7 +109,7 @@ public final class FastSearchTree<T> {
     }
 
     @Override
-    public long getDistance(long[] noise) {
+    public long getDistance(int[] noise) {
       return params.getSquaredDistance(noise);
     }
   }
@@ -124,26 +124,28 @@ public final class FastSearchTree<T> {
     }
 
     @Override
-    public LeafNode getClosestNode(long[] noise, LeafNode alternative, long distance) {
+    public LeafNode getClosestNode(int[] noise, LeafNode alternative, long distance) {
       return this;
     }
 
     @Override
-    public long getDistance(long[] noise) {
+    public long getDistance(int[] noise) {
       return params.getSquaredDistance(noise);
     }
   }
 
   private static sealed interface Node permits BranchNode, LeafNode {
-    public LeafNode getClosestNode(long[] noise, LeafNode alternative, long distance);
+    public LeafNode getClosestNode(int[] noise, LeafNode alternative, long distance);
 
-    public long getDistance(long[] noise);
+    public long getDistance(int[] noise);
   }
 
   private static Parameters getParameters(MultiNoiseUtil.SearchTree.TreeNode<?> node) {
     var ix = node.parameters;
-    var min = new long[] {ix[0].min, ix[1].min, ix[2].min, ix[3].min, ix[4].min, ix[5].min};
-    var max = new long[] {ix[0].max, ix[1].max, ix[2].max, ix[3].max, ix[4].max, ix[5].max};
+    var min = new int[6];
+    var max = new int[6];
+    for (int i = 0; i < 6; i++) min[i] = (int) ix[i].min;
+    for (int i = 0; i < 6; i++) max[i] = (int) ix[i].max;
 
     var sqOffset = MathHelper.square(ix[6].getDistance(0));
     return new Parameters(min, max, sqOffset);
@@ -151,11 +153,11 @@ public final class FastSearchTree<T> {
 
   private static final class Parameters {
 
-    private final long[] min;
-    private final long[] max;
+    private final int[] min;
+    private final int[] max;
     private final long sqOffset;
 
-    public Parameters(long[] min, long[] max, long sqOffset) {
+    public Parameters(int[] min, int[] max, long sqOffset) {
       if (min.length != 6 || max.length != 6) {
         throw new IllegalStateException("Params must be 6 in length");
       }
@@ -164,14 +166,14 @@ public final class FastSearchTree<T> {
       this.sqOffset = sqOffset;
     }
 
-    public long getSquaredDistance(long[] noise) {
-      var values = new long[6];
+    public long getSquaredDistance(int[] noise) {
+      var values = new int[6];
       for (int i = 0; i < 6; i++)
-        values[i] = Math.max(Math.max(noise[i] - this.max[i], this.min[i] - noise[i]), 0L);
+        values[i] = Math.max(Math.max(noise[i] - this.max[i], this.min[i] - noise[i]), 0);
 
       long result = 0L;
       for (int i = 0; i < 6; i++) {
-        result += values[i] * values[i];
+        result += (long) values[i] * (long) values[i];
       }
 
       return result + sqOffset;
