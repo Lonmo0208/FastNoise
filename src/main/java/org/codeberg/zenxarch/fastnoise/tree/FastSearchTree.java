@@ -82,11 +82,21 @@ public final class FastSearchTree<T> {
 
   private static final class BranchNode implements Node {
     private final Node[] nodes;
-    private final Parameters[] params;
+    private final int[] min;
+    private final int[] max;
+    private final long[] sqOffset;
 
     public BranchNode(Parameters[] params, Node[] nodes) {
       this.nodes = nodes;
-      this.params = params;
+      this.min = new int[this.nodes.length * 6];
+      this.max = new int[this.nodes.length * 6];
+      this.sqOffset = new long[this.nodes.length];
+
+      for (int i = 0; i < this.nodes.length; i++) {
+        System.arraycopy(params[i].min, 0, this.min, i * 6, 6);
+        System.arraycopy(params[i].max, 0, this.max, i * 6, 6);
+        this.sqOffset[i] = params[i].sqOffset;
+      }
     }
 
     @Override
@@ -94,8 +104,24 @@ public final class FastSearchTree<T> {
       long minDist = distance;
       LeafNode result = alternative;
 
-      var distances = new long[this.params.length];
-      for (int i = 0; i < distances.length; i++) distances[i] = params[i].getSquaredDistance(noise);
+      var distances = new long[this.nodes.length];
+      var differences = new int[this.min.length];
+      int noiseIdx = 0;
+      for (int i = 0; i < this.min.length; i++) {
+        differences[i] =
+            Math.max(Math.max(noise[noiseIdx] - this.max[i], this.min[i] - noise[noiseIdx]), 0);
+        noiseIdx++;
+        if (noiseIdx == 6) noiseIdx = 0;
+      }
+
+      int distanceIdx = 0;
+      for (int i = 0; i < this.min.length; i += 6) {
+        for (int j = 0; j < 6; j++) {
+          distances[distanceIdx] += (long) differences[i + j] * (long) differences[i + j];
+        }
+        distances[distanceIdx] += sqOffset[distanceIdx];
+        distanceIdx++;
+      }
 
       for (int i = 0; i < distances.length; i++) {
         var nextDist = distances[i];
@@ -163,9 +189,9 @@ public final class FastSearchTree<T> {
 
   private static final class Parameters {
 
-    private final int[] min;
-    private final int[] max;
-    private final long sqOffset;
+    public final int[] min;
+    public final int[] max;
+    public final long sqOffset;
 
     public Parameters(int[] min, int[] max, long sqOffset) {
       if (min.length != 6 || max.length != 6) {
