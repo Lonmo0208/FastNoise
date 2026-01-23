@@ -99,28 +99,57 @@ public final class FastSearchTree<T> {
       }
     }
 
+    private static void repeat(int[] src, int[] dest, int length, int stride) {
+      for (int i = 0; i < length; i += stride) System.arraycopy(src, 0, dest, i, stride);
+    }
+
+    private static void subtract(int[] a, int[] b, int[] dest, int length) {
+      for (int i = 0; i < length; i++) {
+        dest[i] = a[i] - b[i];
+      }
+    }
+
+    private static void max(int[] a, int[] b, int[] dest, int length) {
+      for (int i = 0; i < length; i++) {
+        dest[i] = a[i] > b[i] ? a[i] : b[i];
+      }
+    }
+
+    private static void max(int[] a, int b, int[] dest, int length) {
+      for (int i = 0; i < length; i++) {
+        dest[i] = a[i] > b ? a[i] : b;
+      }
+    }
+
+    private static long sqSum(int[] src, int start, int end) {
+      long result = 0L;
+      for (int i = start; i < end; i++) {
+        result += (long) src[i] * (long) src[i];
+      }
+      return result;
+    }
+
     @Override
     public SearchResult getClosestNode(int[] noise, LeafNode alternative, long distance) {
       long minDist = distance;
       LeafNode result = alternative;
 
-      var distances = new long[this.nodes.length];
-      var differences = new int[this.min.length];
-      int noiseIdx = 0;
-      for (int i = 0; i < this.min.length; i++) {
-        differences[i] =
-            Math.max(Math.max(noise[noiseIdx] - this.max[i], this.min[i] - noise[noiseIdx]), 0);
-        noiseIdx++;
-        if (noiseIdx == 6) noiseIdx = 0;
-      }
+      long[] distances = new long[this.nodes.length];
+      int[] mins = new int[this.min.length];
+      int[] maxs = new int[this.max.length];
+
+      repeat(noise, mins, mins.length, 6);
+      repeat(noise, maxs, maxs.length, 6);
+
+      subtract(this.min, mins, mins, this.min.length);
+      subtract(maxs, this.max, maxs, this.max.length);
+
+      max(mins, maxs, mins, mins.length);
+      max(mins, 0, mins, mins.length);
 
       int distanceIdx = 0;
-      for (int i = 0; i < this.min.length; i += 6) {
-        for (int j = 0; j < 6; j++) {
-          distances[distanceIdx] += (long) differences[i + j] * (long) differences[i + j];
-        }
-        distances[distanceIdx] += sqOffset[distanceIdx];
-        distanceIdx++;
+      for (int i = 0; i < distances.length; i++) {
+        distances[i] = sqSum(mins, i * 6, i * 6 + i) + sqOffset[distanceIdx];
       }
 
       for (int i = 0; i < distances.length; i++) {
