@@ -104,28 +104,20 @@ public final class FastSearchTree<T> {
     }
 
     private static void subtract(int[] a, int[] b, int[] dest, int length) {
-      for (int i = 0; i < length; i++) {
-        dest[i] = a[i] - b[i];
-      }
+      for (int i = 0; i < length; i++) dest[i] = a[i] - b[i];
     }
 
     private static void max(int[] a, int[] b, int[] dest, int length) {
-      for (int i = 0; i < length; i++) {
-        dest[i] = a[i] > b[i] ? a[i] : b[i];
-      }
+      for (int i = 0; i < length; i++) dest[i] = a[i] > b[i] ? a[i] : b[i];
     }
 
     private static void max(int[] a, int b, int[] dest, int length) {
-      for (int i = 0; i < length; i++) {
-        dest[i] = a[i] > b ? a[i] : b;
-      }
+      for (int i = 0; i < length; i++) dest[i] = a[i] > b ? a[i] : b;
     }
 
     private static long sqSum(int[] src, int start, int end) {
       long result = 0L;
-      for (int i = start; i < end; i++) {
-        result += (long) src[i] * (long) src[i];
-      }
+      for (int i = start; i < end; i++) result += (long) src[i] * (long) src[i];
       return result;
     }
 
@@ -148,9 +140,8 @@ public final class FastSearchTree<T> {
       max(mins, 0, mins, mins.length);
 
       int distanceIdx = 0;
-      for (int i = 0; i < distances.length; i++) {
+      for (int i = 0; i < distances.length; i++)
         distances[i] = sqSum(mins, i * 6, i * 6 + i) + sqOffset[distanceIdx];
-      }
 
       for (int i = 0; i < distances.length; i++) {
         var nextDist = distances[i];
