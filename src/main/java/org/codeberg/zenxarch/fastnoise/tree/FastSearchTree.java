@@ -115,9 +115,9 @@ public final class FastSearchTree<T> {
       for (int i = 0; i < length; i++) dest[i] = a[i] > b ? a[i] : b;
     }
 
-    private static long sqSum(int[] src, int start, int end) {
+    private static long sqSum(int[] src, int start, int length) {
       long result = 0L;
-      for (int i = start; i < end; i++) result += (long) src[i] * (long) src[i];
+      for (int i = 0; i < length; i++) result += (long) src[i + start] * (long) src[i + start];
       return result;
     }
 
@@ -139,8 +139,7 @@ public final class FastSearchTree<T> {
       max(mins, maxs, mins, mins.length);
       max(mins, 0, mins, mins.length);
 
-      for (int i = 0; i < distances.length; i++)
-        distances[i] = sqSum(mins, i * 6, i * 6 + i) + sqOffset[i];
+      for (int i = 0; i < distances.length; i++) distances[i] = sqSum(mins, i * 6, 6) + sqOffset[i];
 
       for (int i = 0; i < distances.length; i++) {
         var nextDist = distances[i];
