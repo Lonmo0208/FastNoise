@@ -139,9 +139,8 @@ public final class FastSearchTree<T> {
       max(mins, maxs, mins, mins.length);
       max(mins, 0, mins, mins.length);
 
-      int distanceIdx = 0;
       for (int i = 0; i < distances.length; i++)
-        distances[i] = sqSum(mins, i * 6, i * 6 + i) + sqOffset[distanceIdx];
+        distances[i] = sqSum(mins, i * 6, i * 6 + i) + sqOffset[i];
 
       for (int i = 0; i < distances.length; i++) {
         var nextDist = distances[i];
