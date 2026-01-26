@@ -76,7 +76,6 @@ public abstract class NoiseChunkGeneratorMixin {
     var end =
         chunk.getSectionIndex(
             cellHeight * generationShapeConfig.verticalCellBlockCount() - 1 + minimumY);
-    for (int i = start; i <= end; i++) chunk.getSection(i).lock();
 
     var fastSections = new FastChunkSection[end + 1];
     for (int i = start; i <= end; i++) fastSections[i] = new FastChunkSection(chunk.getSection(i));
@@ -95,9 +94,7 @@ public abstract class NoiseChunkGeneratorMixin {
                   minimumCellY,
                   cellHeight,
                   fastSections);
-    } finally {
-      for (int i = start; i <= end; i++) chunk.getSection(i).unlock();
-    }
+    } finally {}
     return result;
   }
 
