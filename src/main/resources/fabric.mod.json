@@ -30,12 +30,12 @@
 		"java": ">=25"
 	},
 	"breaks": {
-		"moonrise": "*"
-	},
-	"recommends": {
-		"c2me": "*",
+		"moonrise": "*",
 		"noisium": "*",
 		"noisiumed": "*"
+	},
+	"recommends": {
+		"c2me": "*"
 	},
 	"accessWidener": "zfastnoise.ct"
 }
