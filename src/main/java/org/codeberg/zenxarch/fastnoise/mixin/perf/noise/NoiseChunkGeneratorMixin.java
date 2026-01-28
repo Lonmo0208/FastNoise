@@ -90,7 +90,8 @@ public abstract class NoiseChunkGeneratorMixin {
                   minimumCellY,
                   cellHeight,
                   fastSections);
-    } finally {}
+    } finally {
+    }
     return result;
   }
 }

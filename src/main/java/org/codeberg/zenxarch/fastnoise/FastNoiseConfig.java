@@ -30,8 +30,7 @@ public class FastNoiseConfig {
           });
 
   private static Path getConfigPath() {
-    var configDir = FabricLoader.getInstance().getConfigDir();
-    var configPath = configDir.resolve(configFileName);
+    var configPath = FabricLoader.getInstance().getConfigDir().resolve(configFileName);
 
     if (!Files.exists(configPath)) {
       try {
