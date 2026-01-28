@@ -2,6 +2,7 @@ plugins {
 	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
 	id 'me.champeau.jmh' version "${jmh_version}"
+	id "com.modrinth.minotaur" version "${minotaur_version}"
 }
 
 version = project.mod_version + "+" + project.minecraft_version
@@ -105,6 +106,22 @@ jmh {
 	profilers = ['async']
 
 	zip64 = true
+}
+
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = "zfastnoise"
+	versionNumber = version
+	versionType = project.hasProperty("zmtype") ? project.getProperty("zmtype") : "alpha"
+
+	uploadFile = remapJar
+	additionalFiles = [sourcesJar]
+
+	changelog = file("changelog.md").getText()
+
+	gameVersions = [project.minecraft_version]
+	loaders = ["fabric", "quilt"]
+	dependencies {}
 }
 
 tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {

@@ -39,5 +39,11 @@ clean:
 prod:
     ./gradlew prodClient
 
+modrinth ptype="alpha":
+    touch changelog.md
+    $EDITOR changelog.md
+    ./gradlew modrinth -Pzmtype="{{ptype}}"
+    rm changelog.md
+
 task taskName:
     ./gradlew {{taskName}}
