@@ -121,7 +121,10 @@ modrinth {
 
 	gameVersions = [project.minecraft_version]
 	loaders = ["fabric", "quilt"]
-	dependencies {}
+	dependencies {
+		incompatible.project "noisiumforked"
+		incompatible.project "moonrise-opt"
+	}
 }
 
 tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
