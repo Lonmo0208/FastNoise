@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(NoiseChunkGenerator.class)
 public abstract class NoiseChunkGeneratorMixin {
@@ -36,6 +37,7 @@ public abstract class NoiseChunkGeneratorMixin {
       int minimumCellY,
       int cellHeight);
 
+  @Unique
   private Chunk zenxarch$populateNoise(
       Blender blender,
       StructureAccessor structureAccessor,
