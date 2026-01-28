@@ -5,13 +5,13 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMaps;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Properties;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.CustomValue.CvArray;
 import net.fabricmc.loader.api.metadata.CustomValue.CvObject;
 import net.fabricmc.loader.api.metadata.CustomValue.CvType;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.util.Util;
 
 public class FastNoiseConfig {
   private static final String configFileName = FastNoiseConstants.MOD_ID + ".mixin.properties";
@@ -21,13 +21,10 @@ public class FastNoiseConfig {
   private static final String[] keys = new String[] {"mixin.perf.noise", "mixin.perf.biome"};
 
   private static final Object2BooleanMap<String> defaults =
-      Util.make(
-          () -> {
-            var m = new Object2BooleanArrayMap<String>();
-            m.put(keys[0], true);
-            m.put(keys[1], true);
-            return Object2BooleanMaps.unmodifiable(m);
-          });
+      new Object2BooleanArrayMap<>(
+          Map.of(
+              keys[0], true,
+              keys[1], true));
 
   private static Path getConfigPath() {
     var configPath = FabricLoader.getInstance().getConfigDir().resolve(configFileName);
