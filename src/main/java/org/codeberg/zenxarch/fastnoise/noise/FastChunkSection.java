@@ -54,7 +54,7 @@ public final class FastChunkSection {
 
   private void init(BlockState state) {
     this.states = new BlockState[16];
-    this.states[0] = FastWorldgen.AIR;
+    this.states[0] = FastNoiseGen.AIR;
     this.states[1] = state;
     this.storage = new long[4096 / (64 / 4)];
     this.palette = new ArrayPalette<>(this.states, 4, 2);

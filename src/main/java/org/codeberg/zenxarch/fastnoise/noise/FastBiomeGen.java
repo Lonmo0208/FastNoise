@@ -4,12 +4,37 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSupplier;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
+import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PalettedContainer;
 
 public final class FastBiomeGen {
 
   public static void populateBiomes(
+      Chunk chunk, BiomeSupplier supplier, MultiNoiseSampler sampler) {
+    var chunkPos = chunk.getPos();
+    var world = chunk.getHeightLimitView();
+
+    int x = chunkPos.x() * 4;
+    int y = world.getBottomY() >> 2;
+    int z = chunkPos.z() * 4;
+
+    final int maxIdx = world.getHeight() >> 4;
+    var sections = chunk.getSectionArray();
+
+    @SuppressWarnings("unchecked")
+    final RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
+    final var storage = new byte[64];
+
+    for (int i = 0; i < maxIdx; i++) {
+      var section = sections[i];
+      FastBiomeGen.populateBiomes(section, supplier, sampler, x, y, z, biomes, storage);
+      y += 4;
+    }
+  }
+
+  private static void populateBiomes(
       ChunkSection section,
       BiomeSupplier biomeSupplier,
       MultiNoiseUtil.MultiNoiseSampler sampler,

@@ -12,7 +12,7 @@ import net.minecraft.world.gen.chunk.GenerationShapeConfig;
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import org.codeberg.zenxarch.fastnoise.noise.FastChunkSection;
-import org.codeberg.zenxarch.fastnoise.noise.FastWorldgen;
+import org.codeberg.zenxarch.fastnoise.noise.FastNoiseGen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -52,7 +52,7 @@ public abstract class NoiseChunkGeneratorMixin {
                 this.createChunkNoiseSampler(chunkx, structureAccessor, blender, noiseConfig));
     BlockState defaultBlockState = settings.value().defaultBlock();
 
-    FastWorldgen.populateNoise(
+    FastNoiseGen.populateNoise(
         chunkNoiseSampler, defaultBlockState, chunk, minimumCellY, cellHeight, fastSections);
 
     return chunk;
