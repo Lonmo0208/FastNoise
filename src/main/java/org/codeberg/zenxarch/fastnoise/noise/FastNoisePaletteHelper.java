@@ -49,26 +49,18 @@ public final class FastNoisePaletteHelper {
       int size,
       byte[] storage) {
     if (size == 1) {
-      if (container.data.palette() instanceof SingularPalette<RegistryEntry<Biome>> palette) {
-        palette.entry = biomes[0];
-      } else {
-        container.data =
-            new Data<>(
-                SINGULAR_TYPE,
-                new EmptyPaletteStorage(64),
-                new SingularPalette<>(List.of(biomes[0])));
-      }
-    } else {
-      int bits = MathHelper.ceilLog2(size);
-      @SuppressWarnings("unchecked")
-      RegistryEntry<Biome>[] downSizedBiomes = new RegistryEntry[1 << bits];
-      System.arraycopy(biomes, 0, downSizedBiomes, 0, size);
-      container.data =
-          new Data<RegistryEntry<Biome>>(
-              biomePaletteTypes[bits],
-              repackBiomeStorage(biomes, bits, storage),
-              new ArrayPalette<>(downSizedBiomes, bits, size));
+      packSingleElement(container, biomes[0]);
+      return;
     }
+    int bits = MathHelper.ceilLog2(size);
+    @SuppressWarnings("unchecked")
+    RegistryEntry<Biome>[] downSizedBiomes = new RegistryEntry[1 << bits];
+    System.arraycopy(biomes, 0, downSizedBiomes, 0, size);
+    container.data =
+        new Data<RegistryEntry<Biome>>(
+            biomePaletteTypes[bits],
+            repackBiomeStorage(biomes, bits, storage),
+            new ArrayPalette<>(downSizedBiomes, bits, size));
   }
 
   private static final int[] biomeStorageSizes = new int[] {-1, 1, 2, 4, 4, 6, 7};
@@ -90,5 +82,15 @@ public final class FastNoisePaletteHelper {
     }
 
     return new PackedIntegerArray(bits, 64, storage);
+  }
+
+  public static <T> void packSingleElement(PalettedContainer<T> container, T element) {
+    if (container.data.palette() instanceof SingularPalette<T> palette) {
+      palette.entry = element;
+    } else {
+      container.data =
+          new Data<>(
+              SINGULAR_TYPE, new EmptyPaletteStorage(64), new SingularPalette<>(List.of(element)));
+    }
   }
 }
