@@ -3,6 +3,8 @@ package org.codeberg.zenxarch.fastnoise.noise;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSupplier;
+import net.minecraft.world.biome.source.FixedBiomeSource;
+import net.minecraft.world.biome.source.TheEndBiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
@@ -23,6 +25,14 @@ public final class FastBiomeGen {
     final int maxIdx = world.getHeight() >> 4;
     var sections = chunk.getSectionArray();
 
+    {
+      var singleBiome = getSingleBiome(supplier, chunkPos.x(), chunkPos.z());
+      if (singleBiome != null) {
+        packSingleBiome(sections, maxIdx, singleBiome);
+        return;
+      }
+    }
+
     @SuppressWarnings("unchecked")
     final RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
     final var storage = new byte[64];
@@ -31,6 +41,28 @@ public final class FastBiomeGen {
       var section = sections[i];
       FastBiomeGen.populateBiomes(section, supplier, sampler, x, y, z, biomes, storage);
       y += 4;
+    }
+  }
+
+  private static RegistryEntry<Biome> getSingleBiome(BiomeSupplier supplier, int x, int z) {
+    if (supplier instanceof TheEndBiomeSource theEnd) {
+      if (Math.abs(x) > 64) return null;
+      if (Math.abs(z) > 64) return null;
+      if (x * x + z * z < 4096) return theEnd.centerBiome;
+    }
+
+    if (supplier instanceof FixedBiomeSource fixed) {
+      return fixed.biome;
+    }
+
+    return null;
+  }
+
+  private static void packSingleBiome(
+      ChunkSection[] sections, final int maxIdx, RegistryEntry<Biome> biome) {
+    for (int i = 0; i < maxIdx; i++) {
+      FastNoisePaletteHelper.packSingleElement(
+          (PalettedContainer<RegistryEntry<Biome>>) sections[i].biomeContainer, biome);
     }
   }
 

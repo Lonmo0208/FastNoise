@@ -15,3 +15,7 @@ accessible method net/minecraft/world/chunk/ArrayPalette <init> ([Ljava/lang/Obj
 accessible field net/minecraft/world/chunk/ArrayPalette size I
 
 accessible field net/minecraft/world/chunk/SingularPalette entry Ljava/lang/Object;
+
+# Single biome skip
+accessible field net/minecraft/world/biome/source/TheEndBiomeSource centerBiome Lnet/minecraft/registry/entry/RegistryEntry;
+accessible field net/minecraft/world/biome/source/FixedBiomeSource biome Lnet/minecraft/registry/entry/RegistryEntry;
