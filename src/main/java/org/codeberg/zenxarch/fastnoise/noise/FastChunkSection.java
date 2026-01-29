@@ -1,12 +1,8 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.util.collection.PackedIntegerArray;
 import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.Palette;
-import net.minecraft.world.chunk.PaletteType;
-import net.minecraft.world.chunk.PalettedContainer.Data;
 
 public final class FastChunkSection {
 
@@ -56,20 +52,13 @@ public final class FastChunkSection {
     this.storage[(y << 4) | z] |= value << (x * 4);
   }
 
-  private static final Palette.Factory ARRAY = ArrayPalette::create;
-  private static final PaletteType ARRAY_4_TYPE = new PaletteType.Static(ARRAY, 4);
-
   private void init(BlockState state) {
     this.states = new BlockState[16];
     this.states[0] = FastWorldgen.AIR;
     this.states[1] = state;
     this.storage = new long[4096 / (64 / 4)];
     this.palette = new ArrayPalette<>(this.states, 4, 2);
-    var newData =
-        new Data<BlockState>(
-            ARRAY_4_TYPE, new PackedIntegerArray(4, 4096, this.storage), this.palette);
-
-    section.blockStateContainer.data = newData;
+    FastNoisePaletteHelper.initBlockStateContainer(section, palette, storage);
   }
 
   public void recalculateCounts() {
