@@ -1,6 +1,5 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -95,7 +94,6 @@ public class FastNoiseGen {
     for (int i = 0; i < fastSections.length; i++)
       if (fastSections[i] != null) fastSections[i].recalculateCounts();
 
-    Heightmap.populateHeightmaps(
-        chunk, ObjectArraySet.of(Heightmap.Type.OCEAN_FLOOR_WG, Heightmap.Type.WORLD_SURFACE_WG));
+    Heightmap.populateHeightmaps(chunk, chunk.getStatus().getHeightmapTypes());
   }
 }
