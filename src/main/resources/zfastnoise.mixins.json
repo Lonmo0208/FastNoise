@@ -5,7 +5,8 @@
   "mixins": [
     "perf.noise.NoiseChunkGeneratorMixin",
     "perf.biome.NoiseChunkGeneratorMixin",
-    "perf.surface.SurfaceBuilderMixin"
+    "perf.surface.SurfaceBuilderMixin",
+    "HeightmapAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
