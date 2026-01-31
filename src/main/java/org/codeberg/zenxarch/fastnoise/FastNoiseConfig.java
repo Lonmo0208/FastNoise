@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.CustomValue.CvArray;
 import net.fabricmc.loader.api.metadata.CustomValue.CvObject;
@@ -18,13 +20,15 @@ public class FastNoiseConfig {
 
   private static final String overridesKey = FastNoiseConstants.MOD_ID + ":overrides";
 
-  private static final String[] keys = new String[] {"mixin.perf.noise", "mixin.perf.biome"};
+  private static final String[] keys =
+      new String[] {"mixin.perf.noise", "mixin.perf.biome", "mixin.perf.surface"};
+
+  private static Map<String, Boolean> defaultConfig() {
+    return Stream.of(keys).collect(Collectors.toMap(k -> k, _ -> true));
+  }
 
   private static final Object2BooleanMap<String> defaults =
-      new Object2BooleanArrayMap<>(
-          Map.of(
-              keys[0], true,
-              keys[1], true));
+      new Object2BooleanArrayMap<>(defaultConfig());
 
   private static Path getConfigPath() {
     var configPath = FabricLoader.getInstance().getConfigDir().resolve(configFileName);
