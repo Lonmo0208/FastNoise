@@ -128,7 +128,7 @@ public final class HeightmapUtil {
     if (nonEmptySection == -1) return; // Chunk is empty no-op
 
     for (int hidx = 0; hidx < 256; hidx++) {
-      for (int sy = nonEmptySection; sy >= 0; sy++) {
+      for (int sy = nonEmptySection; sy >= 0; sy--) {
         var ly = getLocalY(sections[sy], hidx, cache, predicate);
         if (ly >= 0) {
           storage.set(hidx, (sy << 4) + ly + 1);
