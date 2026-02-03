@@ -18,4 +18,9 @@ accessible field net/minecraft/world/chunk/SingularPalette entry Ljava/lang/Obje
 
 # Single biome skip
 accessible field net/minecraft/world/biome/source/TheEndBiomeSource centerBiome Lnet/minecraft/registry/entry/RegistryEntry;
+accessible field net/minecraft/world/biome/source/TheEndBiomeSource highlandsBiome Lnet/minecraft/registry/entry/RegistryEntry;
+accessible field net/minecraft/world/biome/source/TheEndBiomeSource midlandsBiome Lnet/minecraft/registry/entry/RegistryEntry;
+accessible field net/minecraft/world/biome/source/TheEndBiomeSource smallIslandsBiome Lnet/minecraft/registry/entry/RegistryEntry;
+accessible field net/minecraft/world/biome/source/TheEndBiomeSource barrensBiome Lnet/minecraft/registry/entry/RegistryEntry;
+
 accessible field net/minecraft/world/biome/source/FixedBiomeSource biome Lnet/minecraft/registry/entry/RegistryEntry;

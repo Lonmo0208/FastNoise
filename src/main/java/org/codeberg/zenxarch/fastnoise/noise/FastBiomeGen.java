@@ -10,57 +10,47 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PalettedContainer;
+import net.minecraft.world.gen.densityfunction.DensityFunction;
 
 public final class FastBiomeGen {
 
   public static void populateBiomes(
       Chunk chunk, BiomeSupplier supplier, MultiNoiseSampler sampler) {
-    var chunkPos = chunk.getPos();
-    var world = chunk.getHeightLimitView();
 
-    int x = chunkPos.x() * 4;
-    int y = world.getBottomY() >> 2;
-    int z = chunkPos.z() * 4;
-
-    final int maxIdx = world.getHeight() >> 4;
     var sections = chunk.getSectionArray();
 
-    {
-      var singleBiome = getSingleBiome(supplier, chunkPos.x(), chunkPos.z());
-      if (singleBiome != null) {
-        packSingleBiome(sections, maxIdx, singleBiome);
-        return;
-      }
+    if (supplier instanceof FixedBiomeSource fixed) {
+      packSingleBiome(sections, fixed.biome);
+      return;
     }
+
+    final var chunkPos = chunk.getPos();
+    final int cx = chunkPos.x();
+    final int cz = chunkPos.z();
+
+    if (supplier instanceof TheEndBiomeSource theEnd) {
+      populateEndBiomes(theEnd, chunk, sections, cx, cz, sampler);
+      return;
+    }
+
+    final int minY = chunk.getBottomY();
+    final int x = cx << 2;
+    int y = minY >> 2;
+    final int z = cx << 2;
 
     @SuppressWarnings("unchecked")
     final RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
     final var storage = new byte[64];
 
-    for (int i = 0; i < maxIdx; i++) {
+    for (int i = 0; i < sections.length; i++) {
       var section = sections[i];
       FastBiomeGen.populateBiomes(section, supplier, sampler, x, y, z, biomes, storage);
       y += 4;
     }
   }
 
-  private static RegistryEntry<Biome> getSingleBiome(BiomeSupplier supplier, int x, int z) {
-    if (supplier instanceof TheEndBiomeSource theEnd) {
-      if (Math.abs(x) > 64) return null;
-      if (Math.abs(z) > 64) return null;
-      if (x * x + z * z < 4096) return theEnd.centerBiome;
-    }
-
-    if (supplier instanceof FixedBiomeSource fixed) {
-      return fixed.biome;
-    }
-
-    return null;
-  }
-
-  private static void packSingleBiome(
-      ChunkSection[] sections, final int maxIdx, RegistryEntry<Biome> biome) {
-    for (int i = 0; i < maxIdx; i++) {
+  private static void packSingleBiome(ChunkSection[] sections, RegistryEntry<Biome> biome) {
+    for (int i = 0; i < sections.length; i++) {
       FastNoisePaletteHelper.packSingleElement(
           (PalettedContainer<RegistryEntry<Biome>>) sections[i].biomeContainer, biome);
     }
@@ -101,6 +91,77 @@ public final class FastBiomeGen {
       }
       var container = ((PalettedContainer<RegistryEntry<Biome>>) section.biomeContainer);
       FastNoisePaletteHelper.pack(container, biomes, size, storage);
+    }
+  }
+
+  private static class EndBiomeNoisePos implements DensityFunction.NoisePos {
+    private final int x;
+    private final int z;
+    public int y;
+    private final DensityFunction sampler;
+
+    public EndBiomeNoisePos(int x, int y, int z, DensityFunction sampler) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.sampler = sampler;
+    }
+
+    @Override
+    public int blockX() {
+      return x;
+    }
+
+    @Override
+    public int blockY() {
+      return y;
+    }
+
+    @Override
+    public int blockZ() {
+      return z;
+    }
+
+    public double sampleAndStep() {
+      var result = sampler.sample(this);
+      this.y += 4;
+      return result;
+    }
+  }
+
+  private static RegistryEntry<Biome> getEndBiomeFromHeight(
+      TheEndBiomeSource source, double height) {
+    if (height > 0.25) return source.highlandsBiome;
+    if (height >= -0.0625) return source.midlandsBiome;
+    if (height < -0.21875) return source.smallIslandsBiome;
+    return source.barrensBiome;
+  }
+
+  private static void populateEndBiomes(
+      TheEndBiomeSource source,
+      Chunk chunk,
+      ChunkSection[] sections,
+      int cx,
+      int cz,
+      MultiNoiseUtil.MultiNoiseSampler sampler) {
+    if ((Math.abs(cx) <= 64) && ((Math.abs(cz) <= 64)) && ((cx * cx + cz * cz) <= 4096)) {
+      packSingleBiome(sections, source.centerBiome);
+      return;
+    }
+
+    final int x = (cx << 4) + 8;
+    final int z = (cz << 4) + 8;
+
+    var noisePos = new EndBiomeNoisePos(x, chunk.getBottomY(), z, sampler.erosion());
+
+    for (int i = 0; i < sections.length; i++) {
+      var a = getEndBiomeFromHeight(source, noisePos.sampleAndStep());
+      var b = getEndBiomeFromHeight(source, noisePos.sampleAndStep());
+      var c = getEndBiomeFromHeight(source, noisePos.sampleAndStep());
+      var d = getEndBiomeFromHeight(source, noisePos.sampleAndStep());
+
+      FastNoisePaletteHelper.packFourEntries(
+          (PalettedContainer<RegistryEntry<Biome>>) sections[i].biomeContainer, a, b, c, d);
     }
   }
 }

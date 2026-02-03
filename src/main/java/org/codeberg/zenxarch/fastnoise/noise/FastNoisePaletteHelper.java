@@ -93,4 +93,65 @@ public final class FastNoisePaletteHelper {
               SINGULAR_TYPE, new EmptyPaletteStorage(64), new SingularPalette<>(List.of(element)));
     }
   }
+
+  private static int index(RegistryEntry<Biome>[] palette, int size, RegistryEntry<Biome> value) {
+    for (int i = 0; i < size; i++) {
+      if (palette[i] == value) return i;
+    }
+    return size;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void packFourEntries(
+      PalettedContainer<RegistryEntry<Biome>> container,
+      RegistryEntry<Biome> a,
+      RegistryEntry<Biome> b,
+      RegistryEntry<Biome> c,
+      RegistryEntry<Biome> d) {
+    if (a == b && b == c && c == d) {
+      packSingleElement(container, a);
+      return;
+    }
+    var palette = (RegistryEntry<Biome>[]) new RegistryEntry[4];
+    var index = new int[4];
+    int size = 1;
+    {
+      palette[0] = a;
+      index[0] = 0;
+    }
+    {
+      var next = index(palette, size, b);
+      index[1] = next;
+      palette[next] = b;
+      if (next == size) size++;
+    }
+    {
+      var next = index(palette, size, c);
+      index[2] = next;
+      palette[next] = c;
+      if (next == size) size++;
+    }
+    {
+      var next = index(palette, size, d);
+      index[3] = next;
+      palette[next] = d;
+      if (next == size) size++;
+    }
+
+    var storage = EndBiomeStorageCache.get(index);
+    if (size == 2) {
+      container.data =
+          new Data<RegistryEntry<Biome>>(
+              ARRAY_1_TYPE,
+              storage.copy(),
+              new ArrayPalette<RegistryEntry<Biome>>(
+                  (RegistryEntry<Biome>[]) new RegistryEntry[] {palette[0], palette[1]}, 1, size));
+    } else {
+      container.data =
+          new Data<RegistryEntry<Biome>>(
+              ARRAY_2_TYPE,
+              storage.copy(),
+              new ArrayPalette<RegistryEntry<Biome>>(palette.clone(), 2, size));
+    }
+  }
 }
