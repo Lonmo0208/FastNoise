@@ -130,6 +130,7 @@ modrinth {
 	dependencies {
 		incompatible.project "noisiumforked"
 		incompatible.project "moonrise-opt"
+		incompatible.project "noisiumed"
 	}
 }
 
