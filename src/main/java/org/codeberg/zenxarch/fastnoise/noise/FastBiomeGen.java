@@ -34,9 +34,9 @@ public final class FastBiomeGen {
     }
 
     final int minY = chunk.getBottomY();
-    final int x = cx >> 2;
-    int y = minY << 2;
-    final int z = cx >> 2;
+    final int x = cx << 2;
+    int y = minY >> 2;
+    final int z = cx << 2;
 
     @SuppressWarnings("unchecked")
     final RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
