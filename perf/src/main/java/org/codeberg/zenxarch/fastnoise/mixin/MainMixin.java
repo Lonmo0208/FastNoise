@@ -17,7 +17,7 @@ public abstract class MainMixin {
           @At(
               value = "INVOKE",
               target =
-                  "Lnet/minecraft/world/level/storage/LevelStorage$Session;backupLevelDataFile(Lnet/minecraft/registry/DynamicRegistryManager;Lnet/minecraft/world/SaveProperties;)V"),
+                  "Lnet/minecraft/world/level/storage/LevelStorage$Session;backupLevelDataFile(Lnet/minecraft/world/SaveProperties;)V"),
       cancellable = true)
   private static void zenxarch$main(
       CallbackInfo ci, @Local DynamicRegistryManager.Immutable manager) {
