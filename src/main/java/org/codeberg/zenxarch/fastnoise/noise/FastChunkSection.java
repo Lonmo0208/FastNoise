@@ -3,6 +3,7 @@ package org.codeberg.zenxarch.fastnoise.noise;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.ChunkSection;
+import org.codeberg.zenxarch.fastnoise.noise.container.BlockCountingPalettedContainer;
 
 public final class FastChunkSection {
 
@@ -14,6 +15,7 @@ public final class FastChunkSection {
   private long[] storage;
   private ArrayPalette<BlockState> palette;
   private BlockState[] states;
+  private BlockCountingPalettedContainer<BlockState> counter;
 
   public FastChunkSection(ChunkSection section) {
     this.section = section;
@@ -28,6 +30,7 @@ public final class FastChunkSection {
       } else this.states[(defaultIdx = this.palette.size++)] = state;
     }
     setBlockState(x, y, z, defaultIdx);
+    this.counter.updateCount(defaultIdx);
   }
 
   private int getIndex(BlockState state) {
@@ -46,6 +49,7 @@ public final class FastChunkSection {
   public void setBlockState(int x, int y, int z, BlockState state) {
     var valIdx = getIndex(state);
     setBlockState(x, y, z, valIdx);
+    this.counter.updateCount(valIdx);
   }
 
   private void setBlockState(int x, int y, int z, long value) {
@@ -54,15 +58,24 @@ public final class FastChunkSection {
 
   private void init(BlockState state) {
     this.states = new BlockState[16];
+    this.storage = new long[256];
+    this.palette = new ArrayPalette<>(this.states, 4, 2);
+
     this.states[0] = FastNoiseGen.AIR;
     this.states[1] = state;
-    this.storage = new long[4096 / (64 / 4)];
-    this.palette = new ArrayPalette<>(this.states, 4, 2);
-    FastNoisePaletteHelper.initBlockStateContainer(section, palette, storage);
+
+    this.counter =
+        new BlockCountingPalettedContainer<>(
+            this.section.blockStateContainer.paletteProvider,
+            this.storage,
+            this.states,
+            this.palette);
+    this.section.blockStateContainer = this.counter;
   }
 
   public void recalculateCounts() {
     if (palette == null) return;
-    section.calculateCounts();
+    this.section.calculateCounts();
+    this.section.blockStateContainer = this.counter.revert();
   }
 }
