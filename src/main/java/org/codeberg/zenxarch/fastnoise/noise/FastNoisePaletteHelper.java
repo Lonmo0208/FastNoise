@@ -1,7 +1,6 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
 import java.util.List;
-import net.minecraft.block.BlockState;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.collection.EmptyPaletteStorage;
 import net.minecraft.util.collection.PackedIntegerArray;
@@ -9,7 +8,6 @@ import net.minecraft.util.collection.PaletteStorage;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ArrayPalette;
-import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.Palette;
 import net.minecraft.world.chunk.PaletteType;
 import net.minecraft.world.chunk.PalettedContainer;
@@ -28,7 +26,7 @@ public final class FastNoisePaletteHelper {
   private static final PaletteType ARRAY_1_TYPE = new PaletteType.Static(ARRAY, 1);
   private static final PaletteType ARRAY_2_TYPE = new PaletteType.Static(ARRAY, 2);
   private static final PaletteType ARRAY_3_TYPE = new PaletteType.Static(ARRAY, 3);
-  private static final PaletteType ARRAY_4_TYPE = new PaletteType.Static(ARRAY, 4);
+  public static final PaletteType ARRAY_4_TYPE = new PaletteType.Static(ARRAY, 4);
   private static final PaletteType ARRAY_5_TYPE = new PaletteType.Static(ARRAY, 5);
   private static final PaletteType ARRAY_6_TYPE = new PaletteType.Static(ARRAY, 6);
 
@@ -36,12 +34,6 @@ public final class FastNoisePaletteHelper {
       new PaletteType[] {
         ARRAY_1_TYPE, ARRAY_2_TYPE, ARRAY_3_TYPE, ARRAY_4_TYPE, ARRAY_5_TYPE, ARRAY_6_TYPE
       };
-
-  public static void initBlockStateContainer(
-      ChunkSection section, ArrayPalette<BlockState> palette, long[] storage) {
-    section.blockStateContainer.data =
-        new Data<BlockState>(ARRAY_4_TYPE, new PackedIntegerArray(4, 4096, storage), palette);
-  }
 
   public static void pack(
       PalettedContainer<RegistryEntry<Biome>> container,

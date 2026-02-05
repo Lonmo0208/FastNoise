@@ -5,6 +5,8 @@ accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getVerticalCel
 accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler sampleBlockState ()Lnet/minecraft/block/BlockState;
 
 accessible field net/minecraft/world/chunk/ChunkSection blockStateContainer Lnet/minecraft/world/chunk/PalettedContainer;
+mutable field net/minecraft/world/chunk/ChunkSection blockStateContainer Lnet/minecraft/world/chunk/PalettedContainer;
+
 accessible field net/minecraft/world/chunk/ChunkSection biomeContainer Lnet/minecraft/world/chunk/ReadableContainer;
 
 accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft/world/chunk/PalettedContainer$Data;
@@ -24,3 +26,8 @@ accessible field net/minecraft/world/biome/source/TheEndBiomeSource smallIslands
 accessible field net/minecraft/world/biome/source/TheEndBiomeSource barrensBiome Lnet/minecraft/registry/entry/RegistryEntry;
 
 accessible field net/minecraft/world/biome/source/FixedBiomeSource biome Lnet/minecraft/registry/entry/RegistryEntry;
+
+# block counting container
+accessible method net/minecraft/world/chunk/PalettedContainer <init> (Lnet/minecraft/world/chunk/PaletteProvider;Lnet/minecraft/world/chunk/PaletteType;Lnet/minecraft/util/collection/PaletteStorage;Lnet/minecraft/world/chunk/Palette;)V
+
+accessible field net/minecraft/world/chunk/PalettedContainer paletteProvider Lnet/minecraft/world/chunk/PaletteProvider;
