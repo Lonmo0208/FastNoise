@@ -62,6 +62,7 @@ public final class FastChunkSection {
   }
 
   public void recalculateCounts() {
+    if (palette == null) return;
     section.calculateCounts();
   }
 }
