@@ -1,13 +1,13 @@
 default: build
 
 build:
-    ./gradlew build
+    ./gradlew :build
 
 run:
-    ./gradlew runClient
+    ./gradlew :runClient
 
 sources:
-    ./gradlew genSources
+    ./gradlew :genSources
 
 wrapper:
     ./gradlew wrapper --gradle-version=latest && ./gradlew wrapper
@@ -22,13 +22,13 @@ tidy:
     # find -iname "*.nim" | xargs nimpretty
     
 test:
-    ./gradlew test
+    ./gradlew :test
 
 view_test_results:
     cd build/reports/tests/test/ && python -m http.server
 
 bench:
-    ./gradlew jmh
+    ./gradlew :jmh
 
 stop:
     ./gradlew --stop
@@ -37,12 +37,12 @@ clean:
     ./gradlew clean
 
 prod:
-    ./gradlew prodClient
+    ./gradlew :prodClient
 
 modrinth ptype="alpha":
     touch changelog.md
     $EDITOR changelog.md
-    ./gradlew modrinth -Pzmtype="{{ptype}}"
+    ./gradlew :modrinth -Pzmtype="{{ptype}}"
     rm changelog.md
 
 # Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures"
