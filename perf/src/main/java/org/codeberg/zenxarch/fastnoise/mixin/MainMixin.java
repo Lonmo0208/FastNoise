@@ -20,8 +20,8 @@ public abstract class MainMixin {
                   "Lnet/minecraft/world/level/storage/LevelStorage$Session;backupLevelDataFile(Lnet/minecraft/world/SaveProperties;)V"),
       cancellable = true)
   private static void zenxarch$main(
-      CallbackInfo ci, @Local DynamicRegistryManager.Immutable manager) {
+      String[] args, CallbackInfo ci, @Local DynamicRegistryManager.Immutable manager) {
     ci.cancel();
-    BenchmarkMain.runTest(manager);
+    BenchmarkMain.runTest(args, manager);
   }
 }

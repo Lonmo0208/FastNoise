@@ -2,20 +2,35 @@ package org.codeberg.zenxarch.fastnoise;
 
 import java.util.concurrent.TimeUnit;
 import net.minecraft.registry.DynamicRegistryManager;
+import org.codeberg.zenxarch.fastnoise.mixin.ForkedRunnerAccessor;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
+import org.openjdk.jmh.runner.options.VerboseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BenchmarkMain {
   public static final Logger LOGGER = LoggerFactory.getLogger(BenchmarkMain.class);
 
-  public static void runTest(DynamicRegistryManager manager) {
+  public static void runTest(String[] args, DynamicRegistryManager manager) {
     TestGlobals.setManager(manager);
+
+    if (System.getProperty("zforked") != null) {
+      try {
+        // var clazz = Class.forName("org.openjdk.jmh.runner.ForkedMain");
+        // var methods = Class.forName("org.openjdk.jmh.runner.ForkedMain").getMethods();
+        // Stream.of(methods).filter(m ->
+        // m.getName().equals("main")).findFirst().get().invoke(args);
+        ForkedRunnerAccessor.zenxarch$main(args);
+      } catch (Exception e) {
+        LOGGER.error("Huh?", e);
+      }
+      return;
+    }
 
     if (System.getProperty("zperfbenchmark", "").equals("parity")) {
       doParityTest();
@@ -68,7 +83,8 @@ public class BenchmarkMain {
   }
 
   private static void runBenchmark(String outputPrefix) {
-    var options = new OptionsBuilder().forks(0);
+    var options =
+        new OptionsBuilder().forks(1).verbosity(VerboseMode.EXTRA).jvmArgsAppend("-Dzforked=true");
 
     try {
       options = options.mode(Mode.deepValueOf(System.getProperty("zbenchmode")));
