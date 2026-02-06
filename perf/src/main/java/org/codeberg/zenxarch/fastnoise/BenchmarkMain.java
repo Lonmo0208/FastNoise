@@ -78,7 +78,15 @@ public class BenchmarkMain {
   }
 
   private static void runBenchmark(String outputPrefix) {
-    var options = new OptionsBuilder().forks(2).jvmArgsAppend("-Dzforked=true");
+    var options = new OptionsBuilder();
+
+    {
+      var forks = getIntProperty("zforks", 1, 0);
+      options = options.forks(forks);
+      if (forks != 0) {
+        options = options.jvmArgsAppend("-Dzforked=true");
+      }
+    }
 
     try {
       options = options.mode(Mode.deepValueOf(System.getProperty("zbenchmode")));
