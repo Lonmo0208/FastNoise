@@ -5,8 +5,7 @@
   "mixins": [
     "MainMixin",
     "NoiseChunkGeneratorAccessor",
-    "JmhRunnerMixin",
-    "ForkedRunnerAccessor"
+    "JmhRunnerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
