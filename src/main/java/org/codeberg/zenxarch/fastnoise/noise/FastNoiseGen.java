@@ -2,15 +2,42 @@ package org.codeberg.zenxarch.fastnoise.noise;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
+import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
+import net.minecraft.world.gen.chunk.GenerationShapeConfig;
 import org.codeberg.zenxarch.fastnoise.heightmap.HeightmapUtil;
 
 public class FastNoiseGen {
   public static final BlockState AIR = Blocks.AIR.getDefaultState();
+
+  public static void populateNoise(
+      ChunkNoiseSampler chunkNoiseSampler,
+      RegistryEntry<ChunkGeneratorSettings> settings,
+      Chunk chunk,
+      int minimumCellY,
+      int minimumY,
+      GenerationShapeConfig config,
+      int cellHeight) {
+
+    var start = chunk.getSectionIndex(minimumY);
+    var end = chunk.getSectionIndex(cellHeight * config.verticalCellBlockCount() - 1 + minimumY);
+
+    var fastSections = new FastChunkSection[end + 1];
+    for (int i = start; i <= end; i++) fastSections[i] = new FastChunkSection(chunk.getSection(i));
+
+    populateNoise(
+        chunkNoiseSampler,
+        settings.value().defaultBlock(),
+        chunk,
+        minimumCellY,
+        cellHeight,
+        fastSections);
+  }
 
   public static void populateNoise(
       ChunkNoiseSampler chunkNoiseSampler,
