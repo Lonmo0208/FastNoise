@@ -8,12 +8,18 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.SingularPalette;
 import org.codeberg.zenxarch.fastnoise.mixin.HeightmapAccessor;
 
 public final class HeightmapUtil {
   private HeightmapUtil() {
     throw new IllegalStateException("Utility class");
+  }
+
+  public static Heightmap.Type[] calculateHeightmaps(ChunkStatus status) {
+    var result = new Heightmap.Type[status.getHeightmapTypes().size()];
+    return status.getHeightmapTypes().toArray(result);
   }
 
   public static void updateHeightmap(
