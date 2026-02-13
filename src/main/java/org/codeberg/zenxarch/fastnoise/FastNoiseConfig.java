@@ -115,15 +115,13 @@ public class FastNoiseConfig {
       if (!meta.containsCustomValue(overridesKey)) continue;
 
       var value = meta.getCustomValue(overridesKey);
-      switch (value.getType()) {
-        case CvType.OBJECT -> collectOverrides(map, meta, value.getAsObject());
-        case CvType.ARRAY -> collectOverrides(map, meta, value.getAsArray());
-        case CvType.STRING -> collectOverrides(map, meta, value.getAsString(), false);
-        default ->
-            FastNoiseConstants.LOGGER.error(
-                "Mod {} has unsupported overrides of type {}", meta.getId(), value.getType());
-      }
-      ;
+      var typex = value.getType();
+      if (typex.equals(CvType.OBJECT)) collectOverrides(map, meta, value.getAsObject());
+      else if (typex.equals(CvType.ARRAY)) collectOverrides(map, meta, value.getAsArray());
+      else if (typex.equals(CvType.STRING)) collectOverrides(map, meta, value.getAsString(), false);
+      else
+        FastNoiseConstants.LOGGER.error(
+            "Mod {} has unsupported overrides of type {}", meta.getId(), value.getType());
     }
   }
 
