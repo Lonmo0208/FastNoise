@@ -1,14 +1,17 @@
 package org.codeberg.zenxarch.fastnoise.mixin.perf.noise;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
-import net.minecraft.world.gen.chunk.GenerationShapeConfig;
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import org.codeberg.zenxarch.fastnoise.noise.FastChunkSection;
@@ -50,38 +53,56 @@ public abstract class NoiseChunkGeneratorMixin {
   }
 
   @Overwrite
-  private Chunk method_38332(
-      Chunk chunk,
-      int cellHeight,
-      GenerationShapeConfig generationShapeConfig,
-      int minimumY,
+  public CompletableFuture<Chunk> populateNoise(
+      Executor executor,
       Blender blender,
-      StructureAccessor structureAccessor,
       NoiseConfig noiseConfig,
-      int minimumCellY) {
-    if (SharedConstants.isOutsideGenerationArea(chunk.getPos())) return chunk;
+      StructureAccessor structureAccessor,
+      Chunk chunk) {
+    if (SharedConstants.isOutsideGenerationArea(chunk.getPos()))
+      return CompletableFuture.completedFuture(chunk);
 
-    var start = chunk.getSectionIndex(minimumY);
-    var end =
-        chunk.getSectionIndex(
-            cellHeight * generationShapeConfig.verticalCellBlockCount() - 1 + minimumY);
+    var generationShapeConfig =
+        this.settings.value().generationShapeConfig().trimHeight(chunk.getHeightLimitView());
+    var minimumY = generationShapeConfig.minimumY();
+    var minimumCellY =
+        MathHelper.floorDiv(minimumY, generationShapeConfig.verticalCellBlockCount());
+    var cellHeight =
+        MathHelper.floorDiv(
+            generationShapeConfig.height(), generationShapeConfig.verticalCellBlockCount());
 
-    var fastSections = new FastChunkSection[end + 1];
-    for (int i = start; i <= end; i++) fastSections[i] = new FastChunkSection(chunk.getSection(i));
-
-    var result = chunk;
-    try {
-      result =
-          this.zenxarch$populateNoise(
-              blender,
-              structureAccessor,
-              noiseConfig,
-              chunk,
-              minimumCellY,
-              cellHeight,
-              fastSections);
-    } finally {
+    if (cellHeight <= 0) {
+      return CompletableFuture.completedFuture(chunk);
     }
-    return result;
+
+    return CompletableFuture.supplyAsync(
+        Util.debugSupplier(
+            "wgen_fill_noise",
+            () -> {
+              var start = chunk.getSectionIndex(minimumY);
+              var end =
+                  chunk.getSectionIndex(
+                      cellHeight * generationShapeConfig.verticalCellBlockCount() - 1 + minimumY);
+
+              var fastSections = new FastChunkSection[end + 1];
+              for (int i = start; i <= end; i++)
+                fastSections[i] = new FastChunkSection(chunk.getSection(i));
+
+              var result = chunk;
+              try {
+                result =
+                    this.zenxarch$populateNoise(
+                        blender,
+                        structureAccessor,
+                        noiseConfig,
+                        chunk,
+                        minimumCellY,
+                        cellHeight,
+                        fastSections);
+              } finally {
+              }
+              return result;
+            }),
+        Util.getMainWorkerExecutor());
   }
 }
