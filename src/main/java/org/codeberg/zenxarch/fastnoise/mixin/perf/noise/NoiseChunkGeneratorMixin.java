@@ -28,7 +28,7 @@ public abstract class NoiseChunkGeneratorMixin {
   @Shadow @Final private RegistryEntry<ChunkGeneratorSettings> settings;
 
   @Shadow
-  protected abstract ChunkNoiseSampler createChunkNoiseSampler(
+  protected abstract ChunkNoiseSampler method_41537(
       Chunk chunk, StructureAccessor world, Blender blender, NoiseConfig noiseConfig);
 
   @Unique
@@ -42,8 +42,7 @@ public abstract class NoiseChunkGeneratorMixin {
       FastChunkSection[] fastSections) {
     var chunkNoiseSampler =
         chunk.getOrCreateChunkNoiseSampler(
-            chunkx ->
-                this.createChunkNoiseSampler(chunkx, structureAccessor, blender, noiseConfig));
+            chunkx -> this.method_41537(chunkx, structureAccessor, blender, noiseConfig));
     BlockState defaultBlockState = settings.value().defaultBlock();
 
     FastWorldgen.populateNoise(
