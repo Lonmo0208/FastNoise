@@ -4,9 +4,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.BlockState;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.StructureAccessor;
 import net.minecraft.world.gen.chunk.Blender;
@@ -59,17 +59,16 @@ public abstract class NoiseChunkGeneratorMixin {
       NoiseConfig noiseConfig,
       StructureAccessor structureAccessor,
       Chunk chunk) {
-    if (SharedConstants.isOutsideGenerationArea(chunk.getPos()))
+    if (SharedConstants.method_37896(chunk.getPos()))
       return CompletableFuture.completedFuture(chunk);
 
     var generationShapeConfig =
-        this.settings.value().generationShapeConfig().trimHeight(chunk.getHeightLimitView());
+        this.settings.value().generationShapeConfig().method_42368(chunk.getHeightLimitView());
     var minimumY = generationShapeConfig.minimumY();
-    var minimumCellY =
-        MathHelper.floorDiv(minimumY, generationShapeConfig.verticalCellBlockCount());
+    var minimumCellY = MathHelper.floorDiv(minimumY, generationShapeConfig.verticalBlockSize());
     var cellHeight =
         MathHelper.floorDiv(
-            generationShapeConfig.height(), generationShapeConfig.verticalCellBlockCount());
+            generationShapeConfig.height(), generationShapeConfig.verticalBlockSize());
 
     if (cellHeight <= 0) {
       return CompletableFuture.completedFuture(chunk);
@@ -82,7 +81,7 @@ public abstract class NoiseChunkGeneratorMixin {
               var start = chunk.getSectionIndex(minimumY);
               var end =
                   chunk.getSectionIndex(
-                      cellHeight * generationShapeConfig.verticalCellBlockCount() - 1 + minimumY);
+                      cellHeight * generationShapeConfig.verticalBlockSize() - 1 + minimumY);
 
               var fastSections = new FastChunkSection[end + 1];
               for (int i = start; i <= end; i++)

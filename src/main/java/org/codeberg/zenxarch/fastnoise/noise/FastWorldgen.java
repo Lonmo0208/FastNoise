@@ -3,14 +3,15 @@ package org.codeberg.zenxarch.fastnoise.noise;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSupplier;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 
@@ -28,10 +29,10 @@ public class FastWorldgen {
     int chunkStartX = chunkPos.getStartX();
     int chunkStartZ = chunkPos.getStartZ();
     AquiferSampler aquiferSampler = chunkNoiseSampler.getAquiferSampler();
-    chunkNoiseSampler.sampleStartDensity();
+    chunkNoiseSampler.sampleStartNoise();
     BlockPos.Mutable mutable = new BlockPos.Mutable();
-    int horizontalCellBlockCount = chunkNoiseSampler.getHorizontalCellBlockCount();
-    int verticalCellBlockCount = chunkNoiseSampler.getVerticalCellBlockCount();
+    int horizontalCellBlockCount = chunkNoiseSampler.getHorizontalBlockSize();
+    int verticalCellBlockCount = chunkNoiseSampler.getVerticalBlockSize();
     int cellWidth = 16 / horizontalCellBlockCount;
 
     final boolean skipDefaultBlock = defaultBlockState == AIR;
@@ -39,11 +40,11 @@ public class FastWorldgen {
     FastChunkSection fastSection = fastSections[fastSections.length - 1];
 
     for (int cellX = 0; cellX < cellWidth; cellX++) {
-      chunkNoiseSampler.sampleEndDensity(cellX);
+      chunkNoiseSampler.sampleEndNoise(cellX);
 
       for (int cellZ = 0; cellZ < cellWidth; cellZ++) {
         for (int cellY = cellHeight - 1; cellY >= 0; cellY--) {
-          chunkNoiseSampler.onSampledCellCorners(cellY, cellZ);
+          chunkNoiseSampler.sampleNoiseCorners(cellY, cellZ);
 
           for (int verticalCellBlock = verticalCellBlockCount - 1;
               verticalCellBlock >= 0;
@@ -53,7 +54,7 @@ public class FastWorldgen {
 
             double verticalCellProgress =
                 (double) verticalCellBlock / (double) verticalCellBlockCount;
-            chunkNoiseSampler.interpolateY(blockY, verticalCellProgress);
+            chunkNoiseSampler.sampleNoiseY(blockY, verticalCellProgress);
 
             fastSection = fastSections[chunk.getSectionIndex(blockY)];
 
@@ -61,25 +62,36 @@ public class FastWorldgen {
               int blockX = chunkStartX + cellX * horizontalCellBlockCount + cellBlockX;
               int blockXInSection = blockX & 15;
               double cellXProgress = (double) cellBlockX / (double) horizontalCellBlockCount;
-              chunkNoiseSampler.interpolateX(blockX, cellXProgress);
+              chunkNoiseSampler.sampleNoiseX(blockX, cellXProgress);
 
               for (int cellBlockZ = 0; cellBlockZ < horizontalCellBlockCount; cellBlockZ++) {
                 int blockZ = chunkStartZ + cellZ * horizontalCellBlockCount + cellBlockZ;
                 int blockZInSection = blockZ & 15;
                 double cellZProgress = (double) cellBlockZ / (double) horizontalCellBlockCount;
 
-                chunkNoiseSampler.interpolateZ(blockZ, cellZProgress);
+                chunkNoiseSampler.sampleNoiseZ(blockZ, cellZProgress);
 
                 var state = chunkNoiseSampler.sampleBlockState();
                 if (state == null) {
                   if (skipDefaultBlock) continue;
+                  if (defaultBlockState.getLuminance() != 0
+                      && chunk instanceof ProtoChunk protoChunk) {
+                    mutable.set(blockX, blockY, blockZ);
+                    protoChunk.addLightSource(mutable);
+                  }
                   fastSection.setDefaultBlockState(
                       blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
                   continue;
                 } else if (state == AIR) continue;
-                else
+                else {
+                  if (state.getLuminance() != 0 && chunk instanceof ProtoChunk protoChunk) {
+                    mutable.set(blockX, blockY, blockZ);
+                    protoChunk.addLightSource(mutable);
+                  }
+
                   fastSection.setBlockState(
                       blockXInSection, blockYInSection, blockZInSection, state);
+                }
 
                 if (aquiferSampler.needsFluidTick() && !state.getFluidState().isEmpty()) {
                   mutable.set(blockX, blockY, blockZ);
@@ -94,7 +106,7 @@ public class FastWorldgen {
       chunkNoiseSampler.swapBuffers();
     }
 
-    chunkNoiseSampler.stopInterpolation();
+    chunkNoiseSampler.method_40537();
 
     for (int i = 0; i < fastSections.length; i++)
       if (fastSections[i] != null) fastSections[i].recalculateCounts();
