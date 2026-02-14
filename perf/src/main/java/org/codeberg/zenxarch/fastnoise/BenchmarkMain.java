@@ -7,6 +7,7 @@ import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.ForkedRunnerAccessor;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class BenchmarkMain {
   }
 
   private static void runBenchmark(String outputPrefix) {
-    var options = new OptionsBuilder();
+    ChainedOptionsBuilder options = new OptionsBuilder();
 
     {
       var forks = getIntProperty("zforks", 1, 0);
