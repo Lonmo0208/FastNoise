@@ -39,9 +39,7 @@ dependencies {
 	mappings "org.relativitymc:modern-yarn:${project.yarn_mappings}:v2"
   modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-  if (project.hasProperty("zmod")) {
-    implementation project(path: ':', configuration: 'namedElements')
-  }
+  implementation project(path: ':', configuration: 'namedElements')
   implementation 'org.openjdk.jmh:jmh-core:1.37'
   annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 }

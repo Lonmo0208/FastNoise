@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.BlockColumn;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
+import org.codeberg.zenxarch.fastnoise.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.surface.FastBlockColumn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +22,9 @@ public abstract class SurfaceBuilderMixin {
       at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER))
   public BlockColumn zenxarch$modifyColumn(
       BlockColumn og, @Local Chunk chunk, @Local(ordinal = 0) BlockPos.Mutable columnPos) {
+    if (!FastNoiseConfig.ENABLED) {
+      return og;
+    }
     return new FastBlockColumn(chunk, columnPos);
   }
 }

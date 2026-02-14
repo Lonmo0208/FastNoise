@@ -25,6 +25,7 @@ public final class FastNoiseMixinPlugin implements IMixinConfigPlugin {
 
   @Override
   public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+    if (!FastNoiseConfig.ENABLED) return false;
     if (!mixinClassName.startsWith(mixinPackage)) return false;
     var name = mixinClassName.substring(mixinPackage.length() - "mixin".length());
 

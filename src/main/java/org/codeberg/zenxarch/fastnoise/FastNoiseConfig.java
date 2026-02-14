@@ -20,6 +20,22 @@ public class FastNoiseConfig {
 
   private static final String overridesKey = FastNoiseConstants.MOD_ID + ":overrides";
 
+  private static boolean getProperty(String property, boolean def) {
+    var prop = System.getProperty(property, Boolean.toString(def));
+    if (prop == null) return def;
+    try {
+      return Boolean.parseBoolean(prop);
+    } catch (Exception e) {
+      return def;
+    }
+  }
+
+  public static boolean ENABLED = getProperty("zmod", true);
+
+  static {
+    FastNoiseConstants.LOGGER.info("Mod Enabled: {}", ENABLED);
+  }
+
   private static final String[] keys =
       new String[] {"mixin.perf.noise", "mixin.perf.biome", "mixin.perf.surface"};
 

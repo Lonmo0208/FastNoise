@@ -78,14 +78,31 @@ public class BenchmarkMain {
     }
   }
 
+  private static boolean getBooleanProperty(String name, boolean def) {
+    var value = System.getProperty(name);
+    if (value == null) return def;
+    try {
+      return Boolean.parseBoolean(value);
+    } catch (Exception e) {
+      return def;
+    }
+  }
+
+  private static String jvmArgs(int forks, boolean zmod) {
+    if (forks == 0) return null;
+    return "-Dzforked=true -Dzmod=" + zmod;
+  }
+
   private static void runBenchmark(String outputPrefix) {
     ChainedOptionsBuilder options = new OptionsBuilder();
+    var zmod = getBooleanProperty("zmod", true);
 
     {
       var forks = getIntProperty("zforks", 1, 0);
       options = options.forks(forks);
-      if (forks != 0) {
-        options = options.jvmArgsAppend("-Dzforked=true");
+      var args = jvmArgs(forks, zmod);
+      if (args != null) {
+        options = options.jvmArgsAppend(args);
       }
     }
 
@@ -106,7 +123,7 @@ public class BenchmarkMain {
 
     var benchmarkName = "Vanilla";
 
-    if (System.getProperty("zmod") != null) benchmarkName = "Modded";
+    if (zmod) benchmarkName = "Modded";
 
     if (System.getProperty("zperfbenchmark") != null) {
       var benchRegex = System.getProperty("zperfbenchmark");
