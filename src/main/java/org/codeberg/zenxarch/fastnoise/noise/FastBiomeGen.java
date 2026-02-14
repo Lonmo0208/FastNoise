@@ -32,6 +32,10 @@ public final class FastBiomeGen {
       ChunkNoiseSampler sampler,
       NoiseConfig config,
       RegistryEntry<ChunkGeneratorSettings> settings) {
+    if (true) {
+      populateBiomes(chunk, supplier, createSampler(sampler, config, settings));
+      return;
+    }
     switch (supplier) {
       case FixedBiomeSource fixed -> packSingleBiome(chunk.getSectionArray(), fixed.biome);
       case TheEndBiomeSource theEnd -> {
