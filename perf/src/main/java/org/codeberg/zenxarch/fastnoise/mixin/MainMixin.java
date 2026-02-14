@@ -11,6 +11,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Main.class)
 public abstract class MainMixin {
+  @Inject(method = "main", at = @At("HEAD"), cancellable = true)
+  private static void zenxarch$main(String[] args, CallbackInfo ci) {
+    if (BenchmarkMain.isForked()) return;
+    if (BenchmarkMain.isParityTest()) return;
+    ci.cancel();
+    BenchmarkMain.runTest(args);
+  }
+
   @Inject(
       method = "main",
       at =
@@ -19,9 +27,10 @@ public abstract class MainMixin {
               target =
                   "Lnet/minecraft/world/level/storage/LevelStorage$Session;backupLevelDataFile(Lnet/minecraft/world/SaveProperties;)V"),
       cancellable = true)
-  private static void zenxarch$main(
+  private static void zenxarch$forked(
       String[] args, CallbackInfo ci, @Local DynamicRegistryManager.Immutable manager) {
     ci.cancel();
-    BenchmarkMain.runTest(args, manager);
+    if (BenchmarkMain.isForked()) BenchmarkMain.runForked(args, manager);
+    if (BenchmarkMain.isParityTest()) BenchmarkMain.runParityTest(manager);
   }
 }

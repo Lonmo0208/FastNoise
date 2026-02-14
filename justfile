@@ -86,7 +86,7 @@ perfBiomesAsync +args="":
     ./gradlew :perf:runServer -Pzuseasync="/opt/async-profiler/lib/libasyncProfiler.so" -Pzmod="true" -Pzperfbenchmark="biomegen" -Pzworldname="end" {{args}}
 
 parity:
-    ./gradlew :perf:runServer -Pzperfbenchmark="parity"
+    ./gradlew :perf:runServer -Pzparity="true"
 
 task taskName:
     ./gradlew {{taskName}}

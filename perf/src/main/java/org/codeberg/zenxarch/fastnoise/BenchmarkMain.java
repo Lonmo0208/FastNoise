@@ -16,24 +16,32 @@ import org.slf4j.LoggerFactory;
 public class BenchmarkMain {
   public static final Logger LOGGER = LoggerFactory.getLogger(BenchmarkMain.class);
 
-  public static void runTest(String[] args, DynamicRegistryManager manager) {
+  public static void runTest(String[] args) {
+    runBenchmark("Benchmark ");
+  }
+
+  public static boolean isParityTest() {
+    return System.getProperty("zparity") != null;
+  }
+
+  public static boolean isForked() {
+    return System.getProperty("zforked") != null;
+  }
+
+  public static void runForked(String[] args, DynamicRegistryManager manager) {
     TestGlobals.setManager(manager);
 
-    if (System.getProperty("zforked") != null) {
-      try {
-        ForkedRunnerAccessor.main(args);
-      } catch (Exception e) {
-        LOGGER.error("Huh?", e);
-      }
-      return;
+    try {
+      ForkedRunnerAccessor.main(args);
+    } catch (Exception e) {
+      LOGGER.error("Huh?", e);
     }
+  }
 
-    if (System.getProperty("zperfbenchmark", "").equals("parity")) {
-      doParityTest();
-      return;
-    }
+  public static void runParityTest(DynamicRegistryManager manager) {
+    TestGlobals.setManager(manager);
 
-    runBenchmark("Benchmark ");
+    doParityTest();
   }
 
   private static void doParityTest() {
@@ -89,7 +97,6 @@ public class BenchmarkMain {
   }
 
   private static String jvmArgs(int forks, boolean zmod) {
-    if (forks == 0) return null;
     return "-Dzforked=true -Dzmod=" + zmod;
   }
 
@@ -98,7 +105,7 @@ public class BenchmarkMain {
     var zmod = getBooleanProperty("zmod", true);
 
     {
-      var forks = getIntProperty("zforks", 1, 0);
+      var forks = getIntProperty("zforks", 1, 1);
       options = options.forks(forks);
       var args = jvmArgs(forks, zmod);
       if (args != null) {
