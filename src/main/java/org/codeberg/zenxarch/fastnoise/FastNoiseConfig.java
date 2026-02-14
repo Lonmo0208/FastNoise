@@ -24,7 +24,7 @@ public class FastNoiseConfig {
       new String[] {"mixin.perf.noise", "mixin.perf.biome", "mixin.perf.surface"};
 
   private static Map<String, Boolean> defaultConfig() {
-    return Stream.of(keys).collect(Collectors.toMap(k -> k, _ -> true));
+    return Stream.of(keys).collect(Collectors.toMap(k -> k, k -> true));
   }
 
   private static final Object2BooleanMap<String> defaults =

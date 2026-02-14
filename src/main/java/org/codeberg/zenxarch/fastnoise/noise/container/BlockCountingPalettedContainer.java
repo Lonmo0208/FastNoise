@@ -13,12 +13,12 @@ public class BlockCountingPalettedContainer<T> extends PalettedContainer<T> {
 
   public BlockCountingPalettedContainer(
       PaletteProvider<T> paletteProvider, long[] storage, T[] states, ArrayPalette<T> palette) {
-    this.states = states;
     super(
         paletteProvider,
         FastNoisePaletteHelper.ARRAY_4_TYPE,
         new PackedIntegerArray(4, 4096, storage),
         palette);
+    this.states = states;
     this.palette = palette;
   }
 

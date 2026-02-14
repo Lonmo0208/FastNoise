@@ -40,8 +40,8 @@ public final class FastBiomeGen {
             theEnd,
             chunk,
             chunk.getSectionArray(),
-            chunkPos.x(),
-            chunkPos.z(),
+            chunkPos.x,
+            chunkPos.z,
             createSampler(sampler, config, settings));
       }
       default -> populateBiomes(chunk, supplier, createSampler(sampler, config, settings));
@@ -54,8 +54,8 @@ public final class FastBiomeGen {
     var sections = chunk.getSectionArray();
 
     final var chunkPos = chunk.getPos();
-    final int cx = chunkPos.x();
-    final int cz = chunkPos.z();
+    final int cx = chunkPos.x;
+    final int cz = chunkPos.z;
 
     final int minY = chunk.getBottomY();
     final int x = cx << 2;

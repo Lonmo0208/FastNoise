@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "org.codeberg.zenxarch.fastnoise.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "perf.noise.NoiseChunkGeneratorMixin",
     "perf.biome.NoiseChunkGeneratorMixin",
