@@ -30,7 +30,7 @@ public record BenchmarkSettings(
     return new BenchmarkSettings(endRegion(), defaultSeed, DimensionOptions.END);
   }
 
-  public static record ChunkRegion(ChunkPos[] pos) {
+  public static record ChunkRegion(ChunkPos[] pos, ChunkPos min, ChunkPos max) {
     public static ChunkRegion of(int min, int max) {
       var pos = new ChunkPos[(max + 1 - min) * (max + 1 - min)];
       int idx = 0;
@@ -39,7 +39,7 @@ public record BenchmarkSettings(
           pos[idx++] = new ChunkPos(x, z);
         }
       }
-      return new ChunkRegion(pos);
+      return new ChunkRegion(pos, new ChunkPos(min, min), new ChunkPos(max, max));
     }
   }
 }
