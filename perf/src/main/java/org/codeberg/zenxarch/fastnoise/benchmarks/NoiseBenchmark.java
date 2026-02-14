@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
-@State(Scope.Benchmark)
+@State(Scope.Thread)
 public class NoiseBenchmark {
   private TestWorld world;
   private ProtoChunk[] chunks;

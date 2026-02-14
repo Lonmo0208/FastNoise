@@ -5,7 +5,7 @@ import org.codeberg.zenxarch.fastnoise.BenchmarkSettings;
 import org.codeberg.zenxarch.fastnoise.TestWorld;
 import org.openjdk.jmh.annotations.*;
 
-@State(Scope.Benchmark)
+@State(Scope.Thread)
 public class BiomesBenchmark {
   private TestWorld world;
   private ProtoChunk[] chunks;

@@ -101,7 +101,8 @@ public class BenchmarkMain {
             .measurementTime(TimeValue.seconds(getIntProperty("zmeasuretime", 5, 1)))
             .warmupIterations(getIntProperty("zwarmups", 5, 1))
             .measurementIterations(getIntProperty("zmeasures", 5, 1))
-            .timeUnit(TimeUnit.MILLISECONDS);
+            .timeUnit(TimeUnit.MILLISECONDS)
+            .threads(getIntProperty("zthreads", 1, 1));
 
     var benchmarkName = "Vanilla";
 

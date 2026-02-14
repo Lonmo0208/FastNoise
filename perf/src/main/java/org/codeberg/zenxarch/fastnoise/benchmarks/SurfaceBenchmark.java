@@ -12,7 +12,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
-@State(Scope.Benchmark)
+@State(Scope.Thread)
 public class SurfaceBenchmark {
   private TestWorld world;
   private ChunkRegion chunks;

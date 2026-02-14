@@ -19,7 +19,7 @@ loom {
     runs {
         server {
             server()
-            def props = ["zperfbenchmark","zuseasync","zworldname","zbenchmode","zwarmuptime","zmeasuretime","zwarmups","zmeasures","zmod","zforks"]
+            def props = ["zperfbenchmark","zuseasync","zworldname","zbenchmode","zwarmuptime","zmeasuretime","zwarmups","zmeasures","zmod","zforks", "zthreads"]
             for (def prop in props) {
                 if (project.hasProperty(prop)) {
                     property(prop, project.getProperty(prop))
@@ -34,16 +34,16 @@ loom {
 }
 
 dependencies {
-    // To change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+  // To change the versions see the gradle.properties file
+  minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "org.relativitymc:modern-yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+  modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    if (project.hasProperty("zmod")) {
-        implementation project(path: ':', configuration: 'namedElements')
-    }
-    implementation 'org.openjdk.jmh:jmh-core:1.37'
-    annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+  if (project.hasProperty("zmod")) {
+    implementation project(path: ':', configuration: 'namedElements')
+  }
+  implementation 'org.openjdk.jmh:jmh-core:1.37'
+  annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 }
 
 tasks.withType(JavaCompile).configureEach {
