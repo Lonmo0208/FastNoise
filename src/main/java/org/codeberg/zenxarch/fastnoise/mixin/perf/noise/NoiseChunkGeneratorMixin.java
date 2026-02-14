@@ -1,7 +1,8 @@
 package org.codeberg.zenxarch.fastnoise.mixin.perf.noise;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.SharedConstants;
-import net.minecraft.block.BlockState;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.StructureAccessor;
@@ -11,13 +12,10 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.chunk.GenerationShapeConfig;
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.gen.noise.NoiseConfig;
-import org.codeberg.zenxarch.fastnoise.noise.FastChunkSection;
 import org.codeberg.zenxarch.fastnoise.noise.FastNoiseGen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(NoiseChunkGenerator.class)
 public abstract class NoiseChunkGeneratorMixin {
@@ -37,29 +35,8 @@ public abstract class NoiseChunkGeneratorMixin {
       int minimumCellY,
       int cellHeight);
 
-  @Unique
+  @WrapMethod(method = "method_38332")
   private Chunk zenxarch$populateNoise(
-      Blender blender,
-      StructureAccessor structureAccessor,
-      NoiseConfig noiseConfig,
-      Chunk chunk,
-      int minimumCellY,
-      int cellHeight,
-      FastChunkSection[] fastSections) {
-    var chunkNoiseSampler =
-        chunk.getOrCreateChunkNoiseSampler(
-            chunkx ->
-                this.createChunkNoiseSampler(chunkx, structureAccessor, blender, noiseConfig));
-    BlockState defaultBlockState = settings.value().defaultBlock();
-
-    FastNoiseGen.populateNoise(
-        chunkNoiseSampler, defaultBlockState, chunk, minimumCellY, cellHeight, fastSections);
-
-    return chunk;
-  }
-
-  @Overwrite
-  private Chunk method_38332(
       Chunk chunk,
       int cellHeight,
       GenerationShapeConfig generationShapeConfig,
@@ -67,33 +44,21 @@ public abstract class NoiseChunkGeneratorMixin {
       Blender blender,
       StructureAccessor structureAccessor,
       NoiseConfig noiseConfig,
-      int minimumCellY) {
+      int minimumCellY,
+      Operation<Chunk> op) {
     if (SharedConstants.isOutsideGenerationArea(chunk.getPos())) return chunk;
+    if (SharedConstants.AQUIFERS)
+      return this.populateNoise(
+          blender, structureAccessor, noiseConfig, chunk, minimumCellY, cellHeight);
 
-    var start = chunk.getSectionIndex(minimumY);
-    var end =
-        chunk.getSectionIndex(
-            cellHeight * generationShapeConfig.verticalCellBlockCount() - 1 + minimumY);
+    var sampler =
+        chunk.getOrCreateChunkNoiseSampler(
+            chunkx ->
+                this.createChunkNoiseSampler(chunkx, structureAccessor, blender, noiseConfig));
 
-    var fastSections = new FastChunkSection[end + 1];
-    for (int i = start; i <= end; i++) fastSections[i] = new FastChunkSection(chunk.getSection(i));
+    FastNoiseGen.populateNoise(
+        sampler, this.settings, chunk, minimumCellY, minimumY, generationShapeConfig, cellHeight);
 
-    var result = chunk;
-    try {
-      result =
-          SharedConstants.AQUIFERS
-              ? this.populateNoise(
-                  blender, structureAccessor, noiseConfig, chunk, minimumCellY, cellHeight)
-              : this.zenxarch$populateNoise(
-                  blender,
-                  structureAccessor,
-                  noiseConfig,
-                  chunk,
-                  minimumCellY,
-                  cellHeight,
-                  fastSections);
-    } finally {
-    }
-    return result;
+    return chunk;
   }
 }

@@ -10,28 +10,52 @@ import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PalettedContainer;
+import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
+import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.densityfunction.DensityFunction;
+import net.minecraft.world.gen.noise.NoiseConfig;
+import org.codeberg.zenxarch.fastnoise.mixin.ChunkNoiseSamplerAccessor;
 
 public final class FastBiomeGen {
 
+  private static MultiNoiseSampler createSampler(
+      ChunkNoiseSampler sampler,
+      NoiseConfig config,
+      RegistryEntry<ChunkGeneratorSettings> settings) {
+    return ((ChunkNoiseSamplerAccessor) sampler)
+        .zenxarch$createMultiNoiseSampler(config.getNoiseRouter(), settings.value().spawnTarget());
+  }
+
   public static void populateBiomes(
+      Chunk chunk,
+      BiomeSupplier supplier,
+      ChunkNoiseSampler sampler,
+      NoiseConfig config,
+      RegistryEntry<ChunkGeneratorSettings> settings) {
+    switch (supplier) {
+      case FixedBiomeSource fixed -> packSingleBiome(chunk.getSectionArray(), fixed.biome);
+      case TheEndBiomeSource theEnd -> {
+        final var chunkPos = chunk.getPos();
+        populateEndBiomes(
+            theEnd,
+            chunk,
+            chunk.getSectionArray(),
+            chunkPos.x(),
+            chunkPos.z(),
+            createSampler(sampler, config, settings));
+      }
+      default -> populateBiomes(chunk, supplier, createSampler(sampler, config, settings));
+    }
+  }
+
+  private static void populateBiomes(
       Chunk chunk, BiomeSupplier supplier, MultiNoiseSampler sampler) {
 
     var sections = chunk.getSectionArray();
 
-    if (supplier instanceof FixedBiomeSource fixed) {
-      packSingleBiome(sections, fixed.biome);
-      return;
-    }
-
     final var chunkPos = chunk.getPos();
     final int cx = chunkPos.x();
     final int cz = chunkPos.z();
-
-    if (supplier instanceof TheEndBiomeSource theEnd) {
-      populateEndBiomes(theEnd, chunk, sections, cx, cz, sampler);
-      return;
-    }
 
     final int minY = chunk.getBottomY();
     final int x = cx << 2;
