@@ -3,7 +3,6 @@ package org.codeberg.zenxarch.fastnoise;
 import net.minecraft.world.chunk.ChunkStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.codeberg.zenxarch.fastnoise.FastNoiseConfig;
 
 public final class ParityTest {
   public static final Logger LOGGER = LoggerFactory.getLogger(ParityTest.class);
@@ -35,7 +34,7 @@ public final class ParityTest {
 
     generateChunk(fakeWorld, modded, moddedBiomes);
 
-    for (int i = 0;i < modded.chunks().length;i++) {
+    for (int i = 0; i < modded.chunks().length; i++) {
       var a = modded.chunks()[i];
       var b = original.getChunk(modded.chunks()[i].getPos());
 

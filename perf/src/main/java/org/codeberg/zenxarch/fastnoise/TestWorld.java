@@ -1,5 +1,6 @@
 package org.codeberg.zenxarch.fastnoise;
 
+import java.util.Arrays;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -149,6 +150,12 @@ public final class TestWorld {
       if (!matches(
           (PalettedContainer<RegistryEntry<Biome>>) self[i].biomeContainer,
           (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer)) return false;
+    }
+
+    for (var heightmap : a.getHeightmaps()) {
+      if (!Arrays.equals(
+          a.getHeightmap(heightmap.getKey()).asLongArray(),
+          b.getHeightmap(heightmap.getKey()).asLongArray())) return false;
     }
     return true;
   }
