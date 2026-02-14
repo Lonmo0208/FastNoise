@@ -1,12 +1,9 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.util.collection.PackedIntegerArray;
 import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.Palette;
-import net.minecraft.world.chunk.PaletteType;
-import net.minecraft.world.chunk.PalettedContainer.Data;
+import org.codeberg.zenxarch.fastnoise.noise.container.BlockCountingPalettedContainer;
 
 public final class FastChunkSection {
 
@@ -18,6 +15,7 @@ public final class FastChunkSection {
   private long[] storage;
   private ArrayPalette<BlockState> palette;
   private BlockState[] states;
+  private BlockCountingPalettedContainer<BlockState> counter;
 
   public FastChunkSection(ChunkSection section) {
     this.section = section;
@@ -32,6 +30,7 @@ public final class FastChunkSection {
       } else this.states[(defaultIdx = this.palette.size++)] = state;
     }
     setBlockState(x, y, z, defaultIdx);
+    this.counter.updateCount(defaultIdx);
   }
 
   private int getIndex(BlockState state) {
@@ -50,29 +49,33 @@ public final class FastChunkSection {
   public void setBlockState(int x, int y, int z, BlockState state) {
     var valIdx = getIndex(state);
     setBlockState(x, y, z, valIdx);
+    this.counter.updateCount(valIdx);
   }
 
   private void setBlockState(int x, int y, int z, long value) {
     this.storage[(y << 4) | z] |= value << (x * 4);
   }
 
-  private static final Palette.Factory ARRAY = ArrayPalette::create;
-  private static final PaletteType ARRAY_4_TYPE = new PaletteType.Static(ARRAY, 4);
-
   private void init(BlockState state) {
     this.states = new BlockState[16];
-    this.states[0] = FastWorldgen.AIR;
-    this.states[1] = state;
-    this.storage = new long[4096 / (64 / 4)];
+    this.storage = new long[256];
     this.palette = new ArrayPalette<>(this.states, 4, 2);
-    var newData =
-        new Data<BlockState>(
-            ARRAY_4_TYPE, new PackedIntegerArray(4, 4096, this.storage), this.palette);
 
-    section.blockStateContainer.data = newData;
+    this.states[0] = FastNoiseGen.AIR;
+    this.states[1] = state;
+
+    this.counter =
+        new BlockCountingPalettedContainer<>(
+            this.section.blockStateContainer.paletteProvider,
+            this.storage,
+            this.states,
+            this.palette);
+    this.section.blockStateContainer = this.counter;
   }
 
   public void recalculateCounts() {
-    section.calculateCounts();
+    if (palette == null) return;
+    this.section.calculateCounts();
+    this.section.blockStateContainer = this.counter.revert();
   }
 }

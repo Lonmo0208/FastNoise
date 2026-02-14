@@ -1,21 +1,43 @@
 package org.codeberg.zenxarch.fastnoise.noise;
 
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeSupplier;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.AquiferSampler;
+import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
+import net.minecraft.world.gen.chunk.GenerationShapeConfig;
+import org.codeberg.zenxarch.fastnoise.heightmap.HeightmapUtil;
 
-public class FastWorldgen {
+public class FastNoiseGen {
   public static final BlockState AIR = Blocks.AIR.getDefaultState();
+
+  public static void populateNoise(
+      ChunkNoiseSampler chunkNoiseSampler,
+      RegistryEntry<ChunkGeneratorSettings> settings,
+      Chunk chunk,
+      int minimumCellY,
+      int minimumY,
+      GenerationShapeConfig config,
+      int cellHeight) {
+
+    var start = chunk.getSectionIndex(minimumY);
+    var end = chunk.getSectionIndex(cellHeight * config.verticalCellBlockCount() - 1 + minimumY);
+
+    var fastSections = new FastChunkSection[end + 1];
+    for (int i = start; i <= end; i++) fastSections[i] = new FastChunkSection(chunk.getSection(i));
+
+    populateNoise(
+        chunkNoiseSampler,
+        settings.value().defaultBlock(),
+        chunk,
+        minimumCellY,
+        cellHeight,
+        fastSections);
+  }
 
   public static void populateNoise(
       ChunkNoiseSampler chunkNoiseSampler,
@@ -99,30 +121,8 @@ public class FastWorldgen {
     for (int i = 0; i < fastSections.length; i++)
       if (fastSections[i] != null) fastSections[i].recalculateCounts();
 
-    Heightmap.populateHeightmaps(
-        chunk, ObjectArraySet.of(Heightmap.Type.OCEAN_FLOOR_WG, Heightmap.Type.WORLD_SURFACE_WG));
-  }
-
-  public static void populateBiomes(
-      Chunk chunk, BiomeSupplier supplier, MultiNoiseSampler sampler) {
-    var chunkPos = chunk.getPos();
-    var world = chunk.getHeightLimitView();
-
-    int x = chunkPos.x * 4;
-    int y = world.getBottomY() >> 2;
-    int z = chunkPos.z * 4;
-
-    final int maxIdx = world.getHeight() >> 4;
-    var sections = chunk.getSectionArray();
-
-    @SuppressWarnings("unchecked")
-    final RegistryEntry<Biome>[] biomes = new RegistryEntry[64];
-    final var storage = new byte[64];
-
-    for (int i = 0; i < maxIdx; i++) {
-      var section = sections[i];
-      FastBiomeGen.populateBiomes(section, supplier, sampler, x, y, z, biomes, storage);
-      y += 4;
+    for (var typex : chunk.getStatus().getHeightmapTypes()) {
+      HeightmapUtil.populateHeightmapPostNoise(chunk, typex, defaultBlockState, AIR);
     }
   }
 }
