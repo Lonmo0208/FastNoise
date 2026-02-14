@@ -9,11 +9,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.gen.HeightContext;
 import net.minecraft.world.gen.WorldPresets;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.AquiferSampler.FluidLevelSampler;
@@ -30,6 +32,7 @@ public final class TestWorld {
   private final NoiseConfig noiseConfig;
   private final FluidLevelSampler fluidLevelSampler;
   private final NoiseChunkGenerator generator;
+  private final long seed;
 
   private static final Beardifying beardifying = new BeardifyingImpl();
 
@@ -40,6 +43,7 @@ public final class TestWorld {
   }
 
   public TestWorld(RegistryKey<DimensionOptions> optionsKey, long seed) {
+    this.seed = seed;
     var manager = TestGlobals.getManager();
     var options =
         manager
@@ -117,6 +121,21 @@ public final class TestWorld {
   public void biomes(ProtoChunk chunk) {
     chunk.chunkNoiseSampler = this.createSampler(chunk);
     this.generator.populateBiomes(Blender.getNoBlending(), this.noiseConfig, null, chunk);
+  }
+
+  public void surface(ProtoChunk chunk, ChunkRegion biomeSource) {
+    var registry = TestGlobals.getManager().getOrThrow(RegistryKeys.BIOME);
+    this.noiseConfig
+        .getSurfaceBuilder()
+        .buildSurface(
+            noiseConfig,
+            new BiomeAccess(biomeSource, this.seed),
+            registry,
+            settings.usesLegacyRandom(),
+            new HeightContext(generator, chunk),
+            chunk,
+            chunk.getOrCreateChunkNoiseSampler(null),
+            settings.surfaceRule());
   }
 
   public static boolean matches(ProtoChunk a, ProtoChunk b) {
