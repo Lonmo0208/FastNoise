@@ -5,7 +5,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.dimension.DimensionOptions;
 
 public record BenchmarkSettings(
-    ChunkRegion region, long seed, RegistryKey<DimensionOptions> dimensionOptions) {
+    ChunkRegion region,
+    ChunkRegion biomeRegion,
+    long seed,
+    RegistryKey<DimensionOptions> dimensionOptions) {
 
   private static final long defaultSeed = 100;
   private static final int WorldRadiusInChunks = 16;
@@ -14,20 +17,30 @@ public record BenchmarkSettings(
     return ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
   }
 
+  private static ChunkRegion overworldBiomeRegion() {
+    return ChunkRegion.of(-WorldRadiusInChunks - 1, WorldRadiusInChunks + 1);
+  }
+
   private static ChunkRegion endRegion() {
     return ChunkRegion.of(128 - WorldRadiusInChunks, 128 + WorldRadiusInChunks);
   }
 
+  private static ChunkRegion endBiomeRegion() {
+    return ChunkRegion.of(128 - WorldRadiusInChunks - 1, 128 + WorldRadiusInChunks + 1);
+  }
+
   public static BenchmarkSettings overworld() {
-    return new BenchmarkSettings(overworldRegion(), defaultSeed, DimensionOptions.OVERWORLD);
+    return new BenchmarkSettings(
+        overworldRegion(), overworldBiomeRegion(), defaultSeed, DimensionOptions.OVERWORLD);
   }
 
   public static BenchmarkSettings nether() {
-    return new BenchmarkSettings(overworldRegion(), defaultSeed, DimensionOptions.NETHER);
+    return new BenchmarkSettings(
+        overworldRegion(), overworldBiomeRegion(), defaultSeed, DimensionOptions.NETHER);
   }
 
   public static BenchmarkSettings end() {
-    return new BenchmarkSettings(endRegion(), defaultSeed, DimensionOptions.END);
+    return new BenchmarkSettings(endRegion(), endBiomeRegion(), defaultSeed, DimensionOptions.END);
   }
 
   public static record ChunkRegion(ChunkPos[] pos, ChunkPos min, ChunkPos max) {
