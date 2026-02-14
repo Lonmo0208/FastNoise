@@ -54,6 +54,20 @@ public record ChunkRegion(ProtoChunk[] chunks, Object2IntMap<ChunkPos> chunkGett
     }
   }
 
+  public void copyBiomes(ChunkRegion region) {
+    for (int i = 0; i < this.chunks.length; i++) {
+      var dest = this.chunks[i];
+      var src = region.getChunk(dest.getPos());
+
+      var srcData = src.getSectionArray();
+      var destData = dest.getSectionArray();
+
+      for (int j = 0; j < srcData.length; j++) {
+        destData[j] = new ChunkSection(destData[j].blockStateContainer, srcData[j].biomeContainer);
+      }
+    }
+  }
+
   public ProtoChunk getChunk(ChunkPos pos) {
     return this.chunks[this.chunkGetter.getInt(pos)];
   }

@@ -58,39 +58,7 @@ public class BenchmarkMain {
   public static void runParityTest(DynamicRegistryManager manager) {
     TestGlobals.setManager(manager);
 
-    doParityTest();
-  }
-
-  private static void doParityTest() {
-    LOGGER.info("Starting parity test");
-    doParityTest(BenchmarkSettings.overworld());
-    doParityTest(BenchmarkSettings.nether());
-    doParityTest(BenchmarkSettings.end());
-  }
-
-  private static void doParityTest(BenchmarkSettings settings) {
-    var fakeWorld = new TestWorld(settings);
-
-    var name = settings.dimensionOptions().getValue().getPath();
-
-    LOGGER.info("Generating " + name);
-    for (var pos : settings.region().pos()) {
-      var a = fakeWorld.createChunk(pos);
-      var b = fakeWorld.createChunk(pos);
-
-      a.getOrCreateChunkNoiseSampler(fakeWorld::createSampler);
-      b.getOrCreateChunkNoiseSampler(fakeWorld::createSampler);
-
-      // TODO: fix parity test
-      // Worldgen.vanillaNoise(fakeWorld, a);
-      // Worldgen.optimizedNoise(fakeWorld, b);
-      //
-      // Worldgen.vanillaBiomes(fakeWorld, a);
-      // Worldgen.optimizedBiomes(fakeWorld, b);
-
-      TestWorld.matches(a, b);
-    }
-    LOGGER.info(name + " matches");
+    ParityTest.doParityTest();
   }
 
   private static int getIntProperty(String name, int def, int min) {
