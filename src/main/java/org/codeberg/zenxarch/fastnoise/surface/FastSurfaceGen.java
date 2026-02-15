@@ -51,6 +51,9 @@ public class FastSurfaceGen {
 
     final var defaultState = builder.zenxarch$getDefaultState();
 
+    final int endY = chunk.getBottomY();
+    final int topY = chunk.getTopYInclusive();
+
     for (int x = 0; x < 16; x++) {
       for (int z = 0; z < 16; z++) {
         int blockX = minBlockX + x;
@@ -69,10 +72,16 @@ public class FastSurfaceGen {
         int stoneAboveDepth = 0;
         int waterHeight = Integer.MIN_VALUE;
         int nextCeilingStoneY = Integer.MAX_VALUE;
-        int endY = chunk.getBottomY();
         var sections = chunk.getSectionArray();
 
-        for (int y = height; y >= endY; y--) {
+        int y = height;
+        if (y >= topY) { // assuming void air is air
+          stoneAboveDepth = 0;
+          waterHeight = Integer.MIN_VALUE;
+          y = topY;
+        }
+
+        for (; y >= endY; y--) {
           BlockState old = column.getSection(y).getBlockState(x, y & 0xF, z);
           if (old.isAir()) {
             stoneAboveDepth = 0;
