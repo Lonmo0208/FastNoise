@@ -71,10 +71,6 @@ public class BenchmarkMain {
     }
   }
 
-  private static String jvmArgs(boolean zmod) {
-    return "-Dzforked=true -Dzmod=" + zmod;
-  }
-
   private static Mode getMode() {
     try {
       return Mode.deepValueOf(System.getProperty("zbenchmode"));
@@ -87,7 +83,7 @@ public class BenchmarkMain {
     ChainedOptionsBuilder options =
         new OptionsBuilder()
             .forks(getIntProperty("zforks", 1, 1))
-            .jvmArgsAppend(jvmArgs(zmod))
+            .jvmArgsAppend("-Dzforked=true", "-Dzmixin=" + zmod)
             .mode(getMode())
             .warmupTime(TimeValue.seconds(getIntProperty("zwarmuptime", 5, 1)))
             .measurementTime(TimeValue.seconds(getIntProperty("zmeasuretime", 5, 1)))

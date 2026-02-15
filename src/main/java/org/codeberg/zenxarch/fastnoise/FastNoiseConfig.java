@@ -30,7 +30,7 @@ public class FastNoiseConfig {
     }
   }
 
-  public static boolean ENABLED = getProperty("zmod", true);
+  public static boolean ENABLED = getProperty("zmixin", true);
 
   static {
     FastNoiseConstants.LOGGER.info("Mod Enabled: {}", ENABLED);
