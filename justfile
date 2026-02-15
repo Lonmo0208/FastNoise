@@ -46,6 +46,10 @@ modrinth ptype="alpha":
     rm changelog.md
 
 # Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures zforks zthreads
+perfSurface +args="":
+    ./gradlew :perf:runServer -Pzperfbenchmark="surface" {{args}}
+
+# Available props zperfbenchmark zuseasync zworldname zbenchmode zwarmuptime zmeasuretime zwarmups zmeasures zforks zthreads
 perfNoise +args="":
     ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzmod="false" -Pzworldname="overworld" {{args}}
     ./gradlew :perf:runServer -Pzperfbenchmark="noisegen" -Pzmod="false" -Pzworldname="nether" {{args}}
