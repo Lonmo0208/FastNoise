@@ -1,6 +1,7 @@
 package org.codeberg.zenxarch.fastnoise.surface;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
@@ -10,9 +11,9 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.HeightContext;
-import net.minecraft.world.gen.chunk.BlockColumn;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
@@ -35,7 +36,7 @@ public class FastSurfaceGen {
     final ChunkPos chunkPos = chunk.getPos();
     int minBlockX = chunkPos.getStartX();
     int minBlockZ = chunkPos.getStartZ();
-    BlockColumn column = new FastBlockColumn(chunk, columnPos);
+    var column = new FastBlockColumn(chunk, columnPos);
     var context =
         new MaterialRuleContext(
             (SurfaceBuilder) (Object) builder,
@@ -55,11 +56,11 @@ public class FastSurfaceGen {
         int blockX = minBlockX + x;
         int blockZ = minBlockZ + z;
         int startingHeight = chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE_WG, x, z) + 1;
-        columnPos.setX(blockX).setZ(blockZ);
         RegistryEntry<Biome> surfaceBiome =
             biomeAccess.getBiome(
                 blockPos.set(blockX, useLegacyRandom ? 0 : startingHeight, blockZ));
         if (surfaceBiome.matchesKey(BiomeKeys.ERODED_BADLANDS)) {
+          columnPos.setX(blockX).setZ(blockZ);
           builder.zenxarch$placeBadlandsPillar(column, blockX, blockZ, startingHeight, chunk);
         }
 
@@ -69,9 +70,10 @@ public class FastSurfaceGen {
         int waterHeight = Integer.MIN_VALUE;
         int nextCeilingStoneY = Integer.MAX_VALUE;
         int endY = chunk.getBottomY();
+        var sections = chunk.getSectionArray();
 
         for (int y = height; y >= endY; y--) {
-          BlockState old = column.getState(y);
+          BlockState old = column.getSection(y).getBlockState(x, y & 0xF, z);
           if (old.isAir()) {
             stoneAboveDepth = 0;
             waterHeight = Integer.MIN_VALUE;
@@ -80,17 +82,8 @@ public class FastSurfaceGen {
               waterHeight = y + 1;
             }
           } else {
-            if (nextCeilingStoneY >= y) {
-              nextCeilingStoneY = DimensionType.field_35479;
-
-              for (int lookaheadY = y - 1; lookaheadY >= endY - 1; lookaheadY--) {
-                BlockState nextState = column.getState(lookaheadY);
-                if (!builder.zenxarch$isDefaultBlock(nextState)) {
-                  nextCeilingStoneY = lookaheadY + 1;
-                  break;
-                }
-              }
-            }
+            if (nextCeilingStoneY >= y)
+              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z);
 
             stoneAboveDepth++;
             int stoneBelowDepth = y - nextCeilingStoneY + 1;
@@ -99,7 +92,13 @@ public class FastSurfaceGen {
             if (old == defaultState) {
               BlockState state = rule.tryApply(blockX, y, blockZ);
               if (state != null) {
-                column.setState(y, state);
+                if (y < endY) continue;
+                column.getSection(y).setBlockState(x, y & 0xF, z, state, false);
+                column.fastUpdateHeightmap(x, z, y & 0xF, state);
+                if (state.getFluidState().isEmpty()) {
+                  columnPos.setX(blockX).setZ(blockZ).setY(y);
+                  chunk.markBlockForPostProcessing(columnPos);
+                }
               }
             }
           }
@@ -107,6 +106,7 @@ public class FastSurfaceGen {
 
         if (surfaceBiome.matchesKey(BiomeKeys.FROZEN_OCEAN)
             || surfaceBiome.matchesKey(BiomeKeys.DEEP_FROZEN_OCEAN)) {
+          columnPos.setX(blockX).setZ(blockZ);
           builder.zenxarch$placeIceberg(
               context.estimateSurfaceHeight(),
               surfaceBiome.value(),
@@ -118,5 +118,54 @@ public class FastSurfaceGen {
         }
       }
     }
+  }
+
+  private static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
+
+  private static int nextNonDefaultBlock(
+      SurfaceBuilderAccessor builder,
+      ChunkSection[] sections,
+      int startY,
+      int minY,
+      int lx,
+      int lz) {
+    final int wayBelowMinY = DimensionType.field_35479;
+    if (startY <= minY) {
+      if (builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
+      return wayBelowMinY;
+    }
+    var y = startY - 1;
+    var cy = (y - minY) >> 4;
+    var section = sections[cy];
+
+    {
+      var next = getNextNonDefaultBlock(section, lx, y & 0xF, lz, builder);
+      if (next != -1) return (cy << 4) + next + minY;
+    }
+
+    cy--;
+
+    while (cy >= 0) {
+      section = sections[cy];
+      var next = getNextNonDefaultBlock(section, lx, 0xF, lz, builder);
+      if (next != -1) return (cy << 4) + next + minY;
+      cy--;
+    }
+
+    if (builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
+    return wayBelowMinY;
+  }
+
+  private static int getNextNonDefaultBlock(
+      ChunkSection section, int lx, int ly, int lz, SurfaceBuilderAccessor builder) {
+    var index = lx + (lz << 4) + (ly << 8);
+    var palette = section.blockStateContainer.data.palette();
+    var storage = section.blockStateContainer.data.storage();
+    while (index >= 0) {
+      if (builder.zenxarch$isDefaultBlock(palette.get(storage.get(index))))
+        return index >> 8;
+      index -= 256;
+    }
+    return -1;
   }
 }

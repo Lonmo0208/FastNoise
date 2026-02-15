@@ -21,6 +21,7 @@ public class FastBlockColumn implements BlockColumn {
   private final int minY;
   private final int maxY;
   private final PaletteStorage[] heightmapData;
+  private final ChunkSection[] sections;
 
   private final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
 
@@ -42,13 +43,18 @@ public class FastBlockColumn implements BlockColumn {
       this.heightmapData[i] =
           ((HeightmapAccessor) chunk.getHeightmap(heightmaps[i])).zenxarch$getStorage();
     }
+
+    this.sections = chunk.getSectionArray();
+  }
+
+  public ChunkSection getSection(int y) {
+    return this.sections[(y - minY) >> 4];
   }
 
   private ChunkSection zenxarch$getSection(final int y) {
     columnPos.setY(y);
     if (y < minY || y > maxY) return null;
-    var pos = (y - minY) >> 4;
-    return chunk.getSectionArray()[pos];
+    return getSection(y);
   }
 
   @Override
@@ -60,24 +66,31 @@ public class FastBlockColumn implements BlockColumn {
   }
 
   @Override
-  public void setState(int iy, BlockState state) {
-    columnPos.setY(iy);
-    if (iy < minY || iy > maxY) return;
-    int y = iy - minY;
-    var sections = chunk.getSectionArray();
-    var section = sections[y >> 4];
+  public void setState(int y, BlockState state) {
+    var section = zenxarch$getSection(y);
 
     int lx = columnPos.getX() & 0xF;
     int lz = columnPos.getZ() & 0xF;
 
     section.setBlockState(lx, y & 15, lz, state, false);
-
-    for (int i = 0; i < heightmapData.length; i++) {
-      HeightmapUtil.updateHeightmap(lx, lz, heightmapData[i], predicates[i], state, y, sections);
-    }
+    this.fastUpdateHeightmap(lx, lz, y, state);
 
     if (!state.getFluidState().isEmpty()) {
       chunk.markBlockForPostProcessing(columnPos);
+    }
+  }
+
+  public void fastSetState(ChunkSection section, int lx, int ly, int lz, BlockState state) {
+
+    if (!state.getFluidState().isEmpty()) {
+      chunk.markBlockForPostProcessing(columnPos);
+    }
+  }
+
+  public void fastUpdateHeightmap(int lx, int lz, int iy, BlockState state) {
+    final int y = iy - minY;
+    for (int i = 0; i < heightmapData.length; i++) {
+      HeightmapUtil.updateHeightmap(lx, lz, heightmapData[i], predicates[i], state, y, sections);
     }
   }
 }
