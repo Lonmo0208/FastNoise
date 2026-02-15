@@ -82,7 +82,14 @@ public class FastSurfaceGen {
         }
 
         for (; y >= endY; y--) {
-          BlockState old = column.getSection(y).getBlockState(x, y & 0xF, z);
+          var section = column.getSection(y);
+          if (section.isEmpty()) { // skip whole section
+            y = y - (y & 0xF); // lowest y in current section;
+            stoneAboveDepth = 0;
+            waterHeight = Integer.MIN_VALUE;
+            continue;
+          }
+          BlockState old = section.getBlockState(x, y & 0xF, z);
           if (old.isAir()) {
             stoneAboveDepth = 0;
             waterHeight = Integer.MIN_VALUE;

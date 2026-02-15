@@ -24,6 +24,7 @@ public class FastBlockColumn implements BlockColumn {
   private final ChunkSection[] sections;
 
   private final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
+  private final BlockState AIR = Blocks.AIR.getDefaultState();
 
   private final Heightmap.Type[] heightmaps =
       HeightmapUtil.calculateHeightmaps(ChunkStatus.SURFACE);
@@ -61,6 +62,7 @@ public class FastBlockColumn implements BlockColumn {
   public BlockState getState(int y) {
     var section = zenxarch$getSection(y);
     if (section == null) return VOID_AIR;
+    if (section.isEmpty()) return AIR;
     return section.getBlockState(
         columnPos.getX() & 0xF, columnPos.getY() & 0xF, columnPos.getZ() & 0xF);
   }
