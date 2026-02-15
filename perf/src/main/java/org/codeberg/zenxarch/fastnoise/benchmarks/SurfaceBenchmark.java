@@ -34,16 +34,18 @@ public class SurfaceBenchmark {
     this.chunks = ChunkRegion.of(world, settings.region());
     this.biomeSource = ChunkRegion.of(world, settings.biomeRegion());
 
-    for (int i = 0; i < chunks.chunks().length; i++) {
-      world.biomes(chunks.chunks()[i]);
-      world.noise(chunks.chunks()[i]);
-      chunks.chunks()[i].setStatus(ChunkStatus.NOISE);
-    }
-
     for (int i = 0; i < biomeSource.chunks().length; i++) {
       world.biomes(biomeSource.chunks()[i]);
       world.noise(biomeSource.chunks()[i]);
-      biomeSource.chunks()[i].setStatus(ChunkStatus.BIOMES);
+      biomeSource.chunks()[i].setStatus(ChunkStatus.NOISE);
+    }
+
+    chunks.copyBiomes(biomeSource);
+    chunks.copyNoiseAndHeightmap(biomeSource);
+
+    for (int i = 0; i < chunks.chunks().length; i++) {
+      chunks.chunks()[i].getOrCreateChunkNoiseSampler(world::createSampler);
+      chunks.chunks()[i].setStatus(ChunkStatus.NOISE);
     }
   }
 
