@@ -25,6 +25,7 @@ loom {
                     property(prop, project.getProperty(prop))
                 }
             }
+            vmArgs "-Xmx3G"
             vmArgs "-XX:+UnlockDiagnosticVMOptions"
         }
     }

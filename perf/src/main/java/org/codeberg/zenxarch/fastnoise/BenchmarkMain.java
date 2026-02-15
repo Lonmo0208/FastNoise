@@ -120,6 +120,8 @@ public class BenchmarkMain {
               "libPath=" + System.getProperty("zuseasync") + ";sig=true;output=flamegraph");
     }
 
+    options = options.shouldDoGC(true);
+
     var runner = new Runner(options.build());
     try {
       runner.run();
