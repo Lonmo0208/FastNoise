@@ -32,6 +32,12 @@ public class FastSurfaceGen {
       final ChunkNoiseSampler chunkNoiseSampler,
       final MaterialRules.MaterialRule materialRule) {
 
+    final var defaultState = builder.zenxarch$getDefaultState();
+
+    if (canSkipSurfaceBuilder(materialRule, defaultState)) {
+      return;
+    }
+
     final BlockPos.Mutable columnPos = new BlockPos.Mutable();
     final ChunkPos chunkPos = chunk.getPos();
     int minBlockX = chunkPos.getStartX();
@@ -48,8 +54,6 @@ public class FastSurfaceGen {
             heightContext);
     var rule = materialRule.apply(context);
     BlockPos.Mutable blockPos = new BlockPos.Mutable();
-
-    final var defaultState = builder.zenxarch$getDefaultState();
 
     final int endY = chunk.getBottomY();
     final int topY = chunk.getTopYInclusive();
@@ -182,5 +186,13 @@ public class FastSurfaceGen {
       index -= 256;
     }
     return -1;
+  }
+
+  private static boolean canSkipSurfaceBuilder(
+      MaterialRules.MaterialRule rule, BlockState defaultState) {
+    if (rule instanceof MaterialRules.BlockMaterialRule block) {
+      return block.resultState() == defaultState;
+    }
+    return false;
   }
 }
