@@ -16,6 +16,9 @@ public final class FastNoiseConfigLoader {
   static final String[] MIXIN_KEYS =
       new String[] {"mixin.perf.noise", "mixin.perf.biome", "mixin.perf.surface"};
 
+  static final String[] DISABLED_BY_DEFAULT_KEYS =
+      new String[] {"perf.biomes.end", "perf.biomes.fixed"};
+
   private static final Object2ObjectMap<String, String> COMMENTS =
       new Object2ObjectArrayMap<>(
           Map.of(
@@ -26,7 +29,17 @@ public final class FastNoiseConfigLoader {
               MIXIN_KEYS[2],
               "Replace buildSurface with optimized implementation"));
 
+  private static void putComment(String value, String comment) {
+    COMMENTS.put(value, comment);
+  }
+
   static {
+    putComment(
+        DISABLED_BY_DEFAULT_KEYS[0],
+        "Optimize end biome generation (2x speed) but may cause mod incompatibility");
+    putComment(
+        DISABLED_BY_DEFAULT_KEYS[1],
+        "Optimize single biome generation (major speedup) but may cause mod incompatibility");
     loadDefaults();
   }
 
@@ -35,18 +48,20 @@ public final class FastNoiseConfigLoader {
         FabricLoader.getInstance().getConfigDir().resolve(configFileName));
   }
 
+  private static void loadBoolean(String key, boolean defaultValue) {
+    Optional<Boolean> value = CONFIG.getOptional(key);
+    if (value.isEmpty()) {
+      CONFIG.set(key, defaultValue);
+    }
+    if (!CONFIG.containsComment(key)) {
+      CONFIG.setComment(key, COMMENTS.get(key));
+    }
+  }
+
   private static void loadDefaults() {
     CONFIG.load();
-    for (var key : MIXIN_KEYS) {
-      Optional<Boolean> value = CONFIG.getOptional(key);
-      FastNoiseConstants.LOGGER.info("{} -> {}", key, value);
-      if (value.isEmpty()) {
-        CONFIG.set(key, true);
-      }
-      if (!CONFIG.containsComment(key)) {
-        CONFIG.setComment(key, COMMENTS.get(key));
-      }
-    }
+    for (var key : MIXIN_KEYS) loadBoolean(key, true);
+    for (var key : DISABLED_BY_DEFAULT_KEYS) loadBoolean(key, false);
     CONFIG.save();
   }
 }
