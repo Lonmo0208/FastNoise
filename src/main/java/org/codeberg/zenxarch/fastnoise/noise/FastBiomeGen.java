@@ -14,6 +14,7 @@ import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.densityfunction.DensityFunction;
 import net.minecraft.world.gen.noise.NoiseConfig;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.mixin.ChunkNoiseSamplerAccessor;
 
 public final class FastBiomeGen {
@@ -32,24 +33,24 @@ public final class FastBiomeGen {
       ChunkNoiseSampler sampler,
       NoiseConfig config,
       RegistryEntry<ChunkGeneratorSettings> settings) {
-    if (true) {
-      populateBiomes(chunk, supplier, createSampler(sampler, config, settings));
+
+    if (FastNoiseConfig.OPTIMIZE_FIXED_BIOMES && supplier instanceof FixedBiomeSource fixed) {
+      packSingleBiome(chunk.getSectionArray(), fixed.biome);
       return;
     }
-    switch (supplier) {
-      case FixedBiomeSource fixed -> packSingleBiome(chunk.getSectionArray(), fixed.biome);
-      case TheEndBiomeSource theEnd -> {
-        final var chunkPos = chunk.getPos();
-        populateEndBiomes(
-            theEnd,
-            chunk,
-            chunk.getSectionArray(),
-            chunkPos.x,
-            chunkPos.z,
-            createSampler(sampler, config, settings));
-      }
-      default -> populateBiomes(chunk, supplier, createSampler(sampler, config, settings));
+
+    if (FastNoiseConfig.OPTIMIZE_END_BIOMES && supplier instanceof TheEndBiomeSource theEnd) {
+      final var chunkPos = chunk.getPos();
+      populateEndBiomes(
+          theEnd,
+          chunk,
+          chunk.getSectionArray(),
+          chunkPos.x(),
+          chunkPos.z(),
+          createSampler(sampler, config, settings));
+      return;
     }
+    populateBiomes(chunk, supplier, createSampler(sampler, config, settings));
   }
 
   private static void populateBiomes(
