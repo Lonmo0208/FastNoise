@@ -3,7 +3,7 @@ package org.codeberg.zenxarch.fastnoise.mixin;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import java.util.List;
 import java.util.Set;
-import org.codeberg.zenxarch.fastnoise.FastNoiseConfig;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
