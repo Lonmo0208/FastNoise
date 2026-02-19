@@ -178,8 +178,7 @@ public class FastSurfaceGen {
     var palette = section.blockStateContainer.data.palette();
     var storage = section.blockStateContainer.data.storage();
     while (index >= 0) {
-      if (builder.zenxarch$isDefaultBlock(palette.get(storage.get(index))))
-        return index >> 8;
+      if (builder.zenxarch$isDefaultBlock(palette.get(storage.get(index)))) return index >> 8;
       index -= 256;
     }
     return -1;
