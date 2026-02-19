@@ -45,8 +45,8 @@ public final class FastBiomeGen {
           theEnd,
           chunk,
           chunk.getSectionArray(),
-          chunkPos.x(),
-          chunkPos.z(),
+          chunkPos.x,
+          chunkPos.z,
           createSampler(sampler, config, settings));
       return;
     }
