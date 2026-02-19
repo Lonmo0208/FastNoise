@@ -3,6 +3,7 @@ package org.codeberg.zenxarch.fastnoise;
 import net.minecraft.world.chunk.ChunkStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 
 public final class ParityTest {
   public static final Logger LOGGER = LoggerFactory.getLogger(ParityTest.class);
