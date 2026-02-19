@@ -54,15 +54,29 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
     super.initVerticalContext(
         stoneDepthAbove, stoneDepthBelow, fluidHeight, blockX, blockY, blockZ);
 
+    var y = blockY - minY;
+    var ly = y & 0x15;
+    var cy = y >> 4;
+
+    var single = singleBiomes[cy];
+
+    if (single == null) return;
+
+    if (ly < 2) {
+      if (cy == 0) return;
+      if (singleBiomes[cy] != singleBiomes[cy - 1]) return;
+    }
+
+    if (ly > 14) {
+      if (cy == (this.singleBiomes.length - 1)) return;
+      if (singleBiomes[cy] != singleBiomes[cy + 1]) return;
+    }
+
     var x = blockX & 15;
     if (x < 2 || x > 14) return;
     var z = blockZ & 15;
     if (z < 2 || z > 14) return;
-    var y = blockY - minY;
-    var ly = y & 0x15;
-    if (ly < 2 || ly > 14) return;
-    var single = singleBiomes[y >> 4];
-    if (single == null) return;
+    
     this.biomeSupplier = () -> single;
   }
 
