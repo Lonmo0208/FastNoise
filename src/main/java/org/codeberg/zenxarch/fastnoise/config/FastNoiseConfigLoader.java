@@ -19,6 +19,14 @@ public final class FastNoiseConfigLoader {
   static final String[] DISABLED_BY_DEFAULT_KEYS =
       new String[] {"perf.biomes.end", "perf.biomes.fixed"};
 
+  static boolean optimizeEndBiomes() {
+    return CONFIG.get(DISABLED_BY_DEFAULT_KEYS[0]);
+  }
+
+  static boolean optimizeFixedBiomes() {
+    return CONFIG.get(DISABLED_BY_DEFAULT_KEYS[1]);
+  }
+
   private static final Object2ObjectMap<String, String> COMMENTS =
       new Object2ObjectArrayMap<>(
           Map.of(

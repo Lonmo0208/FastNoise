@@ -13,6 +13,9 @@ import org.codeberg.zenxarch.fastnoise.FastNoiseConstants;
 public class FastNoiseConfig {
   private static final String overridesKey = FastNoiseConstants.MOD_ID + ":overrides";
 
+  public static final boolean OPTIMIZE_END_BIOMES = FastNoiseConfigLoader.optimizeEndBiomes();
+  public static final boolean OPTIMIZE_FIXED_BIOMES = FastNoiseConfigLoader.optimizeFixedBiomes();
+
   private static void collectOverrides(
       Object2BooleanArrayMap<String> map, ModMetadata meta, String key, boolean value) {
     if (!map.containsKey(key)) {
