@@ -14,6 +14,9 @@ import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
 
 public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
 
+  private final RegistryEntry<Biome>[] singleBiomes;
+  private final int minY;
+
   public MaterialRuleContext(
       SurfaceBuilder surfaceBuilder,
       NoiseConfig noiseConfig,
@@ -21,7 +24,8 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       ChunkNoiseSampler chunkNoiseSampler,
       Function<BlockPos, RegistryEntry<Biome>> posToBiome,
       Registry<Biome> biomeRegistry,
-      HeightContext heightContext) {
+      HeightContext heightContext,
+      RegistryEntry<Biome>[] singleBiomes) {
     super(
         surfaceBuilder,
         noiseConfig,
@@ -30,6 +34,8 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
         posToBiome,
         biomeRegistry,
         heightContext);
+    this.singleBiomes = singleBiomes;
+    this.minY = chunk.getBottomY();
   }
 
   @Override
@@ -47,6 +53,17 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       int blockZ) {
     super.initVerticalContext(
         stoneDepthAbove, stoneDepthBelow, fluidHeight, blockX, blockY, blockZ);
+
+    var x = blockX & 15;
+    if (x < 2 || x > 14) return;
+    var z = blockZ & 15;
+    if (z < 2 || z > 14) return;
+    var y = blockY - minY;
+    var ly = y & 0x15;
+    if (ly < 2 || ly > 14) return;
+    var single = singleBiomes[y >> 4];
+    if (single == null) return;
+    this.biomeSupplier = () -> single;
   }
 
   @Override
