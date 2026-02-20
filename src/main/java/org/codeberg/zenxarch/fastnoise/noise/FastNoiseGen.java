@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
@@ -57,44 +58,22 @@ public class FastNoiseGen {
                 (double) verticalCellBlock / (double) verticalCellBlockCount;
             chunkNoiseSampler.interpolateY(blockY, verticalCellProgress);
 
-            var cy = (blockY - minY) >> 4;
-            var fastSection = fastSections[cy];
-
-            for (int cellBlockX = 0; cellBlockX < horizontalCellBlockCount; cellBlockX++) {
-              int blockX = chunkStartX + cellX * horizontalCellBlockCount + cellBlockX;
-              int blockXInSection = blockX & 15;
-              double cellXProgress = (double) cellBlockX / (double) horizontalCellBlockCount;
-              chunkNoiseSampler.interpolateX(blockX, cellXProgress);
-
-              for (int cellBlockZ = 0; cellBlockZ < horizontalCellBlockCount; cellBlockZ++) {
-                int blockZ = chunkStartZ + cellZ * horizontalCellBlockCount + cellBlockZ;
-                int blockZInSection = blockZ & 15;
-                double cellZProgress = (double) cellBlockZ / (double) horizontalCellBlockCount;
-
-                chunkNoiseSampler.interpolateZ(blockZ, cellZProgress);
-
-                var state = chunkNoiseSampler.sampleBlockState();
-
-                if (state == AIR) continue;
-
-                if (fastSection == null) {
-                  fastSection = (fastSections[cy] = new FastChunkSection(sections[cy]));
-                }
-
-                if (state == null) {
-                  fastSection.setDefaultBlockState(
-                      blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
-                  continue;
-                }
-
-                fastSection.setBlockState(blockXInSection, blockYInSection, blockZInSection, state);
-
-                if (aquiferSampler.needsFluidTick() && !state.getFluidState().isEmpty()) {
-                  mutable.set(blockX, blockY, blockZ);
-                  chunk.markBlockForPostProcessing(mutable);
-                }
-              }
-            }
+            iterateCellXZ(
+                chunk,
+                chunkNoiseSampler,
+                aquiferSampler,
+                defaultBlockState,
+                mutable,
+                blockY,
+                blockYInSection,
+                minY,
+                fastSections,
+                sections,
+                horizontalCellBlockCount,
+                chunkStartX,
+                chunkStartZ,
+                cellX,
+                cellZ);
           }
         }
       }
@@ -104,11 +83,72 @@ public class FastNoiseGen {
 
     chunkNoiseSampler.stopInterpolation();
 
+    finalizeChunks(fastSections, chunk, defaultBlockState);
+  }
+
+  private static void finalizeChunks(
+      FastChunkSection[] fastSections, Chunk chunk, BlockState defaultBlockState) {
     for (int i = 0; i < fastSections.length; i++)
       if (fastSections[i] != null) fastSections[i].recalculateCounts();
 
     for (int i = 0; i < heightmaps.length; i++) {
       HeightmapUtil.populateHeightmapPostNoise(chunk, heightmaps[i], defaultBlockState, AIR);
+    }
+  }
+
+  private static void iterateCellXZ(
+      Chunk chunk,
+      ChunkNoiseSampler chunkNoiseSampler,
+      AquiferSampler aquiferSampler,
+      BlockState defaultBlockState,
+      BlockPos.Mutable mutable,
+      int blockY,
+      int blockYInSection,
+      int minY,
+      FastChunkSection[] fastSections,
+      ChunkSection[] sections,
+      int horizontalCellBlockCount,
+      int chunkStartX,
+      int chunkStartZ,
+      int cellX,
+      int cellZ) {
+    var cy = (blockY - minY) >> 4;
+    var fastSection = fastSections[cy];
+
+    for (int cellBlockX = 0; cellBlockX < horizontalCellBlockCount; cellBlockX++) {
+      int blockX = chunkStartX + cellX * horizontalCellBlockCount + cellBlockX;
+      int blockXInSection = blockX & 15;
+      double cellXProgress = (double) cellBlockX / (double) horizontalCellBlockCount;
+      chunkNoiseSampler.interpolateX(blockX, cellXProgress);
+
+      for (int cellBlockZ = 0; cellBlockZ < horizontalCellBlockCount; cellBlockZ++) {
+        int blockZ = chunkStartZ + cellZ * horizontalCellBlockCount + cellBlockZ;
+        int blockZInSection = blockZ & 15;
+        double cellZProgress = (double) cellBlockZ / (double) horizontalCellBlockCount;
+
+        chunkNoiseSampler.interpolateZ(blockZ, cellZProgress);
+
+        var state = chunkNoiseSampler.sampleBlockState();
+
+        if (state == AIR) continue;
+
+        if (fastSection == null) {
+          fastSection = (fastSections[cy] = new FastChunkSection(sections[cy]));
+        }
+
+        if (state == null) {
+          fastSection.setDefaultBlockState(
+              blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
+          continue;
+        }
+
+        fastSection.setBlockState(blockXInSection, blockYInSection, blockZInSection, state);
+
+        if (aquiferSampler.needsFluidTick() && !state.getFluidState().isEmpty()) {
+          mutable.set(blockX, blockY, blockZ);
+          chunk.markBlockForPostProcessing(mutable);
+        }
+      }
     }
   }
 }
