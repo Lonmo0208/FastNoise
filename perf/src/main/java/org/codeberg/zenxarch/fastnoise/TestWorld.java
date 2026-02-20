@@ -2,6 +2,7 @@ package org.codeberg.zenxarch.fastnoise;
 
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import java.util.Arrays;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -13,6 +14,7 @@ import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
@@ -155,19 +157,11 @@ public final class TestWorld {
       if (!matches(
           (PalettedContainer<RegistryEntry<Biome>>) self[i].biomeContainer,
           (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer)) {
-        BenchmarkMain.LOGGER.info(
-            "x: {} y: {} z: {}",
-            a.getPos().x() * 16,
-            (i * 16) + a.getBottomY(),
-            a.getPos().z() * 16);
+        dumpPalette(a, b, self[i], other[i], i);
         throw new IllegalStateException("Chunk sections biomes differ");
       }
       if (!matches(self[i].blockStateContainer, other[i].blockStateContainer)) {
-        BenchmarkMain.LOGGER.info(
-            "x: {} y: {} z: {}",
-            a.getPos().x() * 16,
-            (i * 16) + a.getBottomY(),
-            a.getPos().z() * 16);
+        dumpPalette(a, b, self[i], other[i], i);
         throw new IllegalStateException("Chunk sections blocks differ");
       }
     }
@@ -189,6 +183,24 @@ public final class TestWorld {
           throw new IllegalStateException("Chunks sections post processing lists differ");
       }
     }
+  }
+
+  private static void dumpPalette(
+      ProtoChunk a, ProtoChunk b, ChunkSection ac, ChunkSection bc, int idx) {
+    var pos = a.getPos();
+    BenchmarkMain.LOGGER.info("x: {} z: {}", pos.getStartX(), pos.getStartZ());
+    BenchmarkMain.LOGGER.info("y : {}", a.sectionIndexToCoord(idx) * 16);
+
+    var apal = ac.blockStateContainer.data.palette();
+    var bpal = bc.blockStateContainer.data.palette();
+
+    var arr = new BlockState[apal.getSize()];
+    var brr = new BlockState[bpal.getSize()];
+
+    for (int i = 0; i < arr.length; i++) arr[i] = apal.get(i);
+    for (int i = 0; i < brr.length; i++) arr[i] = bpal.get(i);
+
+    BenchmarkMain.LOGGER.info("a: {}, b: {}", Arrays.toString(arr), Arrays.toString(brr));
   }
 
   private static <T> boolean matches(PalettedContainer<T> self, PalettedContainer<T> other) {
