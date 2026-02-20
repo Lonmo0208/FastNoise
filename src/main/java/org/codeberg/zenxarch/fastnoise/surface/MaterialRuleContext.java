@@ -60,7 +60,7 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
     if (z < 2 || z > 14) return;
 
     var y = blockY - minY;
-    var ly = y & 0x15;
+    var ly = y & 0xF;
     var cy = y >> 4;
 
     var single = singleBiomes[cy];
