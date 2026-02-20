@@ -23,13 +23,15 @@ public record BenchmarkSettings(
   private static final long defaultSeed = getIntProperty("zseed", 100, 0);
   private static final int WorldRadiusInChunks = getIntProperty("zworldradius", 16, 0);
   private static final int endCenter = getIntProperty("zendcenter", 128, Integer.MIN_VALUE);
+  private static final int worldCenter = getIntProperty("zworldcenter", 0, Integer.MIN_VALUE);
 
   private static ChunkRegion overworldRegion() {
-    return ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
+    return ChunkRegion.of(worldCenter - WorldRadiusInChunks, worldCenter + WorldRadiusInChunks);
   }
 
   private static ChunkRegion overworldBiomeRegion() {
-    return ChunkRegion.of(-WorldRadiusInChunks - 1, WorldRadiusInChunks + 1);
+    return ChunkRegion.of(
+        worldCenter - WorldRadiusInChunks - 1, worldCenter + WorldRadiusInChunks + 1);
   }
 
   private static ChunkRegion endRegion() {
