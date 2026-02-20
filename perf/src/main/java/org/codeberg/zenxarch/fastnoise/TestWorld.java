@@ -152,8 +152,6 @@ public final class TestWorld {
       throw new IllegalStateException("Chunk sections length differ");
 
     for (int i = 0; i < self.length; i++) {
-      if (!matches(self[i].blockStateContainer, other[i].blockStateContainer))
-        throw new IllegalStateException("Chunk sections blocks differ");
       if (!matches(
           (PalettedContainer<RegistryEntry<Biome>>) self[i].biomeContainer,
           (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer)) {
@@ -163,6 +161,14 @@ public final class TestWorld {
             (i * 16) + a.getBottomY(),
             a.getPos().z() * 16);
         throw new IllegalStateException("Chunk sections biomes differ");
+      }
+      if (!matches(self[i].blockStateContainer, other[i].blockStateContainer)) {
+        BenchmarkMain.LOGGER.info(
+            "x: {} y: {} z: {}",
+            a.getPos().x() * 16,
+            (i * 16) + a.getBottomY(),
+            a.getPos().z() * 16);
+        throw new IllegalStateException("Chunk sections blocks differ");
       }
     }
 
