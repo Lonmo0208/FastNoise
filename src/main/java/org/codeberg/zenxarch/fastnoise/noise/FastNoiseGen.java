@@ -72,6 +72,7 @@ public class FastNoiseGen {
             chunkNoiseSampler.interpolateY(blockY, verticalCellProgress);
 
             var cy = (blockY - minY) >> 4;
+            var fastSection = fastSections[cy];
 
             for (int cellBlockX = 0; cellBlockX < horizontalCellBlockCount; cellBlockX++) {
               int blockX = chunkStartX + cellX * horizontalCellBlockCount + cellBlockX;
@@ -90,7 +91,6 @@ public class FastNoiseGen {
 
                 if (state == AIR) continue;
 
-                var fastSection = fastSections[cy];
                 if (fastSection == null) {
                   fastSection = (fastSections[cy] = new FastChunkSection(sections[cy]));
                 }
