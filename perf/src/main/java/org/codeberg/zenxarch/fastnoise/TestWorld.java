@@ -1,5 +1,6 @@
 package org.codeberg.zenxarch.fastnoise;
 
+import it.unimi.dsi.fastutil.shorts.ShortList;
 import java.util.Arrays;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
@@ -26,6 +27,7 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
 import net.minecraft.world.gen.densityfunction.DensityFunctionTypes.Beardifying;
 import net.minecraft.world.gen.noise.NoiseConfig;
+import org.codeberg.zenxarch.fastnoise.mixin.ChunkAccessor;
 import org.codeberg.zenxarch.fastnoise.mixin.NoiseChunkGeneratorAccessor;
 
 public final class TestWorld {
@@ -157,6 +159,15 @@ public final class TestWorld {
           a.getHeightmap(heightmap.getKey()).asLongArray(),
           b.getHeightmap(heightmap.getKey()).asLongArray())) return false;
     }
+
+    {
+      var aList = ((ChunkAccessor) a).zenxarch$postProcessingLists();
+      var bList = ((ChunkAccessor) b).zenxarch$postProcessingLists();
+      if (aList.length != bList.length) return false;
+      for (int i = 0; i < aList.length; i++) {
+        if (!matches(aList[i], bList[i])) return false;
+      }
+    }
     return true;
   }
 
@@ -167,6 +178,15 @@ public final class TestWorld {
           != other.data.palette().get(other.data.storage().get(i))) {
         return false;
       }
+    }
+    return true;
+  }
+
+  private static boolean matches(ShortList a, ShortList b) {
+    if (a == null || b == null) return a == b;
+    if (a.size() != b.size()) return false;
+    for (int i = 0; i < a.size(); i++) {
+      if (a.getShort(i) != b.getShort(i)) return false;
     }
     return true;
   }
