@@ -165,7 +165,7 @@ public class FastSurfaceGen {
       int lz) {
     final int wayBelowMinY = DimensionType.field_35479;
     if (startY <= minY) {
-      if (builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
+      if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY;
       return wayBelowMinY;
     }
     var y = startY - 1;
@@ -174,7 +174,7 @@ public class FastSurfaceGen {
 
     {
       var next = getNextNonDefaultBlock(section, lx, y & 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY;
+      if (next != -1) return (cy << 4) + next + minY + 1;
     }
 
     cy--;
@@ -182,11 +182,11 @@ public class FastSurfaceGen {
     while (cy >= 0) {
       section = sections[cy];
       var next = getNextNonDefaultBlock(section, lx, 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY;
+      if (next != -1) return (cy << 4) + next + minY + 1;
       cy--;
     }
 
-    if (builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
+    if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY;
     return wayBelowMinY;
   }
 
@@ -196,7 +196,7 @@ public class FastSurfaceGen {
     var palette = section.blockStateContainer.data.palette();
     var storage = section.blockStateContainer.data.storage();
     while (index >= 0) {
-      if (builder.zenxarch$isDefaultBlock(palette.get(storage.get(index)))) return index >> 8;
+      if (!builder.zenxarch$isDefaultBlock(palette.get(storage.get(index)))) return index >> 8;
       index -= 256;
     }
     return -1;
