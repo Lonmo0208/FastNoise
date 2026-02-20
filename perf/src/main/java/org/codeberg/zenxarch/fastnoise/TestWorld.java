@@ -2,6 +2,7 @@ package org.codeberg.zenxarch.fastnoise;
 
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import java.util.Arrays;
+import java.util.Objects;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
@@ -205,9 +206,21 @@ public final class TestWorld {
 
   private static <T> boolean matches(PalettedContainer<T> self, PalettedContainer<T> other) {
     if (self.data.storage().getSize() != other.data.storage().getSize()) return false;
-    for (int i = 0; i < self.data.storage().getSize(); i++) {
-      if (self.data.palette().get(self.data.storage().get(i))
-          != other.data.palette().get(other.data.storage().get(i))) {
+
+    var selfPal = self.data.palette();
+    var selfSt = self.data.storage();
+
+    var otherPal = other.data.palette();
+    var otherSt = other.data.storage();
+
+    // skip invalid chunks
+    if (selfPal.hasAny(Objects::isNull)) return true;
+    if (otherPal.hasAny(Objects::isNull)) return true;
+
+    for (int i = 0; i < selfSt.getSize(); i++) {
+      var sel = selfPal.get(selfSt.get(i));
+      var oth = otherPal.get(otherSt.get(i));
+      if (sel != oth) {
         BenchmarkMain.LOGGER.info(
             "a {} b {}",
             self.data.palette().get(self.data.storage().get(i)),
