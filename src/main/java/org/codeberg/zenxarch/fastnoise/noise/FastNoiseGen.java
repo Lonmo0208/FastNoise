@@ -24,19 +24,8 @@ public class FastNoiseGen {
       GenerationShapeConfig config,
       int cellHeight) {
 
-    var start = chunk.getSectionIndex(minimumY);
-    var end = chunk.getSectionIndex(cellHeight * config.verticalCellBlockCount() - 1 + minimumY);
-
-    var fastSections = new FastChunkSection[end + 1];
-    for (int i = start; i <= end; i++) fastSections[i] = new FastChunkSection(chunk.getSection(i));
-
     populateNoise(
-        chunkNoiseSampler,
-        settings.value().defaultBlock(),
-        chunk,
-        minimumCellY,
-        cellHeight,
-        fastSections);
+        chunkNoiseSampler, settings.value().defaultBlock(), chunk, minimumCellY, cellHeight);
   }
 
   public static void populateNoise(
@@ -44,8 +33,12 @@ public class FastNoiseGen {
       BlockState defaultBlockState,
       Chunk chunk,
       int minimumCellY,
-      int cellHeight,
-      FastChunkSection[] fastSections) {
+      int cellHeight) {
+
+    var sections = chunk.getSectionArray();
+
+    var fastSections = new FastChunkSection[sections.length];
+
     ChunkPos chunkPos = chunk.getPos();
     int chunkStartX = chunkPos.getStartX();
     int chunkStartZ = chunkPos.getStartZ();
@@ -58,7 +51,8 @@ public class FastNoiseGen {
 
     final boolean skipDefaultBlock = defaultBlockState == AIR;
 
-    FastChunkSection fastSection = fastSections[fastSections.length - 1];
+    var section = sections[0];
+    var minY = chunk.getBottomY();
 
     for (int cellX = 0; cellX < cellWidth; cellX++) {
       chunkNoiseSampler.sampleEndDensity(cellX);
@@ -77,7 +71,7 @@ public class FastNoiseGen {
                 (double) verticalCellBlock / (double) verticalCellBlockCount;
             chunkNoiseSampler.interpolateY(blockY, verticalCellProgress);
 
-            fastSection = fastSections[chunk.getSectionIndex(blockY)];
+            var cy = (blockY - minY) >> 4;
 
             for (int cellBlockX = 0; cellBlockX < horizontalCellBlockCount; cellBlockX++) {
               int blockX = chunkStartX + cellX * horizontalCellBlockCount + cellBlockX;
@@ -93,15 +87,22 @@ public class FastNoiseGen {
                 chunkNoiseSampler.interpolateZ(blockZ, cellZProgress);
 
                 var state = chunkNoiseSampler.sampleBlockState();
+
+                if (state == AIR) continue;
+
+                var fastSection = fastSections[cy];
+                if (fastSection == null) {
+                  fastSection = (fastSections[cy] = new FastChunkSection(sections[cy]));
+                }
+
                 if (state == null) {
                   if (skipDefaultBlock) continue;
                   fastSection.setDefaultBlockState(
                       blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
                   continue;
-                } else if (state == AIR) continue;
-                else
-                  fastSection.setBlockState(
-                      blockXInSection, blockYInSection, blockZInSection, state);
+                }
+
+                fastSection.setBlockState(blockXInSection, blockYInSection, blockZInSection, state);
 
                 if (aquiferSampler.needsFluidTick() && !state.getFluidState().isEmpty()) {
                   mutable.set(blockX, blockY, blockZ);
