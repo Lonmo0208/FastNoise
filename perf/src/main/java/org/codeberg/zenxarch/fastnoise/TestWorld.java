@@ -234,6 +234,7 @@ public final class TestWorld {
       if (sel != oth) {
         BenchmarkMain.LOGGER.info("Modded: {},Vanilla: {}", sel, oth);
         BenchmarkMain.LOGGER.info("Pos: {}", ProtoChunk.joinBlockPos((short) i, cy, pos));
+        BenchmarkMain.LOGGER.info("a: {},b: {}", selfSt.get(i), otherSt.get(i));
         return false;
       }
     }
