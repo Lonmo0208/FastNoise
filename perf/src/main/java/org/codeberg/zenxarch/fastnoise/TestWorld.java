@@ -184,6 +184,10 @@ public final class TestWorld {
     for (int i = 0; i < self.data.storage().getSize(); i++) {
       if (self.data.palette().get(self.data.storage().get(i))
           != other.data.palette().get(other.data.storage().get(i))) {
+        BenchmarkMain.LOGGER.info(
+            "a {} b {}",
+            self.data.palette().get(self.data.storage().get(i)),
+            other.data.palette().get(other.data.storage().get(i)));
         return false;
       }
     }

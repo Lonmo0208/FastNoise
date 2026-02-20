@@ -1,8 +1,5 @@
 package org.codeberg.zenxarch.fastnoise;
 
-import it.unimi.dsi.fastutil.ints.IntComparators;
-import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -13,29 +10,32 @@ import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ProtoChunk;
 import org.codeberg.zenxarch.fastnoise.mixin.ChunkAccessor;
 
-public record ChunkRegion(ProtoChunk[] chunks, Object2IntMap<ChunkPos> chunkGetter)
+public record ChunkRegion(ProtoChunk[] chunks, int minX, int minZ, int strideX)
     implements BiomeAccess.Storage {
   public static ChunkRegion of(
       TestWorld world, org.codeberg.zenxarch.fastnoise.BenchmarkSettings.ChunkRegion region) {
-    var chunks = new ProtoChunk[region.pos().length];
-    var map =
-        new Object2IntAVLTreeMap<ChunkPos>(
-            (a, b) -> {
-              var res = IntComparators.NATURAL_COMPARATOR.compare(a.z(), b.z());
-              if (res != 0) return IntComparators.NATURAL_COMPARATOR.compare(a.x(), b.x());
-              return res;
-            });
-    for (int i = 0; i < region.pos().length; i++) {
-      chunks[i] = world.createChunk(region.pos()[i]);
-      map.put(region.pos()[i], i);
+    var min = region.min();
+    var max = region.max();
+    var sizeX = max.x() + 1 - min.x();
+    var sizeZ = max.z() + 1 - min.z();
+    var chunks = new ProtoChunk[sizeX * sizeZ];
+
+    var result = new ChunkRegion(chunks, min.x(), min.z(), sizeX);
+
+    for (int z = min.z(); z <= max.z(); z++) {
+      for (int x = min.x(); x <= max.x(); x++) {
+        var index = result.getIndex(x, z);
+        var pos = new ChunkPos(x, z);
+        chunks[index] = world.createChunk(pos);
+      }
     }
-    return new ChunkRegion(chunks, map);
+
+    return result;
   }
 
   @Override
   public RegistryEntry<Biome> getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
-    var chunk = chunks[chunkGetter.applyAsInt(new ChunkPos(biomeX >> 2, biomeZ >>> 2))];
-    return chunk.getBiomeForNoiseGen(biomeX, biomeY, biomeZ);
+    return this.getChunk(biomeX >> 2, biomeZ >> 2).getBiomeForNoiseGen(biomeX, biomeY, biomeZ);
   }
 
   public void copyNoiseAndHeightmap(ChunkRegion region) {
@@ -88,7 +88,20 @@ public record ChunkRegion(ProtoChunk[] chunks, Object2IntMap<ChunkPos> chunkGett
     }
   }
 
+  private int getIndex(int x, int z) {
+    var cx = x - minX;
+    var cz = z - minZ;
+    if (cx < 0 || cx >= strideX) return -1;
+    var index = cx + cz * strideX;
+    if (index > this.chunks.length) return -1;
+    return index;
+  }
+
   public ProtoChunk getChunk(ChunkPos pos) {
-    return this.chunks[this.chunkGetter.getInt(pos)];
+    return getChunk(pos.x(), pos.z());
+  }
+
+  public ProtoChunk getChunk(int cx, int cz) {
+    return this.chunks[this.getIndex(cx, cz)];
   }
 }

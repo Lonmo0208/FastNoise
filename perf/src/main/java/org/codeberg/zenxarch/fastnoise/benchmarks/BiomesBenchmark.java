@@ -2,6 +2,7 @@ package org.codeberg.zenxarch.fastnoise.benchmarks;
 
 import net.minecraft.world.chunk.ProtoChunk;
 import org.codeberg.zenxarch.fastnoise.BenchmarkSettings;
+import org.codeberg.zenxarch.fastnoise.ChunkRegion;
 import org.codeberg.zenxarch.fastnoise.TestWorld;
 import org.openjdk.jmh.annotations.*;
 
@@ -22,10 +23,8 @@ public class BiomesBenchmark {
           default -> BenchmarkSettings.end();
         };
     world = new TestWorld(settings);
-    chunks = new ProtoChunk[settings.region().pos().length];
-    for (int i = 0; i < chunks.length; i++) {
-      chunks[i] = world.createChunk(settings.region().pos()[i]);
-    }
+    var region = ChunkRegion.of(world, settings.region());
+    this.chunks = region.chunks();
   }
 
   @TearDown(Level.Invocation)
