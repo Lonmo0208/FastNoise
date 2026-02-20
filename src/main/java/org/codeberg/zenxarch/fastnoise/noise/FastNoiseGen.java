@@ -5,7 +5,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
@@ -14,6 +16,9 @@ import org.codeberg.zenxarch.fastnoise.heightmap.HeightmapUtil;
 
 public class FastNoiseGen {
   public static final BlockState AIR = Blocks.AIR.getDefaultState();
+
+  private static final Heightmap.Type[] heightmaps =
+      HeightmapUtil.calculateHeightmaps(ChunkStatus.NOISE);
 
   public static void populateNoise(
       ChunkNoiseSampler chunkNoiseSampler,
@@ -122,8 +127,8 @@ public class FastNoiseGen {
     for (int i = 0; i < fastSections.length; i++)
       if (fastSections[i] != null) fastSections[i].recalculateCounts();
 
-    for (var typex : chunk.getStatus().getHeightmapTypes()) {
-      HeightmapUtil.populateHeightmapPostNoise(chunk, typex, defaultBlockState, AIR);
+    for (int i = 0; i < heightmaps.length; i++) {
+      HeightmapUtil.populateHeightmapPostNoise(chunk, heightmaps[i], defaultBlockState, AIR);
     }
   }
 }
