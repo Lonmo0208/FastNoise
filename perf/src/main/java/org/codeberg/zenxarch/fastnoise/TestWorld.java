@@ -156,8 +156,14 @@ public final class TestWorld {
         throw new IllegalStateException("Chunk sections blocks differ");
       if (!matches(
           (PalettedContainer<RegistryEntry<Biome>>) self[i].biomeContainer,
-          (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer))
+          (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer)) {
+        BenchmarkMain.LOGGER.info(
+            "x: {} y: {} z: {}",
+            a.getPos().x() * 16,
+            (i * 16) + a.getBottomY(),
+            a.getPos().z() * 16);
         throw new IllegalStateException("Chunk sections biomes differ");
+      }
     }
 
     for (var heightmap : a.getHeightmaps()) {
