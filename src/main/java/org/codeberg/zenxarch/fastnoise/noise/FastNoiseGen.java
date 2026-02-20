@@ -2,16 +2,13 @@ package org.codeberg.zenxarch.fastnoise.noise;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.chunk.AquiferSampler;
-import net.minecraft.world.gen.chunk.ChunkGeneratorSettings;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
-import net.minecraft.world.gen.chunk.GenerationShapeConfig;
 import org.codeberg.zenxarch.fastnoise.heightmap.HeightmapUtil;
 
 public class FastNoiseGen {
@@ -19,19 +16,6 @@ public class FastNoiseGen {
 
   private static final Heightmap.Type[] heightmaps =
       HeightmapUtil.calculateHeightmaps(ChunkStatus.NOISE);
-
-  public static void populateNoise(
-      ChunkNoiseSampler chunkNoiseSampler,
-      RegistryEntry<ChunkGeneratorSettings> settings,
-      Chunk chunk,
-      int minimumCellY,
-      int minimumY,
-      GenerationShapeConfig config,
-      int cellHeight) {
-
-    populateNoise(
-        chunkNoiseSampler, settings.value().defaultBlock(), chunk, minimumCellY, cellHeight);
-  }
 
   public static void populateNoise(
       ChunkNoiseSampler chunkNoiseSampler,
@@ -54,9 +38,6 @@ public class FastNoiseGen {
     int verticalCellBlockCount = chunkNoiseSampler.getVerticalCellBlockCount();
     int cellWidth = 16 / horizontalCellBlockCount;
 
-    final boolean skipDefaultBlock = defaultBlockState == AIR;
-
-    var section = sections[0];
     var minY = chunk.getBottomY();
 
     for (int cellX = 0; cellX < cellWidth; cellX++) {
@@ -101,7 +82,6 @@ public class FastNoiseGen {
                 }
 
                 if (state == null) {
-                  if (skipDefaultBlock) continue;
                   fastSection.setDefaultBlockState(
                       blockXInSection, blockYInSection, blockZInSection, defaultBlockState);
                   continue;
