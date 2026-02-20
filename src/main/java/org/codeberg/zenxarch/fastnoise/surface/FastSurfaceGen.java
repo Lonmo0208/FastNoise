@@ -129,7 +129,7 @@ public class FastSurfaceGen {
                 if (y < endY) continue;
                 column.getSection(y).setBlockState(x, y & 0xF, z, state, false);
                 column.fastUpdateHeightmap(x, z, y & 0xF, state);
-                if (state.getFluidState().isEmpty()) {
+                if (!state.getFluidState().isEmpty()) {
                   columnPos.setX(blockX).setZ(blockZ).setY(y);
                   chunk.markBlockForPostProcessing(columnPos);
                 }
