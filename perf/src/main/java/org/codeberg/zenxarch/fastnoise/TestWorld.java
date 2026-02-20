@@ -3,7 +3,6 @@ package org.codeberg.zenxarch.fastnoise;
 import it.unimi.dsi.fastutil.shorts.ShortList;
 import java.util.Arrays;
 import java.util.Objects;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -16,6 +15,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.Palette;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.UpgradeData;
@@ -191,17 +191,22 @@ public final class TestWorld {
     var pos = a.getPos();
     BenchmarkMain.LOGGER.info("x: {},z: {}", pos.getStartX(), pos.getStartZ());
     BenchmarkMain.LOGGER.info("y: {},cy: {}", a.sectionIndexToCoord(idx) * 16, idx);
+    BenchmarkMain.LOGGER.info(
+        "{} {}",
+        ac.blockStateContainer.data.palette().getClass().getSimpleName(),
+        bc.blockStateContainer.data.palette().getClass().getSimpleName());
 
     var apal = ac.blockStateContainer.data.palette();
     var bpal = bc.blockStateContainer.data.palette();
 
-    var arr = new BlockState[apal.getSize()];
-    var brr = new BlockState[bpal.getSize()];
+    BenchmarkMain.LOGGER.info("a: {}, b: {}", paletteToString(apal), paletteToString(bpal));
+  }
 
-    for (int i = 0; i < arr.length; i++) arr[i] = apal.get(i);
-    for (int i = 0; i < brr.length; i++) arr[i] = bpal.get(i);
-
-    BenchmarkMain.LOGGER.info("a: {}, b: {}", Arrays.toString(arr), Arrays.toString(brr));
+  private static <T> String paletteToString(Palette<T> palette) {
+    var size = palette.getSize();
+    var result = new T[array.size];
+    for (int i = 0; i < array.size; i++) result[i] = array.get(i);
+    return Arrays.toString(result);
   }
 
   private static <T> boolean matches(PalettedContainer<T> self, PalettedContainer<T> other) {
