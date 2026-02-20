@@ -157,7 +157,9 @@ public final class TestWorld {
     for (int i = 0; i < self.length; i++) {
       if (!matches(
           (PalettedContainer<RegistryEntry<Biome>>) self[i].biomeContainer,
-          (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer)) {
+          (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer,
+          a.getPos(),
+          i)) {
         dumpPalette(a, b, self[i], other[i], i);
         throw new IllegalStateException("Chunk sections biomes differ");
       }
@@ -209,7 +211,8 @@ public final class TestWorld {
     return Arrays.toString(result);
   }
 
-  private static <T> boolean matches(PalettedContainer<T> self, PalettedContainer<T> other) {
+  private static <T> boolean matches(
+      PalettedContainer<T> self, PalettedContainer<T> other, ChunkPos pos, int cy) {
     if (self.data.storage().getSize() != other.data.storage().getSize()) return false;
 
     var selfPal = self.data.palette();
@@ -227,7 +230,7 @@ public final class TestWorld {
       var oth = otherPal.get(otherSt.get(i));
       if (sel != oth) {
         BenchmarkMain.LOGGER.info("Modded: {},Vanilla: {}", sel, oth);
-        BenchmarkMain.LOGGER.info("Index: {}", i);
+        BenchmarkMain.LOGGER.info("Pos: {}", ProtoChunk.joinBlockPos(i, cy, pos));
         return false;
       }
     }
