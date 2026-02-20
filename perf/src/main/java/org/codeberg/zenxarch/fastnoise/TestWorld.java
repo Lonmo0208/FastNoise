@@ -204,8 +204,8 @@ public final class TestWorld {
 
   private static <T> String paletteToString(Palette<T> palette) {
     var size = palette.getSize();
-    var result = new T[array.size];
-    for (int i = 0; i < array.size; i++) result[i] = array.get(i);
+    var result = new Object[size];
+    for (int i = 0; i < size; i++) result[i] = palette.get(i);
     return Arrays.toString(result);
   }
 
