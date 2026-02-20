@@ -10,8 +10,18 @@ public record BenchmarkSettings(
     long seed,
     RegistryKey<DimensionOptions> dimensionOptions) {
 
-  private static final long defaultSeed = 100;
-  private static final int WorldRadiusInChunks = 16;
+  private static int getIntProperty(String name, int def, int min) {
+    var value = System.getProperty(name);
+    if (value == null) return def;
+    try {
+      return Math.max(Integer.parseInt(value), min);
+    } catch (Exception e) {
+      return def;
+    }
+  }
+
+  private static final long defaultSeed = getIntProperty("zseed", 100, 0);
+  private static final int WorldRadiusInChunks = getIntProperty("zworldradius", 16, 0);
 
   private static ChunkRegion overworldRegion() {
     return ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
