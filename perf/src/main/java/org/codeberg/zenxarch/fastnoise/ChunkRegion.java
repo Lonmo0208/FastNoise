@@ -56,8 +56,10 @@ public record ChunkRegion(ProtoChunk[] chunks, Object2IntMap<ChunkPos> chunkGett
       }
 
       var destList = ((ChunkAccessor) dest).zenxarch$postProcessingLists();
-      var srcList = ((ChunkAccessor) dest).zenxarch$postProcessingLists();
-      assert (destList.length == srcList.length);
+      var srcList = ((ChunkAccessor) src).zenxarch$postProcessingLists();
+      if (destList.length != srcList.length) {
+        throw new IllegalStateException("Copying invalid data ");
+      }
       for (int j = 0; j < srcList.length; j++) {
         destList[j] = copy(srcList[j]);
       }

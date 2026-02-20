@@ -141,34 +141,39 @@ public final class TestWorld {
             settings.surfaceRule());
   }
 
-  public static boolean matches(ProtoChunk a, ProtoChunk b) {
+  public static void matches(ProtoChunk a, ProtoChunk b) {
     var self = a.getSectionArray();
     var other = b.getSectionArray();
 
-    if (self.length != other.length) return false;
+    if (self.length != other.length)
+      throw new IllegalStateException("Chunk sections length differ");
 
     for (int i = 0; i < self.length; i++) {
-      if (!matches(self[i].blockStateContainer, other[i].blockStateContainer)) return false;
+      if (!matches(self[i].blockStateContainer, other[i].blockStateContainer))
+        throw new IllegalStateException("Chunk sections blocks differ");
       if (!matches(
           (PalettedContainer<RegistryEntry<Biome>>) self[i].biomeContainer,
-          (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer)) return false;
+          (PalettedContainer<RegistryEntry<Biome>>) other[i].biomeContainer))
+        throw new IllegalStateException("Chunk sections biomes differ");
     }
 
     for (var heightmap : a.getHeightmaps()) {
       if (!Arrays.equals(
           a.getHeightmap(heightmap.getKey()).asLongArray(),
-          b.getHeightmap(heightmap.getKey()).asLongArray())) return false;
+          b.getHeightmap(heightmap.getKey()).asLongArray()))
+        throw new IllegalStateException("Chunk sections heightmaps differ");
     }
 
     {
       var aList = ((ChunkAccessor) a).zenxarch$postProcessingLists();
       var bList = ((ChunkAccessor) b).zenxarch$postProcessingLists();
-      if (aList.length != bList.length) return false;
+      if (aList.length != bList.length)
+        throw new IllegalStateException("Chunk sections post processing arrays differ");
       for (int i = 0; i < aList.length; i++) {
-        if (!matches(aList[i], bList[i])) return false;
+        if (!matches(aList[i], bList[i]))
+          throw new IllegalStateException("Chunks sections post processing lists differ");
       }
     }
-    return true;
   }
 
   private static <T> boolean matches(PalettedContainer<T> self, PalettedContainer<T> other) {
