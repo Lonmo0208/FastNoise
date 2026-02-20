@@ -3,12 +3,15 @@ package org.codeberg.zenxarch.fastnoise;
 import it.unimi.dsi.fastutil.ints.IntComparators;
 import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.shorts.ShortArrayList;
+import it.unimi.dsi.fastutil.shorts.ShortList;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ProtoChunk;
+import org.codeberg.zenxarch.fastnoise.mixin.ChunkAccessor;
 
 public record ChunkRegion(ProtoChunk[] chunks, Object2IntMap<ChunkPos> chunkGetter)
     implements BiomeAccess.Storage {
@@ -51,7 +54,22 @@ public record ChunkRegion(ProtoChunk[] chunks, Object2IntMap<ChunkPos> chunkGett
       for (var heightmap : src.getHeightmaps()) {
         dest.setHeightmap(heightmap.getKey(), heightmap.getValue().asLongArray());
       }
+
+      var destList = ((ChunkAccessor) dest).zenxarch$postProcessingLists();
+      var srcList = ((ChunkAccessor) dest).zenxarch$postProcessingLists();
+      assert (destList.length == srcList.length);
+      for (int j = 0; j < srcList.length; j++) {
+        destList[j] = copy(srcList[j]);
+      }
     }
+  }
+
+  private static ShortList copy(ShortList src) {
+    if (src == null) return null;
+    if (src.isEmpty()) return null;
+    var result = new ShortArrayList();
+    result.addAll(src);
+    return result;
   }
 
   public void copyBiomes(ChunkRegion region) {

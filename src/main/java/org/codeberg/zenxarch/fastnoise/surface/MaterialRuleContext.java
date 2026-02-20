@@ -53,7 +53,7 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       int blockZ) {
     super.initVerticalContext(
         stoneDepthAbove, stoneDepthBelow, fluidHeight, blockX, blockY, blockZ);
-    
+
     var x = blockX & 15;
     if (x < 2 || x > 14) return;
     var z = blockZ & 15;
@@ -76,7 +76,7 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       if (cy == (this.singleBiomes.length - 1)) return;
       if (singleBiomes[cy] != singleBiomes[cy + 1]) return;
     }
-    
+
     this.biomeSupplier = () -> single;
   }
 
