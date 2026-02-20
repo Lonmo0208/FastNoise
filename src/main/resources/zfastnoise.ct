@@ -39,3 +39,5 @@ extendable class net/minecraft/world/gen/surfacebuilder/MaterialRules$MaterialRu
 accessible class net/minecraft/world/gen/surfacebuilder/MaterialRules$BlockStateRule
 
 accessible class net/minecraft/world/gen/surfacebuilder/MaterialRules$BlockMaterialRule
+
+accessible field net/minecraft/world/gen/surfacebuilder/MaterialRules$MaterialRuleContext biomeSupplier Ljava/util/function/Supplier;

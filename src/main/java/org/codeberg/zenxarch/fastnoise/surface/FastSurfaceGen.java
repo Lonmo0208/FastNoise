@@ -12,6 +12,8 @@ import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.PalettedContainer;
+import net.minecraft.world.chunk.SingularPalette;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.HeightContext;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
@@ -38,6 +40,18 @@ public class FastSurfaceGen {
       return;
     }
 
+    var sections = chunk.getSectionArray();
+    @SuppressWarnings("unchecked")
+    RegistryEntry<Biome>[] singleBiomes = new RegistryEntry[sections.length];
+    for (int i = 0; i < sections.length; i++) {
+      var container = (PalettedContainer<RegistryEntry<Biome>>) sections[i].biomeContainer;
+      if (container.data.palette() instanceof SingularPalette<RegistryEntry<Biome>> single) {
+        singleBiomes[i] = single.entry;
+      } else {
+        singleBiomes[i] = null;
+      }
+    }
+
     final BlockPos.Mutable columnPos = new BlockPos.Mutable();
     final ChunkPos chunkPos = chunk.getPos();
     int minBlockX = chunkPos.getStartX();
@@ -51,7 +65,8 @@ public class FastSurfaceGen {
             chunkNoiseSampler,
             biomeAccess::getBiome,
             biomeRegistry,
-            heightContext);
+            heightContext,
+            singleBiomes);
     var rule = materialRule.apply(context);
     BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
@@ -76,7 +91,6 @@ public class FastSurfaceGen {
         int stoneAboveDepth = 0;
         int waterHeight = Integer.MIN_VALUE;
         int nextCeilingStoneY = Integer.MAX_VALUE;
-        var sections = chunk.getSectionArray();
 
         int y = height;
         if (y >= topY) { // assuming void air is air
