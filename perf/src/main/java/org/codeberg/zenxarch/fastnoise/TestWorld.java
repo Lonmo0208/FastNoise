@@ -227,6 +227,7 @@ public final class TestWorld {
       var oth = otherPal.get(otherSt.get(i));
       if (sel != oth) {
         BenchmarkMain.LOGGER.info("Modded: {},Vanilla: {}", sel, oth);
+        BenchmarkMain.LOGGER.info("Index: {}", i);
         return false;
       }
     }
