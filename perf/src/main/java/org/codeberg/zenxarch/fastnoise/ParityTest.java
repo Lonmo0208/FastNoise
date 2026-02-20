@@ -37,7 +37,7 @@ public final class ParityTest {
 
     for (int i = 0; i < modded.chunks().length; i++) {
       var a = modded.chunks()[i];
-      var b = original.getChunk(modded.chunks()[i].getPos());
+      var b = original.getChunk(a.getPos());
 
       TestWorld.matches(a, b);
     }
