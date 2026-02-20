@@ -189,8 +189,8 @@ public final class TestWorld {
   private static void dumpPalette(
       ProtoChunk a, ProtoChunk b, ChunkSection ac, ChunkSection bc, int idx) {
     var pos = a.getPos();
-    BenchmarkMain.LOGGER.info("x: {} z: {}", pos.getStartX(), pos.getStartZ());
-    BenchmarkMain.LOGGER.info("y : {}, cy: {}", a.sectionIndexToCoord(idx) * 16, idx);
+    BenchmarkMain.LOGGER.info("x: {},z: {}", pos.getStartX(), pos.getStartZ());
+    BenchmarkMain.LOGGER.info("y: {},cy: {}", a.sectionIndexToCoord(idx) * 16, idx);
 
     var apal = ac.blockStateContainer.data.palette();
     var bpal = bc.blockStateContainer.data.palette();
