@@ -22,6 +22,7 @@ public record BenchmarkSettings(
 
   private static final long defaultSeed = getIntProperty("zseed", 100, 0);
   private static final int WorldRadiusInChunks = getIntProperty("zworldradius", 16, 0);
+  private static final int endCenter = getIntProperty("zendcenter", 128, Integer.MIN_VALUE);
 
   private static ChunkRegion overworldRegion() {
     return ChunkRegion.of(-WorldRadiusInChunks, WorldRadiusInChunks);
@@ -32,11 +33,11 @@ public record BenchmarkSettings(
   }
 
   private static ChunkRegion endRegion() {
-    return ChunkRegion.of(128 - WorldRadiusInChunks, 128 + WorldRadiusInChunks);
+    return ChunkRegion.of(endCenter - WorldRadiusInChunks, endCenter + WorldRadiusInChunks);
   }
 
   private static ChunkRegion endBiomeRegion() {
-    return ChunkRegion.of(128 - WorldRadiusInChunks - 1, 128 + WorldRadiusInChunks + 1);
+    return ChunkRegion.of(endCenter - WorldRadiusInChunks - 1, endCenter + WorldRadiusInChunks + 1);
   }
 
   public static BenchmarkSettings overworld() {
