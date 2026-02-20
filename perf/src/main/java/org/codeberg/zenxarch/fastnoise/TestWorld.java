@@ -226,10 +226,7 @@ public final class TestWorld {
       var sel = selfPal.get(selfSt.get(i));
       var oth = otherPal.get(otherSt.get(i));
       if (sel != oth) {
-        BenchmarkMain.LOGGER.info(
-            "a {} b {}",
-            self.data.palette().get(self.data.storage().get(i)),
-            other.data.palette().get(other.data.storage().get(i)));
+        BenchmarkMain.LOGGER.info("Modded: {},Vanilla: {}", sel, oth);
         return false;
       }
     }
