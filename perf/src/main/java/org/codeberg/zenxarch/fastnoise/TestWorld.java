@@ -142,6 +142,9 @@ public final class TestWorld {
   }
 
   public static void matches(ProtoChunk a, ProtoChunk b) {
+    if (!a.getPos().equals(b.getPos())) {
+      throw new IllegalStateException("Wrong chunks are getting compared");
+    }
     var self = a.getSectionArray();
     var other = b.getSectionArray();
 
