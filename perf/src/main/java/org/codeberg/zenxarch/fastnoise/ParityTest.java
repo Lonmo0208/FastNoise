@@ -26,14 +26,14 @@ public final class ParityTest {
     var original = ChunkRegion.of(fakeWorld, settings.region());
     var originalBiomes = ChunkRegion.of(fakeWorld, settings.biomeRegion());
 
-    generateChunk(fakeWorld, original, originalBiomes);
+    generateChunk(fakeWorld, original, originalBiomes, "Vanilla " + name);
 
     FastNoiseConfig.ENABLED = true;
 
     var modded = ChunkRegion.of(fakeWorld, settings.region());
     var moddedBiomes = ChunkRegion.of(fakeWorld, settings.biomeRegion());
 
-    generateChunk(fakeWorld, modded, moddedBiomes);
+    generateChunk(fakeWorld, modded, moddedBiomes, "Modded " + name);
 
     for (int i = 0; i < modded.chunks().length; i++) {
       var a = modded.chunks()[i];
@@ -44,18 +44,23 @@ public final class ParityTest {
     LOGGER.info(name + " matches");
   }
 
-  private static void generateChunk(TestWorld world, ChunkRegion base, ChunkRegion biomeRegion) {
+  private static void generateChunk(
+      TestWorld world, ChunkRegion base, ChunkRegion biomeRegion, String name) {
     for (int i = 0; i < biomeRegion.chunks().length; i++) {
       world.biomes(biomeRegion.chunks()[i]);
       biomeRegion.chunks()[i].setStatus(ChunkStatus.BIOMES);
     }
+
+    LOGGER.info("Generated Biomes for " + name);
 
     base.copyBiomes(biomeRegion);
 
     for (int i = 0; i < base.chunks().length; i++) {
       base.chunks()[i].getOrCreateChunkNoiseSampler(world::createSampler);
       world.noise(base.chunks()[i]);
+      LOGGER.info("Generated Noise for " + name);
       world.surface(base.chunks()[i], biomeRegion);
+      LOGGER.info("Generated Surface for " + name);
     }
   }
 }
