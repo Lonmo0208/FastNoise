@@ -81,7 +81,7 @@ public class FastNoiseConfig {
     var result = new Object2BooleanArrayMap<String>();
     for (var entry : FastNoiseConfigEntries.ENTRIES) {
       if (!entry.isMixin()) continue;
-      boolean r = FastNoiseConfigLoader.get(entry);
+      boolean r = get(entry);
       result.put(entry.key(), r);
     }
 
