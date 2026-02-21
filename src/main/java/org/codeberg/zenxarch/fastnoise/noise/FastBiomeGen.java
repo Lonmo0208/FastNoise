@@ -96,11 +96,10 @@ public final class FastBiomeGen {
       byte[] storage) {
 
     int size = 0;
-    int idx = 0;
 
-    for (int iy = 0; iy < 4; iy++) {
-      for (int iz = 0; iz < 4; iz++) {
-        for (int ix = 0; ix < 4; ix++) {
+    for (int ix = 0; ix < 4; ix++) {
+      for (int iy = 0; iy < 4; iy++) {
+        for (int iz = 0; iz < 4; iz++) {
 
           var biome = biomeSupplier.getBiome(x + ix, y + iy, z + iz, sampler);
 
@@ -113,9 +112,7 @@ public final class FastBiomeGen {
 
           if (bidx == -1) biomes[(bidx = size++)] = biome;
 
-          storage[idx] = (byte) bidx;
-
-          idx++;
+          storage[(iy << 2 | iz) << 2 | ix] = (byte) bidx;
         }
       }
       var container = ((PalettedContainer<RegistryEntry<Biome>>) section.biomeContainer);

@@ -13,8 +13,17 @@ import org.codeberg.zenxarch.fastnoise.FastNoiseConstants;
 public class FastNoiseConfig {
   private static final String overridesKey = FastNoiseConstants.MOD_ID + ":overrides";
 
-  public static final boolean OPTIMIZE_END_BIOMES = FastNoiseConfigLoader.optimizeEndBiomes();
-  public static final boolean OPTIMIZE_FIXED_BIOMES = FastNoiseConfigLoader.optimizeFixedBiomes();
+  static boolean get(BooleanConfigEntry entry) {
+    return FastNoiseConfigLoader.CONFIG.get(entry.key());
+  }
+
+  public static final boolean OPTIMIZE_END_BIOMES = get(FastNoiseConfigEntries.OPTIMIZE_END_BIOMES);
+  public static final boolean OPTIMIZE_FIXED_BIOMES =
+      get(FastNoiseConfigEntries.OPTIMIZE_FIXED_BIOMES);
+  public static final boolean SKIP_TRIVIAL_SURFACE_BUILDER =
+      get(FastNoiseConfigEntries.SKIP_TRIVIAL_SURFACE_BUILDER);
+  public static final boolean OPTIMIZE_BIOME_ACCESS =
+      get(FastNoiseConfigEntries.OPTIMIZE_BIOME_ACCESS);
 
   private static void collectOverrides(
       Object2BooleanArrayMap<String> map, ModMetadata meta, String key, boolean value) {
@@ -70,9 +79,10 @@ public class FastNoiseConfig {
 
   public static Object2BooleanMap<String> loadConfig() {
     var result = new Object2BooleanArrayMap<String>();
-    for (var key : FastNoiseConfigLoader.MIXIN_KEYS) {
-      boolean r = FastNoiseConfigLoader.CONFIG.get(key);
-      result.put(key, r);
+    for (var entry : FastNoiseConfigEntries.ENTRIES) {
+      if (!entry.isMixin()) continue;
+      boolean r = get(entry);
+      result.put(entry.key(), r);
     }
 
     collectOverrides(result);

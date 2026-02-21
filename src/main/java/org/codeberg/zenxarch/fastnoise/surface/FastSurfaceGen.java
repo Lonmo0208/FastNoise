@@ -12,12 +12,15 @@ import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.PalettedContainer;
+import net.minecraft.world.chunk.SingularPalette;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.HeightContext;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.mixin.SurfaceBuilderAccessor;
 
 public class FastSurfaceGen {
@@ -32,6 +35,24 @@ public class FastSurfaceGen {
       final ChunkNoiseSampler chunkNoiseSampler,
       final MaterialRules.MaterialRule materialRule) {
 
+    final var defaultState = builder.zenxarch$getDefaultState();
+
+    if (canSkipSurfaceBuilder(materialRule, defaultState)) {
+      return;
+    }
+
+    var sections = chunk.getSectionArray();
+    @SuppressWarnings("unchecked")
+    RegistryEntry<Biome>[] singleBiomes = new RegistryEntry[sections.length];
+    for (int i = 0; i < sections.length; i++) {
+      var container = (PalettedContainer<RegistryEntry<Biome>>) sections[i].biomeContainer;
+      if (container.data.palette() instanceof SingularPalette<RegistryEntry<Biome>> single) {
+        singleBiomes[i] = single.entry;
+      } else {
+        singleBiomes[i] = null;
+      }
+    }
+
     final BlockPos.Mutable columnPos = new BlockPos.Mutable();
     final ChunkPos chunkPos = chunk.getPos();
     int minBlockX = chunkPos.getStartX();
@@ -45,11 +66,10 @@ public class FastSurfaceGen {
             chunkNoiseSampler,
             biomeAccess::getBiome,
             biomeRegistry,
-            heightContext);
+            heightContext,
+            singleBiomes);
     var rule = materialRule.apply(context);
     BlockPos.Mutable blockPos = new BlockPos.Mutable();
-
-    final var defaultState = builder.zenxarch$getDefaultState();
 
     final int endY = chunk.getBottomY();
     final int topY = chunk.getTopYInclusive();
@@ -72,7 +92,6 @@ public class FastSurfaceGen {
         int stoneAboveDepth = 0;
         int waterHeight = Integer.MIN_VALUE;
         int nextCeilingStoneY = Integer.MAX_VALUE;
-        var sections = chunk.getSectionArray();
 
         int y = height;
         if (y >= topY) { // assuming void air is air
@@ -99,7 +118,7 @@ public class FastSurfaceGen {
             }
           } else {
             if (nextCeilingStoneY >= y)
-              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z);
+              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
 
             stoneAboveDepth++;
             int stoneBelowDepth = y - nextCeilingStoneY + 1;
@@ -111,7 +130,7 @@ public class FastSurfaceGen {
                 if (y < endY) continue;
                 column.getSection(y).setBlockState(x, y & 0xF, z, state, false);
                 column.fastUpdateHeightmap(x, z, y & 0xF, state);
-                if (state.getFluidState().isEmpty()) {
+                if (!state.getFluidState().isEmpty()) {
                   columnPos.setX(blockX).setZ(blockZ).setY(y);
                   chunk.markBlockForPostProcessing(columnPos);
                 }
@@ -147,7 +166,7 @@ public class FastSurfaceGen {
       int lz) {
     final int wayBelowMinY = DimensionType.field_35479;
     if (startY <= minY) {
-      if (builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
+      if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
       return wayBelowMinY;
     }
     var y = startY - 1;
@@ -168,7 +187,7 @@ public class FastSurfaceGen {
       cy--;
     }
 
-    if (builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
+    if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
     return wayBelowMinY;
   }
 
@@ -178,9 +197,18 @@ public class FastSurfaceGen {
     var palette = section.blockStateContainer.data.palette();
     var storage = section.blockStateContainer.data.storage();
     while (index >= 0) {
-      if (builder.zenxarch$isDefaultBlock(palette.get(storage.get(index)))) return index >> 8;
+      if (!builder.zenxarch$isDefaultBlock(palette.get(storage.get(index)))) return index >> 8;
       index -= 256;
     }
     return -1;
+  }
+
+  private static boolean canSkipSurfaceBuilder(
+      MaterialRules.MaterialRule rule, BlockState defaultState) {
+    if (!FastNoiseConfig.SKIP_TRIVIAL_SURFACE_BUILDER) return false;
+    if (rule instanceof MaterialRules.BlockMaterialRule block) {
+      return block.resultState() == defaultState;
+    }
+    return false;
   }
 }

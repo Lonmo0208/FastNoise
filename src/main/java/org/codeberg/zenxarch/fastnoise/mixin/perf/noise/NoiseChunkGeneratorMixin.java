@@ -47,7 +47,10 @@ public abstract class NoiseChunkGeneratorMixin {
       int minimumCellY,
       Operation<Chunk> op) {
     if (SharedConstants.isOutsideGenerationArea(chunk.getPos())) return chunk;
-    if (SharedConstants.AQUIFERS)
+
+    var defaultBlock = settings.value().defaultBlock();
+
+    if (SharedConstants.AQUIFERS || defaultBlock == FastNoiseGen.AIR)
       return this.populateNoise(
           blender, structureAccessor, noiseConfig, chunk, minimumCellY, cellHeight);
 
@@ -56,8 +59,7 @@ public abstract class NoiseChunkGeneratorMixin {
             chunkx ->
                 this.createChunkNoiseSampler(chunkx, structureAccessor, blender, noiseConfig));
 
-    FastNoiseGen.populateNoise(
-        sampler, this.settings, chunk, minimumCellY, minimumY, generationShapeConfig, cellHeight);
+    FastNoiseGen.populateNoise(sampler, defaultBlock, chunk, minimumCellY, cellHeight);
 
     return chunk;
   }

@@ -12,32 +12,40 @@ public final class FastChunkSection {
   private int defaultIdx = 0;
   private int minIdx = 0;
 
-  private long[] storage;
-  private ArrayPalette<BlockState> palette;
-  private BlockState[] states;
-  private BlockCountingPalettedContainer<BlockState> counter;
+  private final long[] storage;
+  private final ArrayPalette<BlockState> palette;
+  private final BlockState[] states;
+  private final BlockCountingPalettedContainer<BlockState> counter;
 
   public FastChunkSection(ChunkSection section) {
     this.section = section;
+    this.states = new BlockState[16];
+    this.storage = new long[256];
+    this.palette = new ArrayPalette<>(this.states, 4, 1);
+
+    this.states[0] = FastNoiseGen.AIR;
+
+    this.counter =
+        new BlockCountingPalettedContainer<>(
+            this.section.blockStateContainer.paletteProvider,
+            this.storage,
+            this.states,
+            this.palette);
+    this.section.blockStateContainer = this.counter;
   }
 
   public void setDefaultBlockState(int x, int y, int z, BlockState state) {
     if (defaultIdx == 0) {
-      if (palette == null) {
-        init(state);
-        defaultIdx = 1;
-        minIdx = 2;
-      } else this.states[(defaultIdx = this.palette.size++)] = state;
+      this.states[(defaultIdx = this.palette.size++)] = state;
     }
     setBlockState(x, y, z, defaultIdx);
     this.counter.updateCount(defaultIdx);
   }
 
   private int getIndex(BlockState state) {
-    if (palette == null) {
-      init(state);
-      minIdx = 1;
-      return 1;
+    if (minIdx == 0) {
+      this.states[(minIdx = this.palette.size++)] = state;
+      return minIdx;
     }
     for (int i = minIdx; i < palette.size; i++) {
       if (states[i] == state) return i;
@@ -56,25 +64,7 @@ public final class FastChunkSection {
     this.storage[(y << 4) | z] |= value << (x * 4);
   }
 
-  private void init(BlockState state) {
-    this.states = new BlockState[16];
-    this.storage = new long[256];
-    this.palette = new ArrayPalette<>(this.states, 4, 2);
-
-    this.states[0] = FastNoiseGen.AIR;
-    this.states[1] = state;
-
-    this.counter =
-        new BlockCountingPalettedContainer<>(
-            this.section.blockStateContainer.paletteProvider,
-            this.storage,
-            this.states,
-            this.palette);
-    this.section.blockStateContainer = this.counter;
-  }
-
   public void recalculateCounts() {
-    if (palette == null) return;
     this.section.calculateCounts();
     this.section.blockStateContainer = this.counter.revert();
   }

@@ -11,8 +11,12 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 
 public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
+
+  private final RegistryEntry<Biome>[] singleBiomes;
+  private final int minY;
 
   public MaterialRuleContext(
       SurfaceBuilder surfaceBuilder,
@@ -21,7 +25,8 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       ChunkNoiseSampler chunkNoiseSampler,
       Function<BlockPos, RegistryEntry<Biome>> posToBiome,
       Registry<Biome> biomeRegistry,
-      HeightContext heightContext) {
+      HeightContext heightContext,
+      RegistryEntry<Biome>[] singleBiomes) {
     super(
         surfaceBuilder,
         noiseConfig,
@@ -30,6 +35,8 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
         posToBiome,
         biomeRegistry,
         heightContext);
+    this.singleBiomes = singleBiomes;
+    this.minY = chunk.getBottomY();
   }
 
   @Override
@@ -47,6 +54,33 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       int blockZ) {
     super.initVerticalContext(
         stoneDepthAbove, stoneDepthBelow, fluidHeight, blockX, blockY, blockZ);
+
+    if (!FastNoiseConfig.OPTIMIZE_BIOME_ACCESS) return;
+
+    var x = blockX & 15;
+    if (x < 2 || x > 14) return;
+    var z = blockZ & 15;
+    if (z < 2 || z > 14) return;
+
+    var y = blockY - minY;
+    var ly = y & 0xF;
+    var cy = y >> 4;
+
+    var single = singleBiomes[cy];
+
+    if (single == null) return;
+
+    if (ly < 2) {
+      if (cy == 0) return;
+      if (singleBiomes[cy] != singleBiomes[cy - 1]) return;
+    }
+
+    if (ly > 14) {
+      if (cy == (this.singleBiomes.length - 1)) return;
+      if (singleBiomes[cy] != singleBiomes[cy + 1]) return;
+    }
+
+    this.biomeSupplier = () -> single;
   }
 
   @Override
