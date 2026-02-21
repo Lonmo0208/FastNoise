@@ -33,13 +33,13 @@ public class FastNoiseConfigEntries {
           false);
 
   public static final BooleanConfigEntry MIXIN_PERF_BIOMES =
-      of("mixin.perf.biome", "Replace populateBiomes with optimized implementation", true);
+      mixin("perf.biome", "Replace populateBiomes with optimized implementation", true);
 
   public static final BooleanConfigEntry MIXIN_PERF_NOISE =
-      of("mixin.perf.noise", "Replace populateNoise with optimized implementation", true);
+      mixin("perf.noise", "Replace populateNoise with optimized implementation", true);
 
   public static final BooleanConfigEntry MIXIN_PERF_SURFACE =
-      of("mixin.perf.surface", "Replace buildSurface with optimized implementation", false);
+      mixin("perf.surface", "Replace buildSurface with optimized implementation", false);
 
   public static final List<BooleanConfigEntry> ENTRIES =
       new ObjectArrayList<>(
