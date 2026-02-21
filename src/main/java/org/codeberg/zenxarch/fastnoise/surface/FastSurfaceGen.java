@@ -117,7 +117,7 @@ public class FastSurfaceGen {
             }
           } else {
             if (nextCeilingStoneY >= y)
-              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z);
+              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
 
             stoneAboveDepth++;
             int stoneBelowDepth = y - nextCeilingStoneY + 1;
@@ -165,7 +165,7 @@ public class FastSurfaceGen {
       int lz) {
     final int wayBelowMinY = DimensionType.field_35479;
     if (startY <= minY) {
-      if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY;
+      if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
       return wayBelowMinY;
     }
     var y = startY - 1;
@@ -174,7 +174,7 @@ public class FastSurfaceGen {
 
     {
       var next = getNextNonDefaultBlock(section, lx, y & 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY + 1;
+      if (next != -1) return (cy << 4) + next + minY;
     }
 
     cy--;
@@ -182,11 +182,11 @@ public class FastSurfaceGen {
     while (cy >= 0) {
       section = sections[cy];
       var next = getNextNonDefaultBlock(section, lx, 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY + 1;
+      if (next != -1) return (cy << 4) + next + minY;
       cy--;
     }
 
-    if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY;
+    if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
     return wayBelowMinY;
   }
 
