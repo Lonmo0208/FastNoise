@@ -11,6 +11,7 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 
 public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
 
@@ -53,6 +54,8 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       int blockZ) {
     super.initVerticalContext(
         stoneDepthAbove, stoneDepthBelow, fluidHeight, blockX, blockY, blockZ);
+
+    if (!FastNoiseConfig.OPTIMIZE_BIOME_ACCESS) return;
 
     var x = blockX & 15;
     if (x < 2 || x > 14) return;

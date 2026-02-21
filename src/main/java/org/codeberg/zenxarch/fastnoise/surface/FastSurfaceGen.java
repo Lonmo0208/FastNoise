@@ -20,6 +20,7 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.mixin.SurfaceBuilderAccessor;
 
 public class FastSurfaceGen {
@@ -117,7 +118,7 @@ public class FastSurfaceGen {
             }
           } else {
             if (nextCeilingStoneY >= y)
-              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z);
+              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
 
             stoneAboveDepth++;
             int stoneBelowDepth = y - nextCeilingStoneY + 1;
@@ -165,7 +166,7 @@ public class FastSurfaceGen {
       int lz) {
     final int wayBelowMinY = DimensionType.field_35479;
     if (startY <= minY) {
-      if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY;
+      if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
       return wayBelowMinY;
     }
     var y = startY - 1;
@@ -174,7 +175,7 @@ public class FastSurfaceGen {
 
     {
       var next = getNextNonDefaultBlock(section, lx, y & 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY + 1;
+      if (next != -1) return (cy << 4) + next + minY;
     }
 
     cy--;
@@ -182,11 +183,11 @@ public class FastSurfaceGen {
     while (cy >= 0) {
       section = sections[cy];
       var next = getNextNonDefaultBlock(section, lx, 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY + 1;
+      if (next != -1) return (cy << 4) + next + minY;
       cy--;
     }
 
-    if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY;
+    if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
     return wayBelowMinY;
   }
 
@@ -204,6 +205,7 @@ public class FastSurfaceGen {
 
   private static boolean canSkipSurfaceBuilder(
       MaterialRules.MaterialRule rule, BlockState defaultState) {
+    if (!FastNoiseConfig.SKIP_TRIVIAL_SURFACE_BUILDER) return false;
     if (rule instanceof MaterialRules.BlockMaterialRule block) {
       return block.resultState() == defaultState;
     }
