@@ -17,7 +17,7 @@ public final class FastNoiseConfigLoader {
       new String[] {"mixin.perf.noise", "mixin.perf.biome", "mixin.perf.surface"};
 
   static final String[] DISABLED_BY_DEFAULT_KEYS =
-      new String[] {"perf.biomes.end", "perf.biomes.fixed"};
+      new String[] {"perf.biomes.end", "perf.biomes.fixed", "mixin.perf.surface"};
 
   static boolean optimizeEndBiomes() {
     return CONFIG.get(DISABLED_BY_DEFAULT_KEYS[0]);
@@ -68,8 +68,8 @@ public final class FastNoiseConfigLoader {
 
   private static void loadDefaults() {
     CONFIG.load();
-    for (var key : MIXIN_KEYS) loadBoolean(key, true);
     for (var key : DISABLED_BY_DEFAULT_KEYS) loadBoolean(key, false);
+    for (var key : MIXIN_KEYS) loadBoolean(key, true);
     CONFIG.save();
   }
 }
