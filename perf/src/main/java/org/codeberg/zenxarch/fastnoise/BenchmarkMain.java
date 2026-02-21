@@ -1,9 +1,12 @@
 package org.codeberg.zenxarch.fastnoise;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import net.minecraft.registry.DynamicRegistryManager;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.results.RunResult;
+import org.openjdk.jmh.results.format.ResultFormatFactory;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.ForkedRunnerAccessor;
 import org.openjdk.jmh.runner.Runner;
@@ -32,8 +35,10 @@ public class BenchmarkMain {
     if (zmod.isPresent()) {
       runBenchmark("Benchmark ", zmod.get());
     } else {
-      runBenchmark("Benchmark", false);
-      runBenchmark("Benchmark", true);
+      var a = runBenchmark("Benchmark", false);
+      var b = runBenchmark("Benchmark", true);
+      ResultFormatFactory.getInstance(ResultFormatType.TEXT, System.out).writeOut(a);
+      ResultFormatFactory.getInstance(ResultFormatType.TEXT, System.out).writeOut(b);
     }
   }
 
@@ -79,7 +84,7 @@ public class BenchmarkMain {
     }
   }
 
-  private static void runBenchmark(String outputPrefix, boolean zmod) {
+  private static Collection<RunResult> runBenchmark(String outputPrefix, boolean zmod) {
     ChainedOptionsBuilder options =
         new OptionsBuilder()
             .forks(getIntProperty("zforks", 1, 1))
@@ -124,9 +129,10 @@ public class BenchmarkMain {
 
     var runner = new Runner(options.build());
     try {
-      runner.run();
+      return runner.run();
     } catch (RunnerException exception) {
       LOGGER.info("Cannot run jmh: {}", exception.getMessage());
+      throw new IllegalStateException("Cannot run jmh {}", exception);
     }
   }
 }
