@@ -58,9 +58,8 @@ public final class ParityTest {
     for (int i = 0; i < base.chunks().length; i++) {
       base.chunks()[i].getOrCreateChunkNoiseSampler(world::createSampler);
       world.noise(base.chunks()[i]);
-      LOGGER.info("Generated Noise for " + name);
       world.surface(base.chunks()[i], biomeRegion);
-      LOGGER.info("Generated Surface for " + name);
     }
+    LOGGER.info("Generated " + name);
   }
 }
