@@ -20,6 +20,7 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.mixin.SurfaceBuilderAccessor;
 
 public class FastSurfaceGen {
@@ -204,6 +205,7 @@ public class FastSurfaceGen {
 
   private static boolean canSkipSurfaceBuilder(
       MaterialRules.MaterialRule rule, BlockState defaultState) {
+    if (!FastNoiseConfig.SKIP_TRIVIAL_SURFACE_BUILDER) return false;
     if (rule instanceof MaterialRules.BlockMaterialRule block) {
       return block.resultState() == defaultState;
     }
