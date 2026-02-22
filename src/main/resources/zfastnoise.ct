@@ -1,4 +1,4 @@
-classTweaker v1 named
+accessWidener v1 named
 
 accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getHorizontalCellBlockCount ()I
 accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getVerticalCellBlockCount ()I
@@ -12,7 +12,7 @@ accessible field net/minecraft/world/chunk/ChunkSection biomeContainer Lnet/mine
 accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft/world/chunk/PalettedContainer$Data;
 
 accessible class net/minecraft/world/chunk/PalettedContainer$Data
-
+accessible method net/minecraft/world/chunk/PalettedContainer$Data <init> (Lnet/minecraft/world/chunk/PaletteType;Lnet/minecraft/util/collection/PaletteStorage;Lnet/minecraft/world/chunk/Palette;)V
 accessible method net/minecraft/world/chunk/ArrayPalette <init> ([Ljava/lang/Object;II)V
 accessible field net/minecraft/world/chunk/ArrayPalette size I
 
