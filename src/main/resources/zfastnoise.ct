@@ -1,11 +1,11 @@
 accessWidener v1 named
 
-accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getHorizontalBlockSize ()I
-accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getVerticalBlockSize ()I
+accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getHorizontalCellBlockCount ()I
+accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler getVerticalCellBlockCount ()I
 accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler sampleBlockState ()Lnet/minecraft/block/BlockState;
 
 accessible field net/minecraft/world/chunk/ChunkSection blockStateContainer Lnet/minecraft/world/chunk/PalettedContainer;
-accessible field net/minecraft/world/chunk/ChunkSection biomeContainer Lnet/minecraft/class_7522;
+accessible field net/minecraft/world/chunk/ChunkSection biomeContainer Lnet/minecraft/world/chunk/ReadableContainer;
 
 accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft/world/chunk/PalettedContainer$Data;
 
