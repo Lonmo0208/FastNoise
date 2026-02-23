@@ -139,6 +139,7 @@ modrinth {
   }
 }
 
-tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
-  mods.from configurations.modImplementation
-}
+// TODO: Uncomment after it is implemented
+// tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+//   mods.from configurations.modImplementation
+// }
