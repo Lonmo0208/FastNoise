@@ -128,8 +128,8 @@ public class FastSurfaceGen {
               BlockState state = rule.tryApply(blockX, y, blockZ);
               if (state != null) {
                 if (y < endY) continue;
-                column.getSection(y).setBlockState(x, y & 0xF, z, state, false);
-                column.fastUpdateHeightmap(x, z, y & 0xF, state);
+                section.setBlockState(x, y & 0xF, z, state, false);
+                column.fastUpdateHeightmap(x, z, y, state);
                 if (!state.getFluidState().isEmpty()) {
                   columnPos.setX(blockX).setZ(blockZ).setY(y);
                   chunk.markBlockForPostProcessing(columnPos);
