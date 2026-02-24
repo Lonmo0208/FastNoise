@@ -188,6 +188,14 @@ public final class TestWorld {
     }
   }
 
+  public static void dumpSections(String name, ProtoChunk a) {
+    var sections = a.getSectionArray();
+    for (int i = 0; i < sections.length; i++) {
+      BenchmarkMain.LOGGER.info(
+          "{} {} -> {}", name, i, paletteToString(sections[i].blockStateContainer.data.palette()));
+    }
+  }
+
   private static void dumpPalette(
       ProtoChunk a, ProtoChunk b, ChunkSection ac, ChunkSection bc, int idx) {
     var pos = a.getPos();

@@ -39,7 +39,13 @@ public final class ParityTest {
       var a = modded.chunks()[i];
       var b = original.getChunk(a.getPos());
 
-      TestWorld.matches(a, b);
+      try {
+        TestWorld.matches(a, b);
+      } catch (Exception e) {
+        TestWorld.dumpSections("Modded", a);
+        TestWorld.dumpSections("Vanilla", b);
+        throw e;
+      }
     }
     LOGGER.info(name + " matches");
   }
