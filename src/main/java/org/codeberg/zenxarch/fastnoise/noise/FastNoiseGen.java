@@ -112,6 +112,8 @@ public class FastNoiseGen {
       int chunkStartZ,
       int cellX,
       int cellZ) {
+    final var postProcessingLists = chunk.getPostProcessingLists();
+
     var cy = (blockY - minY) >> 4;
     var fastSection = fastSections[cy];
 
@@ -145,8 +147,8 @@ public class FastNoiseGen {
         fastSection.setBlockState(blockXInSection, blockYInSection, blockZInSection, state);
 
         if (aquiferSampler.needsFluidTick() && !state.getFluidState().isEmpty()) {
-          mutable.set(blockX, blockY, blockZ);
-          chunk.markBlockForPostProcessing(mutable);
+          Chunk.getList(postProcessingLists, cy)
+              .add((short) (blockXInSection | blockYInSection << 4 | blockZInSection << 8));
         }
       }
     }
