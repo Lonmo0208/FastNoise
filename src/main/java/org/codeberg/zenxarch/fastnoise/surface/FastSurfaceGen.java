@@ -101,7 +101,7 @@ public class FastSurfaceGen {
         }
 
         for (; y >= endY; y--) {
-          var section = column.getSection(y);
+          final var section = column.getSection(y);
           if (section.isEmpty()) { // skip whole section
             y = y - (y & 0xF); // lowest y in current section;
             stoneAboveDepth = 0;
@@ -125,15 +125,7 @@ public class FastSurfaceGen {
             context.initVerticalContext(
                 stoneAboveDepth, stoneBelowDepth, waterHeight, blockX, y, blockZ);
             if (old == defaultState) {
-              BlockState state = rule.tryApply(blockX, y, blockZ);
-              if (state != null) {
-                section.setBlockState(x, y & 0xF, z, state, false);
-                column.fastUpdateHeightmap(x, z, y, state);
-                if (!state.getFluidState().isEmpty()) {
-                  columnPos.setX(blockX).setZ(blockZ).setY(y);
-                  chunk.markBlockForPostProcessing(columnPos);
-                }
-              }
+              setBlockState(section, x, y, z, rule.tryApply(blockX, y, blockZ), column, chunk);
             }
           }
         }
@@ -152,6 +144,24 @@ public class FastSurfaceGen {
         }
       }
     }
+  }
+
+  private static void setBlockState(
+      ChunkSection section,
+      int x,
+      int y,
+      int z,
+      BlockState state,
+      FastBlockColumn column,
+      Chunk chunk) {
+    if (state == null) return;
+    final int ly = y & 0xF;
+    section.setBlockState(x, ly, z, state, false);
+    column.fastUpdateHeightmap(x, z, y, state);
+    if (state.getFluidState().isEmpty()) return;
+
+    Chunk.getList(chunk.getPostProcessingLists(), column.getSectionIndex(y))
+        .add((short) (x | ly << 4 | z << 8));
   }
 
   private static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
