@@ -127,7 +127,6 @@ public class FastSurfaceGen {
             if (old == defaultState) {
               BlockState state = rule.tryApply(blockX, y, blockZ);
               if (state != null) {
-                if (y < endY) continue;
                 section.setBlockState(x, y & 0xF, z, state, false);
                 column.fastUpdateHeightmap(x, z, y, state);
                 if (!state.getFluidState().isEmpty()) {
