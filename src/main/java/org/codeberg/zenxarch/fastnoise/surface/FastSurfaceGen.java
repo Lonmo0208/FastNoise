@@ -180,18 +180,16 @@ public class FastSurfaceGen {
     }
     var y = startY - 1;
     var cy = (y - minY) >> 4;
-    var section = sections[cy];
 
     {
-      var next = getNextNonDefaultBlock(section, lx, y & 0xF, lz, builder);
+      var next = getNextNonDefaultBlock(sections[cy], lx, y & 0xF, lz, builder);
       if (next != -1) return (cy << 4) + next + minY;
     }
 
     cy--;
 
     while (cy >= 0) {
-      section = sections[cy];
-      var next = getNextNonDefaultBlock(section, lx, 0xF, lz, builder);
+      var next = getNextNonDefaultBlock(sections[cy], lx, 0xF, lz, builder);
       if (next != -1) return (cy << 4) + next + minY;
       cy--;
     }
@@ -201,7 +199,7 @@ public class FastSurfaceGen {
   }
 
   private static int getNextNonDefaultBlock(
-      ChunkSection section, int lx, int ly, int lz, SurfaceBuilderAccessor builder) {
+      final ChunkSection section, int lx, int ly, int lz, SurfaceBuilderAccessor builder) {
     var index = lx + (lz << 4) + (ly << 8);
     var palette = section.blockStateContainer.data.palette();
     var storage = section.blockStateContainer.data.storage();
