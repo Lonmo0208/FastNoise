@@ -8,6 +8,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.SingularPalette;
 import net.minecraft.world.gen.chunk.AquiferSampler;
 import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import org.codeberg.zenxarch.fastnoise.heightmap.HeightmapUtil;
@@ -17,6 +18,15 @@ public class FastNoiseGen {
 
   private static final Heightmap.Type[] heightmaps =
       HeightmapUtil.calculateHeightmaps(ChunkStatus.NOISE);
+
+  public static boolean isEmpty(Chunk chunk) {
+    var sections = chunk.getSectionArray();
+    for (int i = 0; i < sections.length; i++) {
+      if (sections[i].blockStateContainer.data.palette() instanceof SingularPalette) continue;
+      return false;
+    }
+    return true;
+  }
 
   public static void populateNoise(
       ChunkNoiseSampler chunkNoiseSampler,
