@@ -46,11 +46,8 @@ public abstract class NoiseChunkGeneratorMixin {
                 this.createChunkNoiseSampler(chunkx, structureAccessor, blender, noiseConfig));
 
     var original = ((ChunkGeneratorAccessor) this).zenxarch$getBiomeSource();
-    
-    var supplier =
-        BelowZeroRetrogen.getBiomeSupplier(
-            blender.getBiomeSupplier(original),
-            chunk);
+
+    var supplier = BelowZeroRetrogen.getBiomeSupplier(blender.getBiomeSupplier(original), chunk);
 
     if (supplier != original) {
       op.call(blender, noiseConfig, structureAccessor, chunk);

@@ -50,7 +50,10 @@ public abstract class NoiseChunkGeneratorMixin {
 
     var defaultBlock = settings.value().defaultBlock();
 
-    if (SharedConstants.AQUIFERS || defaultBlock == FastNoiseGen.AIR)
+    if (SharedConstants.AQUIFERS
+        || defaultBlock == FastNoiseGen.AIR
+        || chunk.hasBelowZeroRetrogen()
+        || !FastNoiseGen.isEmpty(chunk))
       return this.populateNoise(
           blender, structureAccessor, noiseConfig, chunk, minimumCellY, cellHeight);
 
