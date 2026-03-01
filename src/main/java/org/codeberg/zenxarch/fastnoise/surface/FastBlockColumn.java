@@ -48,8 +48,12 @@ public class FastBlockColumn implements BlockColumn {
     this.sections = chunk.getSectionArray();
   }
 
+  public int getSectionIndex(int y) {
+    return (y - minY) >> 4;
+  }
+
   public ChunkSection getSection(int y) {
-    return this.sections[(y - minY) >> 4];
+    return this.sections[getSectionIndex(y)];
   }
 
   private ChunkSection zenxarch$getSection(final int y) {
