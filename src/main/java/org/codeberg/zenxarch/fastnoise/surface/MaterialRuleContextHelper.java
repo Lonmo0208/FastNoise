@@ -12,6 +12,7 @@ public final class MaterialRuleContextHelper {
   private MaterialRuleContextHelper() {}
 
   public static RegistryEntry<Biome>[] calculateSingleBiomes(Chunk chunk) {
+    if (!FastNoiseConfig.ENABLED) return null;
     if (!FastNoiseConfig.OPTIMIZE_BIOME_ACCESS) return null;
     var sections = chunk.getSectionArray();
     @SuppressWarnings("unchecked")
