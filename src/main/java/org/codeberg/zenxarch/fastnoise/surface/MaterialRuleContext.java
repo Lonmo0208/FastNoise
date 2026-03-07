@@ -57,10 +57,10 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
 
     if (!FastNoiseConfig.OPTIMIZE_BIOME_ACCESS) return;
 
-    var x = blockX & 15;
-    if (x < 2 || x > 14) return;
-    var z = blockZ & 15;
-    if (z < 2 || z > 14) return;
+    var x = blockX & 0xF;
+    if (x < 2 || x > 13) return;
+    var z = blockZ & 0xF;
+    if (z < 2 || z > 13) return;
 
     var y = blockY - minY;
     var ly = y & 0xF;
@@ -75,7 +75,7 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
       if (singleBiomes[cy] != singleBiomes[cy - 1]) return;
     }
 
-    if (ly > 14) {
+    if (ly > 13) {
       if (cy == (this.singleBiomes.length - 1)) return;
       if (singleBiomes[cy] != singleBiomes[cy + 1]) return;
     }
