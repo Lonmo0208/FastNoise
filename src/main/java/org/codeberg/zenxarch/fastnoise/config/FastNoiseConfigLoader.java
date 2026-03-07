@@ -51,6 +51,7 @@ public final class FastNoiseConfigLoader {
 
   private static void loadDefaults() {
     CONFIG.load();
+    if (CONFIG.isEmpty()) CONFIG.set(VERSION_KEY, CONFIG_VERSION);
     for (var entry : FastNoiseConfigEntries.ENTRIES) {
       loadBoolean(entry);
     }
