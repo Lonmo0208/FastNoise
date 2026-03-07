@@ -80,6 +80,15 @@ public class FastNoiseConfig {
     }
   }
 
+  private static void collectIncompats(Object2BooleanArrayMap<String> map) {
+    var loader = FabricLoader.getInstance();
+    for (var entry : FastNoiseConfigEntries.ENTRIES) {
+      for (var modId : entry.incompats()) {
+        if (loader.isModLoaded(modId)) map.put(entry.key(), false);
+      }
+    }
+  }
+
   public static Object2BooleanMap<String> loadConfig() {
     var result = new Object2BooleanArrayMap<String>();
     for (var entry : FastNoiseConfigEntries.ENTRIES) {
@@ -89,6 +98,7 @@ public class FastNoiseConfig {
     }
 
     collectOverrides(result);
+    collectIncompats(result);
     return Object2BooleanMaps.unmodifiable(result);
   }
 }
