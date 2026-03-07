@@ -101,7 +101,7 @@ public class FastSurfaceGen {
         }
 
         for (; y >= endY; y--) {
-          var section = column.getSection(y);
+          final var section = column.getSection(y);
           if (section.isEmpty()) { // skip whole section
             y = y - (y & 0xF); // lowest y in current section;
             stoneAboveDepth = 0;
@@ -125,16 +125,7 @@ public class FastSurfaceGen {
             context.initVerticalContext(
                 stoneAboveDepth, stoneBelowDepth, waterHeight, blockX, y, blockZ);
             if (old == defaultState) {
-              BlockState state = rule.tryApply(blockX, y, blockZ);
-              if (state != null) {
-                if (y < endY) continue;
-                section.setBlockState(x, y & 0xF, z, state, false);
-                column.fastUpdateHeightmap(x, z, y, state);
-                if (!state.getFluidState().isEmpty()) {
-                  columnPos.setX(blockX).setZ(blockZ).setY(y);
-                  chunk.markBlockForPostProcessing(columnPos);
-                }
-              }
+              setBlockState(section, x, y, z, rule.tryApply(blockX, y, blockZ), column, chunk);
             }
           }
         }
@@ -155,6 +146,24 @@ public class FastSurfaceGen {
     }
   }
 
+  private static void setBlockState(
+      ChunkSection section,
+      int x,
+      int y,
+      int z,
+      BlockState state,
+      FastBlockColumn column,
+      Chunk chunk) {
+    if (state == null) return;
+    final int ly = y & 0xF;
+    section.setBlockState(x, ly, z, state, false);
+    column.fastUpdateHeightmap(x, z, y, state);
+    if (state.getFluidState().isEmpty()) return;
+
+    Chunk.getList(chunk.getPostProcessingLists(), column.getSectionIndex(y))
+        .add((short) (x | ly << 4 | z << 8));
+  }
+
   private static final BlockState VOID_AIR = Blocks.VOID_AIR.getDefaultState();
 
   private static int nextNonDefaultBlock(
@@ -171,18 +180,16 @@ public class FastSurfaceGen {
     }
     var y = startY - 1;
     var cy = (y - minY) >> 4;
-    var section = sections[cy];
 
     {
-      var next = getNextNonDefaultBlock(section, lx, y & 0xF, lz, builder);
+      var next = getNextNonDefaultBlock(sections[cy], lx, y & 0xF, lz, builder);
       if (next != -1) return (cy << 4) + next + minY;
     }
 
     cy--;
 
     while (cy >= 0) {
-      section = sections[cy];
-      var next = getNextNonDefaultBlock(section, lx, 0xF, lz, builder);
+      var next = getNextNonDefaultBlock(sections[cy], lx, 0xF, lz, builder);
       if (next != -1) return (cy << 4) + next + minY;
       cy--;
     }
@@ -192,7 +199,7 @@ public class FastSurfaceGen {
   }
 
   private static int getNextNonDefaultBlock(
-      ChunkSection section, int lx, int ly, int lz, SurfaceBuilderAccessor builder) {
+      final ChunkSection section, int lx, int ly, int lz, SurfaceBuilderAccessor builder) {
     var index = lx + (lz << 4) + (ly << 8);
     var palette = section.blockStateContainer.data.palette();
     var storage = section.blockStateContainer.data.storage();
