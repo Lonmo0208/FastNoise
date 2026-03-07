@@ -49,10 +49,16 @@ public abstract class NoiseChunkGeneratorMixin {
         chunk.getOrCreateChunkNoiseSampler(
             chunkx ->
                 this.createChunkNoiseSampler(chunkx, structureAccessor, blender, noiseConfig));
-    var supplier =
-        BelowZeroRetrogen.getBiomeSupplier(
-            blender.getBiomeSupplier(((ChunkGeneratorAccessor) this).zenxarch$getBiomeSource()),
-            chunk);
+
+    var original = ((ChunkGeneratorAccessor) this).zenxarch$getBiomeSource();
+
+    var supplier = BelowZeroRetrogen.getBiomeSupplier(blender.getBiomeSupplier(original), chunk);
+
+    if (supplier != original) {
+      op.call(blender, noiseConfig, structureAccessor, chunk);
+      return;
+    }
+
     FastBiomeGen.populateBiomes(chunk, supplier, sampler, noiseConfig, this.settings);
   }
 }

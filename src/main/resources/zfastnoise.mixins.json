@@ -6,10 +6,10 @@
     "perf.noise.NoiseChunkGeneratorMixin",
     "perf.biome.NoiseChunkGeneratorMixin",
     "perf.surface.SurfaceBuilderMixin",
+    "perf.surface.MaterialRuleContextMixin",
     "HeightmapAccessor",
     "ChunkNoiseSamplerAccessor",
-    "ChunkGeneratorAccessor",
-    "SurfaceBuilderAccessor"
+    "ChunkGeneratorAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
