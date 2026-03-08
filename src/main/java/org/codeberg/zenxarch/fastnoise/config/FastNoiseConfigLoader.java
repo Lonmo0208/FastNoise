@@ -16,7 +16,7 @@ public final class FastNoiseConfigLoader {
     loadDefaults();
   }
 
-  public static CommentedFileConfig getConfig() {
+  private static CommentedFileConfig getConfig() {
     return CommentedFileConfig.of(FMLPaths.CONFIGDIR.get().resolve(configFileName));
   }
 
