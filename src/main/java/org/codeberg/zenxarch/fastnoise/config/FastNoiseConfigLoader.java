@@ -25,9 +25,7 @@ public final class FastNoiseConfigLoader {
     if (value.isEmpty()) {
       CONFIG.set(entry.key(), entry.defaultValue());
     }
-    if (!CONFIG.containsComment(entry.key())) {
-      CONFIG.setComment(entry.key(), entry.comment());
-    }
+    CONFIG.setComment(entry.key(), entry.comment());
   }
 
   private static void initVersion() {
