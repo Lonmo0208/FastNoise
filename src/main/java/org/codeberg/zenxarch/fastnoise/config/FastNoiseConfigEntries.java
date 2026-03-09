@@ -33,7 +33,7 @@ public class FastNoiseConfigEntries {
               "Predict biomes in advance in surface builder. Major speedup for surface builder"
                   + "\n (depends on surface builder mixin)",
               true)
-          .incompatibleWith("modernfix");
+          .incompatibleWith("modernfix", "c2me");
 
   public static final BooleanConfigEntry MIXIN_PERF_BIOMES =
       mixin("perf.biome", "Replace populateBiomes with optimized implementation", true);
