@@ -1,7 +1,6 @@
-package org.codeberg.zenxarch.fastnoise.surface;
+package org.codeberg.zenxarch.fastnoise.surface.biome;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -9,7 +8,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.SingularPalette;
 
-public final class FastBiomeProvider implements Supplier<RegistryEntry<Biome>> {
+public final class FastBiomeProvider implements BiomeProvider {
 
   private RegistryEntry<Biome> biome;
   private boolean withinBounds;
@@ -18,15 +17,15 @@ public final class FastBiomeProvider implements Supplier<RegistryEntry<Biome>> {
   private int blockZ;
 
   private final RegistryEntry<Biome>[] singleBiomes;
-  private final Function<BlockPos, RegistryEntry<Biome>> biomeGetter;
+  private final Function<BlockPos, RegistryEntry<Biome>> posToBiome;
 
   private final BlockPos.Mutable mutable = new BlockPos.Mutable();
   private final int minY;
 
   @SuppressWarnings("unchecked")
-  public FastBiomeProvider(Chunk chunk, Function<BlockPos, RegistryEntry<Biome>> biomeGetter) {
+  public FastBiomeProvider(Chunk chunk, Function<BlockPos, RegistryEntry<Biome>> posToBiome) {
 
-    this.biomeGetter = biomeGetter;
+    this.posToBiome = posToBiome;
     this.minY = chunk.getBottomY();
 
     var sections = chunk.getSectionArray();
@@ -44,13 +43,23 @@ public final class FastBiomeProvider implements Supplier<RegistryEntry<Biome>> {
 
   @Override
   public RegistryEntry<Biome> get() {
-    if (biome == null) {
-      return this.biomeGetter.apply(mutable.set(blockX, blockY, blockZ));
-    }
+    if (biome == null) biome = compute();
     return biome;
   }
 
-  public RegistryEntry<Biome> getSingleBiome() {
+  private RegistryEntry<Biome> compute() {
+    var single = getSingleBiome();
+    if (single == null) {
+      return this.posToBiome.apply(mutable.set(blockX, blockY, blockZ));
+    }
+    return single;
+  }
+
+  private RegistryEntry<Biome> getSingleBiome() {
+    if (!withinBounds || !withinBounds(blockY)) {
+      return null;
+    }
+
     var y = blockY - minY;
     var ly = y & 0xF;
     var cy = y >> 4;
@@ -80,15 +89,10 @@ public final class FastBiomeProvider implements Supplier<RegistryEntry<Biome>> {
 
   public void updateY(int blockY) {
     this.blockY = blockY;
-    if (!withinBounds || !withinBounds(blockY)) {
-      biome = null;
-      return;
-    }
-
-    this.biome = getSingleBiome();
+    this.biome = null;
   }
 
   private boolean withinBounds(int i) {
-    return ((0x1 << i) & ~0b0011_1111_1111_1100) == 0;
+    return ((0x1 << (i & 0xF)) & ~0b0011_1111_1111_1100) == 0;
   }
 }

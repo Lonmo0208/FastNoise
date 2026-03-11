@@ -11,10 +11,14 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import net.minecraft.world.gen.noise.NoiseConfig;
 import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
+import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
+import org.codeberg.zenxarch.fastnoise.surface.biome.BiomeProvider;
+import org.codeberg.zenxarch.fastnoise.surface.biome.FastBiomeProvider;
+import org.codeberg.zenxarch.fastnoise.surface.biome.NoAllocationBiomeProvider;
 
 public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
 
-  private final FastBiomeProvider posToBiomeProvider;
+  private final BiomeProvider posToBiomeProvider;
 
   public MaterialRuleContext(
       SurfaceBuilder surfaceBuilder,
@@ -33,7 +37,10 @@ public class MaterialRuleContext extends MaterialRules.MaterialRuleContext {
         posToBiome,
         biomeRegistry,
         heightContext);
-    this.posToBiomeProvider = new FastBiomeProvider(chunk, posToBiome);
+    this.posToBiomeProvider =
+        FastNoiseConfig.OPTIMIZE_BIOME_ACCESS
+            ? new FastBiomeProvider(chunk, posToBiome)
+            : new NoAllocationBiomeProvider(posToBiome);
     this.biomeSupplier = this.posToBiomeProvider;
   }
 
