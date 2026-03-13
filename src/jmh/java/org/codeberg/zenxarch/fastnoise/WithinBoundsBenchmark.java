@@ -1,7 +1,6 @@
 package org.codeberg.zenxarch.fastnoise;
 
 import java.util.Random;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
