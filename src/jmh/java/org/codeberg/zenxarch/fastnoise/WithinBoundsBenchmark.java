@@ -12,14 +12,22 @@ public class WithinBoundsBenchmark {
 
   Random random = new Random();
 
+  private boolean withinBoundsOpt(int i) {
+    return ((0x1 << (i & 0xF)) & ~0b0011_1111_1111_1100) == 0;
+  }
+
   @Benchmark
   public void withinBoundsOpt(Blackhole hole) {
-    hole.consume(((0x1 << (random.nextInt() & 0xF)) & ~0b0011_1111_1111_1100) == 0);
+    hole.consume(withinBoundsOpt(random.nextInt()));
+  }
+
+  private boolean withinBoundsSimple(int i) {
+    var n = i & 0xF;
+    return n < 2 || n > 13;
   }
 
   @Benchmark
   public void withinBoundsSimple(Blackhole hole) {
-    var newInt = random.nextInt() & 0xF;
-    hole.consume(newInt < 2 || newInt > 13);
+    hole.consume(withinBoundsSimple(random.nextInt()));
   }
 }
