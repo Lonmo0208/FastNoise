@@ -103,12 +103,12 @@ jmh {
 	fork = 2
 	timeOnIteration = '1s'
 
-	// jvmArgsAppend = ["-XX:+UnlockDiagnosticVMOptions","-XX:+LogCompilation","-XX:+PrintAssembly"]
+	jvmArgsAppend = ["-XX:+UnlockDiagnosticVMOptions","-XX:CompileCommand=print,*WithinBoundsBenchmark.within*"]
 
 	warmup = '2s'
 	warmupIterations = 2
 
-	profilers = ['async']
+	// profilers = ['async']
 
 	zip64 = true
 }
