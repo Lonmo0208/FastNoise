@@ -62,6 +62,12 @@ public final class FastSectionCache {
     }
   }
 
+  public void setStateToDefault(int x, int y, int z) {
+    var index = index(x, z);
+    IS_DEFAULT[index] = setBit(IS_DEFAULT[index], y);
+    IS_SOLID[index] = setBit(IS_SOLID[index], y);
+  }
+
   public static enum STATE {
     AIR,
     WATER,

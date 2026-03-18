@@ -19,4 +19,9 @@ public final class FastChunkCache {
     var sy = (y - minY) >> 4;
     return caches[sy].getState(x, y & 0xF, z);
   }
+
+  public void setStateToDefaultBlock(int x, int y, int z) {
+    var sy = (y - minY) >> 4;
+    caches[sy].setStateToDefault(x, y & 0xF, z);
+  }
 }
