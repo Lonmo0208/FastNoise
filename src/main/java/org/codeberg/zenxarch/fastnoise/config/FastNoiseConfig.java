@@ -90,6 +90,79 @@ public class FastNoiseConfig {
 
   public static final UnmodifiableCommentedConfig CONFIG_WITH_OVERRIDES = getConfigWithOverrides();
 
+  private static void collectOverrides(
+      CommentedConfig config, ModMetadata meta, String key, boolean value) {
+    if (!config.contains(key)) {
+      FastNoiseConstants.LOGGER.error("Mod {} tried to override unknown key {}", meta.getId(), key);
+    } else {
+      FastNoiseConstants.LOGGER.info(
+          "Mod {} override key {} with value {}", meta.getId(), key, value);
+      config.set(key, value);
+    }
+  }
+
+  private static void collectOverrides(CommentedConfig config, ModMetadata meta, CvArray array) {
+    for (var value : array) {
+      if (!(value instanceof String string)) {
+        FastNoiseConstants.LOGGER.error(
+            "Mod {} has array of not strings as overrides", meta.getModId());
+        continue;
+      }
+      collectOverrides(config, meta, value.getAsString(), false);
+    }
+  }
+
+  private static void collectOverrides(CommentedConfig config, ModMetadata meta, CvObject object) {
+    for (var value : object) {
+      if (value.getValue().getType() != CvType.BOOLEAN) {
+        FastNoiseConstants.LOGGER.error(
+            "Mod {} has object of not booleans as overrides", meta.getModId());
+        continue;
+      }
+      collectOverrides(config, meta, value.getKey(), value.getValue().getAsBoolean());
+    }
+  }
+
+  private static void collectOverrides(CommentedConfig config) {
+    for (var container : FabricLoader.getInstance().getAllMods()) {
+      var meta = container.getMetadata();
+      if (!meta.containsCustomValue(overridesKey)) continue;
+
+      var value = meta.getCustomValue(overridesKey);
+      switch (value.getType()) {
+        case CvType.OBJECT -> collectOverrides(config, meta, value.getAsObject());
+        case CvType.ARRAY -> collectOverrides(config, meta, value.getAsArray());
+        case CvType.STRING -> collectOverrides(config, meta, value.getAsString(), false);
+        default ->
+            FastNoiseConstants.LOGGER.error(
+                "Mod {} has unsupported overrides of type {}",
+                container.getModId(),
+                value.getClass().getSimpleName());
+      }
+    }
+  }
+
+  private static void collectIncompats(CommentedConfig config) {
+    var loader = FabricLoader.getInstance();
+    for (var entry : FastNoiseConfigEntries.ENTRIES) {
+      for (var modId : entry.incompats()) {
+        if (loader.isModLoaded(modId)) config.set(entry.key(), false);
+      }
+    }
+  }
+
+  private static UnmodifiableCommentedConfig getConfigWithOverrides() {
+    var result = CommentedConfig.inMemory();
+    result.addAll(FastNoiseConfigLoader.CONFIG);
+
+    collectOverrides(result);
+    collectIncompats(result);
+
+    return result.unmodifiable();
+  }
+
+  public static final UnmodifiableCommentedConfig CONFIG_WITH_OVERRIDES = getConfigWithOverrides();
+
   static boolean get(BooleanConfigEntry entry) {
     return CONFIG_WITH_OVERRIDES.get(entry.key());
   }
@@ -102,61 +175,38 @@ public class FastNoiseConfig {
   public static final boolean OPTIMIZE_BIOME_ACCESS =
       get(FastNoiseConfigEntries.OPTIMIZE_BIOME_ACCESS);
 
-  private static void collectOverrides(
-      Object2BooleanArrayMap<String> map, ModInfo meta, String key, boolean value) {
-    if (!map.containsKey(key)) {
-      FastNoiseConstants.LOGGER.error(
-          "Mod {} tried to override unknown key {}", meta.getModId(), key);
-    } else {
-      FastNoiseConstants.LOGGER.info(
-          "Mod {} override key {} with value {}", meta.getModId(), key, value);
-      map.put(key, value);
-    }
-  }
-
-  private static void collectOverrides(
-      Object2BooleanArrayMap<String> map, ModInfo meta, List<?> array) {
-    for (var value : array) {
-      if (!(value instanceof String string)) {
-        FastNoiseConstants.LOGGER.error(
-            "Mod {} has array of not strings as overrides", meta.getModId());
-        continue;
-      }
-      collectOverrides(map, meta, string, false);
-    }
-  }
-
-  private static void collectOverrides(
-      Object2BooleanArrayMap<String> map, ModInfo meta, Map<?, ?> object) {
-    for (var value : object.keySet()) {
-      if (!(value instanceof String key)) continue;
-      if (!(object.get(value) instanceof Boolean bl)) {
-        FastNoiseConstants.LOGGER.error(
-            "Mod {} has object of not booleans as overrides", meta.getModId());
-        continue;
-      }
-      collectOverrides(map, meta, key, bl);
-    }
-  }
-
-  private static void collectOverrides(Object2BooleanArrayMap<String> map) {
-    for (var container : FMLLoader.getCurrent().getLoadingModList().getMods()) {
-      var meta = container.getConfigElement(overridesKey);
-      if (meta.isEmpty()) continue;
-
-      var value = meta.get();
-      switch (value) {
-        case Map<?, ?> otherMap -> collectOverrides(map, container, otherMap);
-        case List<?> list -> collectOverrides(map, container, list);
-        case String string -> collectOverrides(map, container, string, false);
-        default ->
-            FastNoiseConstants.LOGGER.error(
-                "Mod {} has unsupported overrides of type {}",
-                container.getModId(),
-                value.getClass().getSimpleName());
+  private static void collectIncompats(CommentedConfig config) {
+    var loader = FabricLoader.getInstance();
+    for (var entry : FastNoiseConfigEntries.ENTRIES) {
+      for (var modId : entry.incompats()) {
+        if (loader.isModLoaded(modId)) config.set(entry.key(), false);
       }
     }
   }
+
+  private static UnmodifiableCommentedConfig getConfigWithOverrides() {
+    var result = CommentedConfig.inMemory();
+    result.addAll(FastNoiseConfigLoader.CONFIG);
+
+    collectOverrides(result);
+    collectIncompats(result);
+
+    return result.unmodifiable();
+  }
+
+  public static final UnmodifiableCommentedConfig CONFIG_WITH_OVERRIDES = getConfigWithOverrides();
+
+  static boolean get(BooleanConfigEntry entry) {
+    return CONFIG_WITH_OVERRIDES.get(entry.key());
+  }
+
+  public static final boolean OPTIMIZE_END_BIOMES = get(FastNoiseConfigEntries.OPTIMIZE_END_BIOMES);
+  public static final boolean OPTIMIZE_FIXED_BIOMES =
+      get(FastNoiseConfigEntries.OPTIMIZE_FIXED_BIOMES);
+  public static final boolean SKIP_TRIVIAL_SURFACE_BUILDER =
+      get(FastNoiseConfigEntries.SKIP_TRIVIAL_SURFACE_BUILDER);
+  public static final boolean OPTIMIZE_BIOME_ACCESS =
+      get(FastNoiseConfigEntries.OPTIMIZE_BIOME_ACCESS);
 
   public static Object2BooleanMap<String> loadConfig() {
     var result = new Object2BooleanArrayMap<String>();

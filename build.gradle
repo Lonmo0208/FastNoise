@@ -130,13 +130,11 @@ modrinth {
 
   changelog = file("changelog.md").exists() ? file("changelog.md").getText() : ""
 
-  gameVersions = [project.minecraft_version]
-  loaders = ["neoforge"]
-  dependencies {
-    incompatible.project "noisiumforked"
-    incompatible.project "moonrise-opt"
-    incompatible.project "noisiumed"
-  }
+	gameVersions = [project.minecraft_version]
+	loaders = ["fabric", "quilt"]
+	dependencies {
+		incompatible.project "moonrise-opt"
+	}
 }
 
 // TODO: Uncomment after it is implemented
