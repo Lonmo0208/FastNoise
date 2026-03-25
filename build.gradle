@@ -131,7 +131,7 @@ modrinth {
   changelog = file("changelog.md").exists() ? file("changelog.md").getText() : ""
 
   gameVersions = [project.minecraft_version]
-  loaders = ["fabric", "quilt"]
+  loaders = ["neoforge"]
   dependencies {
     incompatible.project "moonrise-opt"
   }
