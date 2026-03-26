@@ -42,7 +42,7 @@ public final class FastChunkCache {
 
   public int nextNonSolidBlockY(int x, int startY, int z) {
     var y = startY - 1;
-    var cy = (startY - minY) >> 4;
+    var cy = (y - minY) >> 4;
 
     {
       var next = caches[cy].nextNonSolidBlock(x, y & 0xF, z);
