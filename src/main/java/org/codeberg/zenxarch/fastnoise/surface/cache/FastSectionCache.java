@@ -24,15 +24,8 @@ public final class FastSectionCache {
 
     for (int i = 0; i < palette.size; i++) {
       var state = fromBlockState(palette.get(i), defaultState);
-      switch (state) {
-        case AIR -> setBit(isDefault, i);
-        case WATER -> {}
-        case ORE -> setBit(isSolid, i);
-        case STONE -> {
-          setBit(isDefault, i);
-          setBit(isSolid, i);
-        }
-      }
+      if (state == STATE.STONE || state == STATE.AIR) isDefault = setBit(isDefault, i);
+      if (state == STATE.STONE || state == STATE.ORE) isSolid = setBit(isSolid, i);
     }
 
     for (int z = 0; z < 16; z++) {
