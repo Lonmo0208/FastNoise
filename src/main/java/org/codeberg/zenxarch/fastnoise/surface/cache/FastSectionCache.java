@@ -103,13 +103,13 @@ public final class FastSectionCache {
 
   public int nextNonSolidBlock(int x, int ly, int z) {
     var mask = (0x1 << (ly + 1)) - 1;
-    var value = IS_SOLID[index(x, z)] & mask;
+    var value = ~IS_SOLID[index(x, z)] & mask;
 
     return 31 - Integer.numberOfLeadingZeros(value);
   }
 
   public int nextNonSolidBlock(int x, int z) {
-    return 31 - Integer.numberOfLeadingZeros(IS_SOLID[index(x, z)]);
+    return 31 - Integer.numberOfLeadingZeros(~IS_SOLID[index(x, z)]);
   }
 
   public static enum STATE {
