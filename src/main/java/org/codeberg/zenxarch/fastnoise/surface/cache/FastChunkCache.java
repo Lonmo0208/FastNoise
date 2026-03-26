@@ -15,9 +15,9 @@ public final class FastChunkCache {
     this.minY = chunk.getBottomY();
   }
 
-  public boolean isEmpty(int x,int y,int z) {
+  public boolean isEmpty(int x, int y, int z) {
     var sy = (y - minY) >> 4;
-    return caches[sy].isEmpty(x,z);
+    return caches[sy].isEmpty(x, z);
   }
 
   public FastSectionCache.STATE getState(int x, int y, int z) {

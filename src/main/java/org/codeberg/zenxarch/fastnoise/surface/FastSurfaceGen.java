@@ -22,6 +22,7 @@ import net.minecraft.world.gen.surfacebuilder.MaterialRules;
 import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
 import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.mixin.SurfaceBuilderAccessor;
+import org.codeberg.zenxarch.fastnoise.surface.cache.FastChunkCache;
 
 public class FastSurfaceGen {
   public static void buildSurface(
@@ -74,18 +75,31 @@ public class FastSurfaceGen {
     final int endY = chunk.getBottomY();
     final int topY = chunk.getTopYInclusive();
 
+    RegistryEntry<Biome>[] surfaceBiomes = new RegistryEntry[256];
+
+    // TODO: just update the chunk cache instead
     for (int x = 0; x < 16; x++) {
       for (int z = 0; z < 16; z++) {
         int blockX = minBlockX + x;
         int blockZ = minBlockZ + z;
         int startingHeight = chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE_WG, x, z) + 1;
-        RegistryEntry<Biome> surfaceBiome =
-            biomeAccess.getBiome(
-                blockPos.set(blockX, useLegacyRandom ? 0 : startingHeight, blockZ));
+        var surfaceBiome =
+            surfaceBiomes[(x * 16) + z] =
+                biomeAccess.getBiome(
+                    blockPos.set(blockX, useLegacyRandom ? 0 : startingHeight, blockZ));
         if (surfaceBiome.matchesKey(BiomeKeys.ERODED_BADLANDS)) {
           columnPos.setX(blockX).setZ(blockZ);
           builder.zenxarch$placeBadlandsPillar(column, blockX, blockZ, startingHeight, chunk);
         }
+      }
+    }
+
+    final var chunkCache = new FastChunkCache(chunk, defaultState);
+
+    for (int x = 0; x < 16; x++) {
+      for (int z = 0; z < 16; z++) {
+        int blockX = minBlockX + x;
+        int blockZ = minBlockZ + z;
 
         int height = chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE_WG, x, z) + 1;
         context.initHorizontalContext(blockX, blockZ);
@@ -102,34 +116,47 @@ public class FastSurfaceGen {
 
         for (; y >= endY; y--) {
           final var section = column.getSection(y);
-          if (section.isEmpty()) { // skip whole section
+          if (chunkCache.isEmpty(x, y, z)) { // skip whole section
             y = y - (y & 0xF); // lowest y in current section;
             stoneAboveDepth = 0;
             waterHeight = Integer.MIN_VALUE;
             continue;
           }
-          BlockState old = section.getBlockState(x, y & 0xF, z);
-          if (old.isAir()) {
-            stoneAboveDepth = 0;
-            waterHeight = Integer.MIN_VALUE;
-          } else if (!old.getFluidState().isEmpty()) {
-            if (waterHeight == Integer.MIN_VALUE) {
-              waterHeight = y + 1;
-            }
-          } else {
-            if (nextCeilingStoneY >= y)
-              nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
 
-            stoneAboveDepth++;
-            int stoneBelowDepth = y - nextCeilingStoneY + 1;
-            context.initVerticalContext(
-                stoneAboveDepth, stoneBelowDepth, waterHeight, blockX, y, blockZ);
-            if (old == defaultState) {
+          switch (chunkCache.getState(x, y, z)) {
+            case AIR -> {
+              stoneAboveDepth = 0;
+              waterHeight = Integer.MIN_VALUE;
+            }
+            case WATER -> {
+              if (waterHeight == Integer.MIN_VALUE) {
+                waterHeight = y + 1;
+              }
+            }
+            case ORE -> {
+              if (nextCeilingStoneY >= y)
+                nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
+
+              stoneAboveDepth++;
+              int stoneBelowDepth = y - nextCeilingStoneY + 1;
+              context.initVerticalContext(
+                  stoneAboveDepth, stoneBelowDepth, waterHeight, blockX, y, blockZ);
+            }
+            case STONE -> {
+              if (nextCeilingStoneY >= y)
+                nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
+
+              stoneAboveDepth++;
+              int stoneBelowDepth = y - nextCeilingStoneY + 1;
+              context.initVerticalContext(
+                  stoneAboveDepth, stoneBelowDepth, waterHeight, blockX, y, blockZ);
               setBlockState(section, x, y, z, rule.tryApply(blockX, y, blockZ), column, chunk);
             }
           }
         }
 
+        // can't have it both be frozen ocean and eroded badlands
+        var surfaceBiome = surfaceBiomes[(x * 16) + z];
         if (surfaceBiome.matchesKey(BiomeKeys.FROZEN_OCEAN)
             || surfaceBiome.matchesKey(BiomeKeys.DEEP_FROZEN_OCEAN)) {
           columnPos.setX(blockX).setZ(blockZ);
@@ -140,7 +167,7 @@ public class FastSurfaceGen {
               blockPos,
               blockX,
               blockZ,
-              startingHeight);
+              height);
         }
       }
     }
