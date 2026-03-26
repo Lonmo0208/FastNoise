@@ -1,8 +1,8 @@
 package org.codeberg.zenxarch.fastnoise.surface.cache;
 
-import it.unimi.dsi.fastutil.shorts.ShortShortPair;
+import java.util.Arrays;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.ArrayPalette;
 
 public final class FastSectionCache {
   /*
@@ -18,38 +18,72 @@ public final class FastSectionCache {
     return x + (z << 4);
   }
 
-  public FastSectionCache(ChunkSection section, BlockState defaultState) {
+  public FastSectionCache(ArrayPalette<BlockState> palette, long[] data, BlockState defaultState) {
+    short isSolid = 0x0;
+    short isDefault = 0x0;
+
+    for (int i = 0; i < palette.size; i++) {
+      var state = fromBlockState(palette.get(i), defaultState);
+      switch (state) {
+        case AIR -> setBit(isDefault, i);
+        case WATER -> {}
+        case ORE -> setBit(isSolid, i);
+        case STONE -> {
+          setBit(isDefault, i);
+          setBit(isSolid, i);
+        }
+      }
+    }
+
     for (int z = 0; z < 16; z++) {
       for (int x = 0; x < 16; x++) {
-        var index = index(x, z);
-        var pair = fromColumn(section, defaultState, x, z);
-        IS_SOLID[index] = pair.leftShort();
-        IS_DEFAULT[index] = pair.rightShort();
+        fillFromColumn(palette, data, defaultState, x, z, isDefault, isSolid);
       }
     }
   }
 
-  private ShortShortPair fromColumn(ChunkSection section, BlockState defaultState, int x, int z) {
-    short isSolid = 0x0, isDefault = 0x0;
+  // empty section ctor
+  public FastSectionCache() {
+    // Arrays.fill(IS_SOLID, (short) 0x0); // not needed
+    Arrays.fill(IS_DEFAULT, (short) 0xFFFF);
+  }
+
+  private void fillFromColumn(
+      ArrayPalette<BlockState> palette,
+      long[] data,
+      BlockState defaultState,
+      int x,
+      int z,
+      short isDefault,
+      short isSolid) {
+    short risSolid = 0x0, risDefault = 0x0;
 
     for (int y = 0; y < 16; y++) {
-      var state = section.getBlockState(x, y, z);
-      if (state.isAir()) isDefault = setBit(isDefault, y);
-      else if (!state.getFluidState().isEmpty()) {
-      } else {
-        isSolid = setBit(isSolid, y);
-        if (state == defaultState) isDefault = setBit(isDefault, y);
-      }
+      var idx = (y << 4) + z;
+
+      var value = (int) ((data[idx] >> (x << 2)) & 0xF);
+
+      if (getBit(isDefault, value)) setBit(risDefault, y);
+      if (getBit(isSolid, value)) setBit(risSolid, y);
     }
 
-    return ShortShortPair.of(isSolid, isDefault);
+    var index = index(x, z);
+    IS_SOLID[index] = risSolid;
+    IS_DEFAULT[index] = risDefault;
   }
 
-  private short setBit(short in, int bitIdx) {
+  private static STATE fromBlockState(BlockState state, BlockState defaultState) {
+    if (state.isAir()) return STATE.AIR;
+    if (!state.getFluidState().isEmpty()) return STATE.WATER;
+    if (state == defaultState) return STATE.STONE;
+    return STATE.ORE;
+  }
+
+  private static short setBit(short in, int bitIdx) {
     return (short) (in | (0x1 << bitIdx));
   }
 
-  private boolean getBit(short in, int bitIdx) {
+  private static boolean getBit(short in, int bitIdx) {
     return ((in >> bitIdx) & 0x1) != 0x0;
   }
 
@@ -71,7 +105,7 @@ public final class FastSectionCache {
   public boolean isEmpty(int x, int z) {
     var index = index(x, z);
     if (IS_SOLID[index] != 0x0) return false;
-    return IS_DEFAULT[index] == ~((short) 0x0);
+    return IS_DEFAULT[index] == 0xFFFF;
   }
 
   public static enum STATE {

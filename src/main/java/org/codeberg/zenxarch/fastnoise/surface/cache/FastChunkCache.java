@@ -1,7 +1,9 @@
 package org.codeberg.zenxarch.fastnoise.surface.cache;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.SingularPalette;
 
 public final class FastChunkCache {
   private final FastSectionCache[] caches;
@@ -10,8 +12,16 @@ public final class FastChunkCache {
   public FastChunkCache(Chunk chunk, BlockState defaultState) {
     var sections = chunk.getSectionArray();
     this.caches = new FastSectionCache[sections.length];
-    for (int i = 0; i < sections.length; i++)
-      caches[i] = new FastSectionCache(sections[i], defaultState);
+    for (int i = 0; i < sections.length; i++) {
+      caches[i] =
+          switch (sections[i].blockStateContainer.data.palette()) {
+            case SingularPalette<BlockState> _ -> new FastSectionCache();
+            case ArrayPalette<BlockState> array ->
+                new FastSectionCache(
+                    array, sections[i].blockStateContainer.data.storage().getData(), defaultState);
+            default -> throw new IllegalStateException("Unexpected data found in chunk");
+          };
+    }
     this.minY = chunk.getBottomY();
   }
 
