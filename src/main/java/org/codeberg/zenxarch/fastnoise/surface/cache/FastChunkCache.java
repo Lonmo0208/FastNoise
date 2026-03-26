@@ -39,4 +39,24 @@ public final class FastChunkCache {
     var sy = (y - minY) >> 4;
     caches[sy].setStateToDefault(x, y & 0xF, z);
   }
+
+  public int nextNonSolidBlockY(int x, int startY, int z) {
+    var y = startY - 1;
+    var cy = (startY - minY) >> 4;
+
+    {
+      var next = caches[cy].nextNonSolidBlock(x, y & 0xF, z);
+      if (next != -1) return (cy << 4) + next + minY;
+    }
+
+    cy--;
+
+    while (cy >= 0) {
+      var next = caches[cy].nextNonSolidBlock(x, z);
+      if (next != -1) return (cy << 4) + next + minY;
+      cy--;
+    }
+
+    return minY - 1;
+  }
 }

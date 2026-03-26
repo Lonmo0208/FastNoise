@@ -101,6 +101,16 @@ public final class FastSectionCache {
     return IS_DEFAULT[index] == 0xFFFF;
   }
 
+  public int nextNonSolidBlock(int x, int ly, int z) {
+    var value = IS_SOLID[index(x, z)] & ((0x1 << ly) - 1);
+
+    return 15 - Integer.numberOfTrailingZeros(value);
+  }
+
+  public int nextNonSolidBlock(int x, int z) {
+    return 15 - Integer.numberOfTrailingZeros(IS_SOLID[index(x, z)]);
+  }
+
   public static enum STATE {
     AIR,
     WATER,

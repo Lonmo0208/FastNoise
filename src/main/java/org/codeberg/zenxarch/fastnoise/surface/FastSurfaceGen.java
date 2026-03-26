@@ -24,7 +24,6 @@ import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
 import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.mixin.SurfaceBuilderAccessor;
 import org.codeberg.zenxarch.fastnoise.surface.cache.FastChunkCache;
-import org.codeberg.zenxarch.fastnoise.surface.cache.FastSectionCache.STATE;
 
 public class FastSurfaceGen {
 
@@ -227,12 +226,9 @@ public class FastSurfaceGen {
       if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
       return wayBelowMinY;
     }
-    var y = startY - 1;
 
-    while (y >= minY) {
-      var state = chunkCache.getState(lx, y, lz);
-      if (state != STATE.ORE && state != STATE.STONE) return y;
-    }
+    var y = chunkCache.nextNonSolidBlockY(lx, startY, lz);
+    if (y >= minY) return y;
 
     if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
     return wayBelowMinY;
