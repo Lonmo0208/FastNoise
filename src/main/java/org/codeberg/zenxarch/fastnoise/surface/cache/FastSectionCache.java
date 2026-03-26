@@ -102,7 +102,8 @@ public final class FastSectionCache {
   }
 
   public int nextNonSolidBlock(int x, int ly, int z) {
-    var value = IS_SOLID[index(x, z)] & ((0x1 << ly) - 1);
+    var mask = (0x1 << (ly + 1)) - 1;
+    var value = IS_SOLID[index(x, z)] & mask;
 
     return 31 - Integer.numberOfLeadingZeros(value);
   }
