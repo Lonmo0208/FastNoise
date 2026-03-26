@@ -68,6 +68,12 @@ public final class FastSectionCache {
     IS_SOLID[index] = setBit(IS_SOLID[index], y);
   }
 
+  public boolean isEmpty(int x,int z) {
+    var index = index(x, z);
+    if (IS_SOLID[index] != 0x0) return false;
+    return IS_DEFAULT[index] == ~((short) 0x0);
+  }
+
   public static enum STATE {
     AIR,
     WATER,
