@@ -10,6 +10,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.PalettedContainer;
@@ -25,6 +26,19 @@ import org.codeberg.zenxarch.fastnoise.mixin.SurfaceBuilderAccessor;
 import org.codeberg.zenxarch.fastnoise.surface.cache.FastChunkCache;
 
 public class FastSurfaceGen {
+
+  public static boolean canUseSurfaceBuilder(Chunk chunk) {
+    var sections = chunk.getSectionArray();
+    for (int i = 0; i < sections.length; i++) {
+      var config = sections[i].blockStateContainer.data.configuration();
+      var palette = sections[i].blockStateContainer.data.palette();
+      if (palette instanceof SingularPalette) continue;
+      if (palette instanceof ArrayPalette && config.bitsInMemory() == 4) continue;
+      return false;
+    }
+    return true;
+  }
+
   public static void buildSurface(
       SurfaceBuilderAccessor builder,
       final NoiseConfig noiseConfig,
@@ -92,6 +106,10 @@ public class FastSurfaceGen {
           builder.zenxarch$placeBadlandsPillar(column, blockX, blockZ, startingHeight, chunk);
         }
       }
+    }
+
+    if (!canUseSurfaceBuilder(chunk)) {
+      throw new IllegalStateException("Some mod has made unexpected changes to chunk gen");
     }
 
     final var chunkCache = new FastChunkCache(chunk, defaultState);
