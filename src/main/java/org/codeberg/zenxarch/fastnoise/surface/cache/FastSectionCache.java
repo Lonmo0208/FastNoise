@@ -15,7 +15,7 @@ public final class FastSectionCache {
   private final short[] IS_DEFAULT = new short[256];
 
   private static int index(int x, int z) {
-    return x + z << 4;
+    return x + (z << 4);
   }
 
   public FastSectionCache(ChunkSection section, BlockState defaultState) {
