@@ -63,8 +63,8 @@ public final class FastSectionCache {
 
       var value = (int) ((data[idx] >> (x << 2)) & 0xF);
 
-      if (getBit(isDefault, value)) setBit(risDefault, y);
-      if (getBit(isSolid, value)) setBit(risSolid, y);
+      if (getBit(isDefault, value)) risDefault = setBit(risDefault, y);
+      if (getBit(isSolid, value)) risSolid = setBit(risSolid, y);
     }
 
     var index = index(x, z);
