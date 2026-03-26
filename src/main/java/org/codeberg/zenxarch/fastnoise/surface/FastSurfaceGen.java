@@ -24,6 +24,7 @@ import net.minecraft.world.gen.surfacebuilder.SurfaceBuilder;
 import org.codeberg.zenxarch.fastnoise.config.FastNoiseConfig;
 import org.codeberg.zenxarch.fastnoise.mixin.SurfaceBuilderAccessor;
 import org.codeberg.zenxarch.fastnoise.surface.cache.FastChunkCache;
+import org.codeberg.zenxarch.fastnoise.surface.cache.FastSectionCache.STATE;
 
 public class FastSurfaceGen {
 
@@ -153,7 +154,8 @@ public class FastSurfaceGen {
             }
             case ORE -> {
               if (nextCeilingStoneY >= y)
-                nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
+                nextCeilingStoneY =
+                    nextNonDefaultBlock(builder, sections, y, endY, x, z, chunkCache) + 1;
 
               stoneAboveDepth++;
               int stoneBelowDepth = y - nextCeilingStoneY + 1;
@@ -162,7 +164,8 @@ public class FastSurfaceGen {
             }
             case STONE -> {
               if (nextCeilingStoneY >= y)
-                nextCeilingStoneY = nextNonDefaultBlock(builder, sections, y, endY, x, z) + 1;
+                nextCeilingStoneY =
+                    nextNonDefaultBlock(builder, sections, y, endY, x, z, chunkCache) + 1;
 
               stoneAboveDepth++;
               int stoneBelowDepth = y - nextCeilingStoneY + 1;
@@ -217,42 +220,22 @@ public class FastSurfaceGen {
       int startY,
       int minY,
       int lx,
-      int lz) {
+      int lz,
+      FastChunkCache chunkCache) {
     final int wayBelowMinY = DimensionType.field_35479;
     if (startY <= minY) {
       if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
       return wayBelowMinY;
     }
     var y = startY - 1;
-    var cy = (y - minY) >> 4;
 
-    {
-      var next = getNextNonDefaultBlock(sections[cy], lx, y & 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY;
-    }
-
-    cy--;
-
-    while (cy >= 0) {
-      var next = getNextNonDefaultBlock(sections[cy], lx, 0xF, lz, builder);
-      if (next != -1) return (cy << 4) + next + minY;
-      cy--;
+    while (y >= minY) {
+      var state = chunkCache.getState(lx, y, lz);
+      if (state != STATE.ORE && state != STATE.STONE) return y;
     }
 
     if (!builder.zenxarch$isDefaultBlock(VOID_AIR)) return minY - 1;
     return wayBelowMinY;
-  }
-
-  private static int getNextNonDefaultBlock(
-      final ChunkSection section, int lx, int ly, int lz, SurfaceBuilderAccessor builder) {
-    var index = lx + (lz << 4) + (ly << 8);
-    var palette = section.blockStateContainer.data.palette();
-    var storage = section.blockStateContainer.data.storage();
-    while (index >= 0) {
-      if (!builder.zenxarch$isDefaultBlock(palette.get(storage.get(index)))) return index >> 8;
-      index -= 256;
-    }
-    return -1;
   }
 
   private static boolean canSkipSurfaceBuilder(

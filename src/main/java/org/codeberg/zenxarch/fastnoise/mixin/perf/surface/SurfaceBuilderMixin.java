@@ -43,7 +43,7 @@ public abstract class SurfaceBuilderMixin {
           chunk,
           chunkNoiseSampler,
           materialRule);
-          return;
+      return;
     }
     FastSurfaceGen.buildSurface(
         (SurfaceBuilderAccessor) this,
