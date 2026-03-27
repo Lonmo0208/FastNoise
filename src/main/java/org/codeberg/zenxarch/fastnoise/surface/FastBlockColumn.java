@@ -57,8 +57,8 @@ public class FastBlockColumn implements BlockColumn {
   private ChunkSection zenxarch$getSection(final int y) {
     columnPos.setY(y);
     var cy = getSectionIndex(y);
-    if (y < 0 || y >= sections.length) return null;
-    return getSection(y);
+    if (cy < 0 || cy >= sections.length) return null;
+    return this.sections[cy];
   }
 
   @Override
