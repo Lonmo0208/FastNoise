@@ -86,13 +86,6 @@ public class FastBlockColumn implements BlockColumn {
     }
   }
 
-  public void fastSetState(ChunkSection section, int lx, int ly, int lz, BlockState state) {
-
-    if (!state.getFluidState().isEmpty()) {
-      chunk.markBlockForPostProcessing(columnPos);
-    }
-  }
-
   public void fastUpdateHeightmap(int lx, int lz, int iy, BlockState state) {
     final int y = iy - minY;
     for (int i = 0; i < heightmapData.length; i++) {
