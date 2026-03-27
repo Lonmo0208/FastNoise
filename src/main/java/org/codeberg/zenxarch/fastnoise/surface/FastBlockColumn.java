@@ -75,6 +75,9 @@ public class FastBlockColumn implements BlockColumn {
   public void setState(int y, BlockState state) {
     var section = zenxarch$getSection(y);
 
+    // out of bounds
+    if (section == null) return;
+
     int lx = columnPos.getX() & 0xF;
     int lz = columnPos.getZ() & 0xF;
 
