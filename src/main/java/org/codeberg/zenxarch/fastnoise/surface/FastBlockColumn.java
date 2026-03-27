@@ -19,7 +19,6 @@ public class FastBlockColumn implements BlockColumn {
   private final Chunk chunk;
   private final BlockPos.Mutable columnPos;
   private final int minY;
-  private final int maxY;
   private final PaletteStorage[] heightmapData;
   private final ChunkSection[] sections;
 
@@ -37,7 +36,6 @@ public class FastBlockColumn implements BlockColumn {
     this.chunk = chunk;
     this.columnPos = columnPos;
     this.minY = this.chunk.getBottomY();
-    this.maxY = this.chunk.getTopYInclusive();
     this.heightmapData = new PaletteStorage[heightmaps.length];
 
     for (int i = 0; i < heightmapData.length; i++) {
@@ -58,7 +56,8 @@ public class FastBlockColumn implements BlockColumn {
 
   private ChunkSection zenxarch$getSection(final int y) {
     columnPos.setY(y);
-    if (y < minY || y > maxY) return null;
+    var cy = getSectionIndex(y);
+    if (y < 0 || y >= sections.length) return null;
     return getSection(y);
   }
 
