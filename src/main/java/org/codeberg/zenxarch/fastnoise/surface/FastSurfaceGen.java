@@ -82,7 +82,7 @@ public class FastSurfaceGen {
             biomeAccess.getBiome(
                 blockPos.set(blockX, useLegacyRandom ? 0 : startingHeight, blockZ));
         if (surfaceBiome.matchesKey(BiomeKeys.ERODED_BADLANDS)) {
-          column.updateXZ(blockX, blockZ);
+          column.updateXZ(x, z);
           builder.zenxarch$placeBadlandsPillar(column, blockX, blockZ, startingHeight, chunk);
         }
 
@@ -131,7 +131,7 @@ public class FastSurfaceGen {
 
         if (surfaceBiome.matchesKey(BiomeKeys.FROZEN_OCEAN)
             || surfaceBiome.matchesKey(BiomeKeys.DEEP_FROZEN_OCEAN)) {
-          column.updateXZ(blockX, blockZ);
+          column.updateXZ(x, z);
           builder.zenxarch$placeIceberg(
               context.estimateSurfaceHeight(),
               surfaceBiome.value(),

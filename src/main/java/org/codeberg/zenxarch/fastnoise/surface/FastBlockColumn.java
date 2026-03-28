@@ -48,8 +48,8 @@ public class FastBlockColumn implements BlockColumn {
   }
 
   public void updateXZ(int x, int z) {
-    this.lx = x & 0xF;
-    this.lz = z & 0xF;
+    this.lx = x;
+    this.lz = z;
   }
 
   public int getSectionIndex(int y) {
