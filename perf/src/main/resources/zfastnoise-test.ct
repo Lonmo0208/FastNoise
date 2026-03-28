@@ -19,3 +19,10 @@ accessible method net/minecraft/world/gen/chunk/ChunkNoiseSampler createMultiNoi
 
 accessible field net/minecraft/world/chunk/Chunk chunkNoiseSampler Lnet/minecraft/world/gen/chunk/ChunkNoiseSampler;
 accessible method net/minecraft/world/gen/chunk/NoiseChunkGenerator populateBiomes (Lnet/minecraft/world/gen/chunk/Blender;Lnet/minecraft/world/gen/noise/NoiseConfig;Lnet/minecraft/world/gen/StructureAccessor;Lnet/minecraft/world/chunk/Chunk;)V
+
+## section
+
+accessible field net/minecraft/world/chunk/ChunkSection nonEmptyBlockCount S
+accessible field net/minecraft/world/chunk/ChunkSection nonEmptyFluidCount S
+accessible field net/minecraft/world/chunk/ChunkSection randomTickableBlockCount S
+accessible field net/minecraft/world/chunk/ChunkSection randomTickableFluidCount S

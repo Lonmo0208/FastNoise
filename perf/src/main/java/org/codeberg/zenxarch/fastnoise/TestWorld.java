@@ -167,6 +167,9 @@ public final class TestWorld {
         dumpPalette(a, b, self[i], other[i], i);
         throw new IllegalStateException("Chunk sections blocks differ");
       }
+      if (!matchesCounts(self[i], other[i])) {
+        throw new IllegalStateException("Chunk sections block counts differ");
+      }
     }
 
     for (var heightmap : a.getHeightmaps()) {
@@ -217,6 +220,13 @@ public final class TestWorld {
     var result = new Object[size];
     for (int i = 0; i < size; i++) result[i] = palette.get(i);
     return Arrays.toString(result);
+  }
+
+  private static boolean matchesCounts(ChunkSection a, ChunkSection b) {
+    return (a.nonEmptyBlockCount == b.nonEmptyBlockCount
+        && a.nonEmptyFluidCount == b.nonEmptyFluidCount
+        && a.randomTickableBlockCount == b.randomTickableBlockCount
+        && a.randomTickableFluidCount == b.randomTickableFluidCount);
   }
 
   private static <T> boolean matches(
