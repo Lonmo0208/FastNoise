@@ -34,7 +34,7 @@ public abstract class SurfaceBuilderMixin {
       final ChunkNoiseSampler chunkNoiseSampler,
       final MaterialRules.MaterialRule materialRule,
       Operation<Void> op) {
-    if (!FastNoiseConfig.ENABLED) {
+    if (!FastNoiseConfig.ENABLED || chunk.hasBelowZeroRetrogen()) {
       op.call(
           noiseConfig,
           biomeAccess,
@@ -46,6 +46,7 @@ public abstract class SurfaceBuilderMixin {
           materialRule);
       return;
     }
+
     FastSurfaceGen.buildSurface(
         (SurfaceBuilderAccessor) this,
         noiseConfig,
