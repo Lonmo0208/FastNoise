@@ -28,6 +28,7 @@ import org.codeberg.zenxarch.fastnoise.surface.cache.FastChunkCache;
 public class FastSurfaceGen {
 
   public static boolean canUseSurfaceBuilder(Chunk chunk) {
+    if (chunk.hasBelowZeroRetrogen()) return false;
     var sections = chunk.getSectionArray();
     for (int i = 0; i < sections.length; i++) {
       var config = sections[i].blockStateContainer.data.configuration();
