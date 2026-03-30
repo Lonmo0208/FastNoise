@@ -13,7 +13,6 @@ import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.ArrayPalette;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.PalettedContainer;
 import net.minecraft.world.chunk.SingularPalette;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.HeightContext;
@@ -57,18 +56,6 @@ public class FastSurfaceGen {
       return;
     }
 
-    var sections = chunk.getSectionArray();
-    @SuppressWarnings("unchecked")
-    RegistryEntry<Biome>[] singleBiomes = new RegistryEntry[sections.length];
-    for (int i = 0; i < sections.length; i++) {
-      var container = (PalettedContainer<RegistryEntry<Biome>>) sections[i].biomeContainer;
-      if (container.data.palette() instanceof SingularPalette<RegistryEntry<Biome>> single) {
-        singleBiomes[i] = single.entry;
-      } else {
-        singleBiomes[i] = null;
-      }
-    }
-
     final ChunkPos chunkPos = chunk.getPos();
     int minBlockX = chunkPos.getStartX();
     int minBlockZ = chunkPos.getStartZ();
@@ -81,8 +68,7 @@ public class FastSurfaceGen {
             chunkNoiseSampler,
             biomeAccess::getBiome,
             biomeRegistry,
-            heightContext,
-            singleBiomes);
+            heightContext);
     var rule = materialRule.apply(context);
     BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
