@@ -68,11 +68,10 @@ public class FastSurfaceGen {
       }
     }
 
-    final BlockPos.Mutable columnPos = new BlockPos.Mutable();
     final ChunkPos chunkPos = chunk.getPos();
     int minBlockX = chunkPos.getStartX();
     int minBlockZ = chunkPos.getStartZ();
-    var column = new FastBlockColumn(chunk, columnPos);
+    var column = new FastBlockColumn(chunk);
     var context =
         new MaterialRuleContext(
             (SurfaceBuilder) (Object) builder,
@@ -102,7 +101,7 @@ public class FastSurfaceGen {
                 biomeAccess.getBiome(
                     blockPos.set(blockX, useLegacyRandom ? 0 : startingHeight, blockZ));
         if (surfaceBiome.matchesKey(BiomeKeys.ERODED_BADLANDS)) {
-          columnPos.setX(blockX).setZ(blockZ);
+          column.updateXZ(x, z);
           builder.zenxarch$placeBadlandsPillar(column, blockX, blockZ, startingHeight, chunk);
         }
       }
@@ -179,7 +178,7 @@ public class FastSurfaceGen {
         var surfaceBiome = surfaceBiomes[(x * 16) + z];
         if (surfaceBiome.matchesKey(BiomeKeys.FROZEN_OCEAN)
             || surfaceBiome.matchesKey(BiomeKeys.DEEP_FROZEN_OCEAN)) {
-          columnPos.setX(blockX).setZ(blockZ);
+          column.updateXZ(x, z);
           builder.zenxarch$placeIceberg(
               context.estimateSurfaceHeight(),
               surfaceBiome.value(),
