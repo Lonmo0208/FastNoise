@@ -9,7 +9,8 @@
     "HeightmapAccessor",
     "ChunkNoiseSamplerAccessor",
     "ChunkGeneratorAccessor",
-    "SurfaceBuilderAccessor"
+    "SurfaceBuilderAccessor",
+    "MultiNoiseBiomeSourceAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

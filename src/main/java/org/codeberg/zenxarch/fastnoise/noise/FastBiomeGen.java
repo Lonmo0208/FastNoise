@@ -4,6 +4,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeSupplier;
 import net.minecraft.world.biome.source.FixedBiomeSource;
+import net.minecraft.world.biome.source.MultiNoiseBiomeSource;
 import net.minecraft.world.biome.source.TheEndBiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil.MultiNoiseSampler;
@@ -50,6 +51,10 @@ public final class FastBiomeGen {
           createSampler(sampler, config, settings));
       return;
     }
+
+    if (FastNoiseConfig.OPTIMIZE_BIOME_TREE
+        && supplier instanceof MultiNoiseBiomeSource multiNoise) {}
+
     populateBiomes(chunk, supplier, createSampler(sampler, config, settings));
   }
 
