@@ -41,7 +41,7 @@ remapJar {
 dependencies {
   // To change the versions see the gradle.properties file
   minecraft "com.mojang:minecraft:${project.minecraft_version}"
-  neoForge "net.neoforged:neoforge:${project.neo_version}"
+  forgeUserdev "net.neoforged:neoforge:${project.neo_version}:userdev"
   mappings loom.layered {
     it.mappings "org.relativitymc:modern-yarn:${project.yarn_mappings}:v2"
     it.mappings "org.relativitymc:modern-yarn-mappings-patch-neoforge:${project.yarn_mappings_patch}"
