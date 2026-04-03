@@ -99,6 +99,7 @@ public class FastSurfaceGen {
     }
 
     final var chunkCache = new FastChunkCache(chunk, defaultState);
+    var sections = chunk.getSectionArray();
 
     for (int x = 0; x < 16; x++) {
       for (int z = 0; z < 16; z++) {
