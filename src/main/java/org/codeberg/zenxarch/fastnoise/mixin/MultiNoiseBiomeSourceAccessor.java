@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(MultiNoiseBiomeSource.class)
 public interface MultiNoiseBiomeSourceAccessor {
   @Invoker("getBiomeEntries")
-  public Entries<RegistryEntry<Biome>> getBiomeEntries();
+  public Entries<RegistryEntry<Biome>> zenxarch$getBiomeEntries();
 }

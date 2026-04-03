@@ -10,7 +10,8 @@
     "ChunkNoiseSamplerAccessor",
     "ChunkGeneratorAccessor",
     "SurfaceBuilderAccessor",
-    "MultiNoiseBiomeSourceAccessor"
+    "MultiNoiseBiomeSourceAccessor",
+    "EntriesAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
