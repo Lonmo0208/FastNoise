@@ -14,7 +14,7 @@ public class FastNoiseConfigEntries {
           .incompatibleWith("biolith");
 
   public static final BooleanConfigEntry OPTIMIZE_BIOME_TREE =
-      of("perf.biomes.tree", "Optimize biome tree by avoiding multiple calls to thread local", true)
+      of("perf.biomes.tree", "Optimize biome tree by avoiding multiple calls to thread local", false)
           .incompatibleWith("biolith");
 
   public static final BooleanConfigEntry OPTIMIZE_FIXED_BIOMES =
